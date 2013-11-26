@@ -16,5 +16,5 @@ the signatures of the added functions and browse the web on how to use the nativ
 Documentation
 -------------
 
-The docs are generated using [jsdoc3]{https://github.com/jsdoc3/jsdoc} and included in this repo.
-An ugly yet working version is available at the [project root]{http://espretto.github.io/Stryng/} URL.
+The docs are generated using [jsdoc3](https://github.com/jsdoc3/jsdoc) and included in this repo.
+An ugly yet working version is available at the [project root](http://espretto.github.io/Stryng/) URL.
