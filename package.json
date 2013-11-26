@@ -1,5 +1,5 @@
 {
-  "name": "Stringen",
+  "name": "Stryng",
   "version": "0.0.1",
   "devDependencies": {
     "benchmark": "~1.0.0",
