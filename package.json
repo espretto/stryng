@@ -1,0 +1,9 @@
+{
+  "name": "Stringen",
+  "version": "0.0.1",
+  "devDependencies": {
+    "benchmark": "~1.0.0",
+    "should": "~2.1.0",
+    "jsdoc": "~3.3.0-alpha2"
+  }
+}
