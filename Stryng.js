@@ -2,7 +2,15 @@
  * @file 
  * @see [article on generics]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#String_generic_methods} at MDN.
  * @version 0.0.1
- * @author Marius Runge <espretto@gmail.com>
+ * @author <espretto@gmail.com>
+ */
+
+/**
+ * @todo better design patterns
+ * do not pass boolean flags
+ * do not expect null
+ * provide a context to exceptions
+ * defensive programming
  */
 
 // https://github.com/umdjs/umd/blob/master/returnExports.js
@@ -28,7 +36,7 @@
             _Stryng = root.Stryng;
 
         /**
-         * availabel in browsers only.
+         * available in browsers only.
          * restores whatever was assigned to <code>Stryng</code> before
          * @function Stryng.noConflict
          * @returns Stryng
@@ -154,22 +162,22 @@
     is =
     {
         // 'Arguments': function(o){ return toString.call(o) === is.ObjectArguments || o && o.callee != null },
-        'Array': Array.isArray || function(o){ toString.call(o) === is.ObjectArray },
+        'Array': Array.isArray || function(o){ return toString.call(o) === is.ObjectArray },
         // 'Boolean': function(o){ return typeof o === is.TypeBoolean || toString.call(o) === is.ObjectBoolean },
         // 'Date': function(o){ return toString.call(o) === is.ObjectDate }
-        'Function': function(o){ typeof o === is.TypeFunction || toString.call(o) === is.ObjectFunction },
+        'Function': function(o){ return typeof o === is.TypeFunction || toString.call(o) === is.ObjectFunction },
         // 'Number': function(o){ return typeof o === is.TypeNumber || toString.call(o) === is.ObjectNumber},
         // 'Object': function(o){ return toString.call(o) === is.ObjectObject},
-        'RegExp': function(o){ toString.call(o) === is.ObjectRegExp },
-        'String': function(o){ typeof o === is.TypeString || toString.call(o) === is.ObjectString }
+        'RegExp': function(o){ return toString.call(o) === is.ObjectRegExp },
+        'String': function(o){ return typeof o === is.TypeString || toString.call(o) === is.ObjectString }
     }
 
     ; // end var block
 
     forOwn.call(is, function(fn, type){
 
-        this['Type' + type] = type.toLowerCase();
-        this['Object' + type] = '[object ' + type + ']';
+        is['Type' + type] = type.toLowerCase();
+        is['Object' + type] = '[object ' + type + ']';
     });
 
     ///////////////////////
@@ -178,7 +186,7 @@
 
     function exit(path, args)
     {
-        throw new Error('invalid usage of ' + fnName + ' with given args [' + slice.call(args) + ']');
+        throw new Error('invalid usage of "' + fnName + '" with given args [' + slice.call(args) + ']');
     }
 
     // works on the array - does not copy
@@ -360,9 +368,8 @@
             }
             else
             {
-                for(var index = input.indexOf(search); index !== -1;)
+                for(var index = input.indexOf(search); index !== -1; count++)
                 {
-                    count++;
                     index = input.indexOf(search, index + i);
                 }
             }
@@ -1103,7 +1110,7 @@
          * @function Stryng.isNumeric
          * @param  {string}  input
          * @return {boolean} whether the string is numeric
-         * @throws {(Error|TypeError)} if any required argument is missing
+         * @throws {Error} if any required argument is missing
          * @example
          * // returns false
          * Stryng.isNumeric('123,00')
@@ -1198,6 +1205,7 @@
         /**
          * generates a string of random characters
          * which default to the ASCII printables.
+         * @function Stryng.random
          * @param  {number} n
          *   length. parsed by {@link Stryng.toNat}
          * @param  {(number|string)} [from=32]
@@ -1378,7 +1386,7 @@
     ////////////
     // native //
     ////////////
-    
+
     forEach.call(methods, function(fnName){
 
         var fn = ''[fnName];
@@ -1393,7 +1401,7 @@
                 // and then again to a string '[object global]' on node
                 if(arguments[0] == null)
                 {
-                    throw new TypeError('Cannot call ' + fnName + ' of undefined');
+                    throw new Error('Cannot call ' + fnName + ' of undefined');
                 }
 
                 return Function.call.apply(fn, arguments);
@@ -1467,8 +1475,8 @@
             }
         });
 
-        // strip last '&' or initial '?'
-        return result.slice(0 -1);
+        // strip last '&' or initial '?' if object is empty
+        return result.slice(0, -1);
     }
 
     /**
