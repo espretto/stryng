@@ -2,6 +2,8 @@
 Stryng = require('./../Stryng.js');
 expect = require('chai').expect;
 
+// checkout sinonjs.org
+
 describe('Stryng', function(){
 
 
