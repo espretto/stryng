@@ -1,17 +1,6 @@
 
 Stryng = require('./../Stryng.js');
-Benchmark = require('benchmark');
 expect = require('chai').expect;
-
-Benchmark.Suite.options.onCycle = function(e)
-{
-	console.log(String(e.target));
-};
-
-Benchmark.Suite.options.onError = function(e)
-{
-	console.log(e.target.error);
-};
 
 // checkout sinonjs.org
 
@@ -69,42 +58,5 @@ describe('Stryng', function(){
 		    expect(Stryng.trimRight(padded)).to.equal(msg);
 
 		});
-
-		describe('benchmarks', function(){
-
-	    	it('trimRight', function (done) {
-		
-	    		this.timeout(0);
-
-				var
-
-				ws = '\u0009\u000A\u000B\u000C'
-			       + '\u00A0\u000D\u0020\u1680'
-			       + '\u180E\u2000\u2001\u2002'
-			       + '\u2003\u2004\u2005\u2006'
-			       + '\u2007\u2008\u2009\u200A'
-			       + '\u2028\u2029\u202F\u205F'
-			       + '\u3000\uFEFF',
-
-			    msg = 'Hello World',
-
-			    padded = msg + ws;
-
-				Benchmark.Suite()
-
-					.on('complete', function(){
-						console.log('fastest:' + this.filter('fastest').pluck('name'));
-						done();
-					})
-					.add('Stryng.trimRight()', function() {
-						Stryng.trimRight(padded);
-					})
-					.add('Stryng.trimRight2()', function() {
-						Stryng.trimRight2(padded);
-					})
-					.run()
-
-				});
-		    });
 	});
 });
