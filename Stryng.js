@@ -20,20 +20,21 @@
     {
         // AMD. Register as an anonymous module.
         define(factory);
-
     }
-    else if(typeof exports === 'object' && module.exports)
+    else if(typeof module === 'object' && module.exports)
     {
-        // Node. Does not work with strict CommonJS,
-        // but only CommonJS-like enviroments
-        // that support module.exports, like Node.
+        // strict CommonJS
         module.exports = factory();
+    }
+    else if(typeof exports === 'object')
+    {
+        // NodeJS
+        exports = factory();
     }
     else
     {
-        // Browser globals (root is window)
-        var Stryng = factory(),
-            _Stryng = root.Stryng;
+        var _Stryng = root.Stryng,
+            Stryng = factory();
 
         /**
          * available in browsers only.
@@ -59,7 +60,7 @@
 
     methods = [
 
-        'charAt', 'charCodeAt', 'codePointAt', 'contains',
+        'charAt', 'charCodeAt', 'codePointAt', 'concat', 'contains',
         'endsWith', 'fromCodePoint', 'indexOf', 'lastIndexOf',
         'localeCompare', 'match', 'normalize', 'replace', 'search',
         'slice', 'split', 'startsWith', 'substr', 'substring',
@@ -123,12 +124,6 @@
 
     fromCharCode = String.fromCharCode,
 
-    isFinite = isFinite,
-
-    encodeURIComponent = encodeURIComponent,
-
-    decodeURIComponent = decodeURIComponent,
-
     ///////////////////////////////////////
     // regular expressions (precompiled) //
     ///////////////////////////////////////
@@ -137,48 +132,59 @@
 
     reWord = /\w/,
 
-    reWhitespace = /\s+/,
-
-    reNotWhitespace = /\S/,
-
     reQuote = /^['|"]+|["|']+$/g,
-
-    reNotPrintable = (function(begin, end, i, max){
-
-        while(++i !== max)
-        {
-            // escape them all
-            begin += '\\' + fromCharCode(i);
-        }
-
-        return new RegExp(begin + end);
-
-    })('[^', ']', 31, 127),
 
     /////////////////////////
     // class / type checks //
     /////////////////////////
-    
-    is =
+
+    is = {
+        // 'Arguments': function(o){ return toString.call(o) === '[object Arguments]' || o && o.callee != null },
+        'Array': Array.isArray || function(o){ return toString.call(o) === '[object Array]' },
+        // 'Boolean': function(o){ return typeof o === 'boolean' || toString.call(o) === '[object Boolean]' },
+        // 'Date': function(o){ return toString.call(o) === '[object Date]' }
+        'Function': function(o){ return typeof o === 'function' || toString.call(o) === '[object Function]' },
+        // 'Number': function(o){ return typeof o === 'number' || toString.call(o) === '[object Number]' },
+        // 'Object': function(o){ return toString.call(o) === '[object Object]' },
+        'RegExp': function(o){ return toString.call(o) === '[object RegExp]' },
+        'String': function(o){ return typeof o === 'string' || toString.call(o) === '[object String]' }
+    },
+
+    /////////////////////////////////
+    // shim whitespace recognition //
+    /////////////////////////////////
+
+    ws = '\u0009\u000A\u000B\u000C'
+       + '\u00A0\u000D\u0020\u1680'
+       + '\u180E\u2000\u2001\u2002'
+       + '\u2003\u2004\u2005\u2006'
+       + '\u2007\u2008\u2009\u200A'
+       + '\u2028\u2029\u202F\u205F'
+       + '\u3000\uFEFF',
+
+    strWS = '\\s',
+    reWS  = /\s/; // new RegExp(strWS)
+
+    for(var i = ws.length; i--;)
     {
-        // 'Arguments': function(o){ return toString.call(o) === is.ObjectArguments || o && o.callee != null },
-        'Array': Array.isArray || function(o){ return toString.call(o) === is.ObjectArray },
-        // 'Boolean': function(o){ return typeof o === is.TypeBoolean || toString.call(o) === is.ObjectBoolean },
-        // 'Date': function(o){ return toString.call(o) === is.ObjectDate }
-        'Function': function(o){ return typeof o === is.TypeFunction || toString.call(o) === is.ObjectFunction },
-        // 'Number': function(o){ return typeof o === is.TypeNumber || toString.call(o) === is.ObjectNumber},
-        // 'Object': function(o){ return toString.call(o) === is.ObjectObject},
-        'RegExp': function(o){ return toString.call(o) === is.ObjectRegExp },
-        'String': function(o){ return typeof o === is.TypeString || toString.call(o) === is.ObjectString }
+        var chr = ws.charAt(i);
+
+        if(!reWS.test(chr))
+        {
+            strWS += chr;
+        }
     }
 
-    ; // end var block
+    // redefine if not compliant
+    if(strWS.length > 2)
+    {
+        strWS = '[' + strWS + ']';
+        reWS  = new RegExp(strWS);
+    }
 
-    forOwn.call(is, function(fn, type){
-
-        is['Type' + type] = type.toLowerCase();
-        is['Object' + type] = '[object ' + type + ']';
-    });
+    var reWSs      = new RegExp(strWS + '+'),
+        reTrimLeft = new RegExp('^' + strWS + strWS + '*'),
+        reNoWS     = new RegExp('[^' + strWS.substring(1) + ']');
 
     ///////////////////////
     // utility functions //
@@ -186,7 +192,7 @@
 
     function exit(path, args)
     {
-        throw new Error('invalid usage of "' + fnName + '" with given args [' + slice.call(args) + ']');
+        throw new Error('invalid usage of "' + path + '" with given args [' + slice.call(args) + ']');
     }
 
     // works on the array - does not copy
@@ -306,7 +312,7 @@
     function Stryng(obj)
     {
         if(!(this instanceof Stryng)) return new Stryng(obj);
-        this.value = obj == null ? '' : String(obj);
+        this._value = obj == null ? '' : String(obj);
     }
 
     var StryngGenerics = {
@@ -315,6 +321,53 @@
         toNat: toNat,
         toInt: toInt,
         toFloat: toFloat,
+
+        trimLeft: function(input)
+        {
+            if(input == null) exit('Stryng.trimLeft', arguments);
+            return input.replace(reTrimLeft, '');
+        },
+
+        trimRight: function(input)
+        {
+            if(input == null) exit('Stryng.trimRight', arguments);
+            for(var i = input.length - 1; reWS.test(input.charAt(i)) && i--;);
+            return i > 0 ? input.slice(0, ++i) : '';
+        },
+
+        trimRight2: function(input)
+        {
+            if(input == null) exit('Stryng.trimRight2', arguments);
+            for(var i = input.length - 1; ws.indexOf(input.charAt(i)) !== -1 && i--;);
+            return i > 0 ? input.slice(0, ++i) : '';
+        },
+
+        trim: function(input)
+        {
+            if(input == null) exit('Stryng.trim', arguments);
+            input = input.replace(reTrimLeft, '');
+            for(var i = input.length; reWS.test(input.charAt(--i)) && i;);
+            return i ? input.slice(0, i) : '';
+        },
+
+        contains: function(input, search)
+        {
+            return input.indexOf(search) !== -1;
+        },
+
+        // startsWith as well as indexOf act as if there was no offset specified if negative
+        startsWith: function(input, search, offset)
+        {
+            return input.indexOf(search, toInt(offset)) === 0;
+        },
+
+        // endsWith as well as lastIndexOf act as if there was no offset specified if negative
+        endsWith: function(input, search, offset)
+        {
+            offset = toInt(offset, input.length);
+            var i = input.lastIndexOf(search, offset);
+            return i !== -1 && i + search.length === offset;
+        },
 
         /**
          * upper-cases the first letter. ignores the empty string.
@@ -348,7 +401,7 @@
         count: function(input, search)
         {
             var count = 0,
-                i = search.length
+                i = search.length;
 
             if (is.RegExp(search))
             {
@@ -430,11 +483,7 @@
          */
         join: function(input /* strings */)
         {
-            if(arguments.length < 2)
-            {
-                exit('Stryng.join()', arguments);
-            }
-
+            if(arguments.length < 2) exit('Stryng.join', arguments);
             return flatten(slice.call(arguments, 1)).join(input);
         },
 
@@ -482,7 +531,7 @@
          */
         exchange: function(input, oldString, newString, n)
         {
-            if(newString == null || oldString == null) exit('Stryng.exchange()', arguments);
+            if(newString == null || oldString == null) exit('Stryng.exchange', arguments);
             n = toInt(n);
             if(n == null || !isFinite(n)) return input.split(oldString).join(newString);
             else if(n === 0) return input;
@@ -524,7 +573,7 @@
 
             maxLength = toInt(maxLength);
 
-            if(maxLength === 0 || !isFinite(maxLength)) exit('Stryng.pad()', arguments);
+            if(maxLength === 0 || !isFinite(maxLength)) exit('Stryng.pad', arguments);
             
             var pLength = padding.length;
 
@@ -571,17 +620,16 @@
          * @param {...string} prefix - an arbitrary number of strings to prepend in the given order
          * @return {string}
          * @example
-         * // returns 'Hello World!'
-         * Stryng.prepend('!', 'World', ' ', 'Hello');
+         * Stryng.prepend('!', 'World', ' ', 'Hello'); // returns 'Hello World!'
          *
          * // which equals the more intuitive
          * ['!', 'World', ' ', 'Hello'].reverse().join('');
          */
         prepend: function(/* input, prefixes */)
         {
-            var args = arguments, // promote compression
-                i = args.length - 1,
-                result = args[i];
+            var args   = arguments,         // promote compression
+                i      = args.length - 1,   // skip last
+                result = args[i];           // append to reversely
 
             while(i--)
             {
@@ -607,35 +655,38 @@
          * as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</code>.
          * @function Stryng.lstrip
          * @param  {string} input
-         * @param  {string} prefix - string to remove
-         * @param  {number} [n=1]  - parsed by {@link Stryng.toNat}.
-         *                           number of operations (recursion depth)
+         * @param  {string} prefix
+         *   string to remove
+         * @param  {number} [limit=Infinity]
+         *   parsed by {@link Stryng.toNat}.
+         *   number of operations (recursion depth)
          * @return {string}
-         * @throws {(Error|TypeError)} if any required argument is missing
+         * @throws {TypeError}
+         *   if any required argument is missing
          * @example
-         * // returns 'loosy'
          * Stryng.lstrip('lefty loosy', 'lefty ');
+         * // returns 'loosy'
          *
-         * // returns the empty string
          * Stryng.lstrip('blubblubblub', 'blub');
+         * // returns the empty string
          */
-        lstrip: function(input, prefix, n)
+        lstrip: function(input, prefix, limit)
         {
-            n = toNat(n, 1)
+            limit = toNat(limit, 1/0)
 
             var pLength = prefix.length,
-                index = input.indexOf(prefix),
-                i = 0; // pending index
+                i = input.indexOf(prefix),
+                j = 0; // pending i
 
             while( // startsWith(prefix, i) where i is the offset
-                n-- &&
-                index === i
+                limit-- &&
+                i === j
             ){
-                i += pLength;
-                index = input.indexOf(prefix, i);
+                j += pLength;
+                i = input.indexOf(prefix, j);
             }
 
-            return i ? input.substring(i) : input;
+            return j ? input.substring(j) : input;
         },
 
         /**
@@ -644,18 +695,16 @@
          * @todo merge into {@link Stryng.lstrip} for inputs of <code>n > 5</code> - faster
          * @todo test and benchmark across browsers
          */
-        lstrip2: function(input, prefix, n)
+        lstrip2: function(input, prefix, limit)
         {
-            n = toNat(n, 1)
+            limit = toNat(limit, 1/0);
 
-            var pLength = prefix.length;
-
-            while(
-                n-- &&
-                input.indexOf(prefix) === 0
-            ){
-                input = input.substring(pLength);
-            }
+            for(var
+                pLength = prefix.length;
+                limit-- &&
+                input.indexOf(prefix) === 0;
+                input = input.substring(pLength)
+            );
 
             return input;
         },
@@ -713,9 +762,9 @@
          * @return {string}
          * @throws {(Error|TypeError)} if any required argument is missing
          */
-        rstrip: function(input, suffix, n)
+        rstrip: function(input, suffix, limit)
         {
-            n = toNat(n, 1);
+            limit = toNat(limit, 1/0);
 
             var sLength = suffix.length,
                 iLength = input.length,
@@ -723,7 +772,7 @@
                 j = iLength; // pending index
 
             while( // endsWith
-                n-- &&
+                limit-- &&
                 i !== -1 &&
                 i === iLength - sLength
             ){
@@ -815,52 +864,57 @@
          * do not confuse this with the indicated default input for <code>n</code>.
          * @function Stryng.lsplit
          * @param  {string} input
-         * @param  {string} [delimiter=/\s+/] - defaults to a grouped arbitrary number of whitespace
-         * @param  {number} [n=Infinity]      - parsed by {@link Stryng.toNat}.
-         *                                      maximum number of split operations.
+         * @param  {string} [delimiter=/\s+/]
+         *   defaults to a grouped arbitrary number of whitespace
+         * @param  {number} [n=Infinity]
+         *   parsed by {@link Stryng.toNat}.
+         *   maximum number of split operations.
          * @return {string[]}
-         * @throws {(Error|TypeError)} if any required argument is missing
+         * @throws {(Error|TypeError)}
+         *   if any required argument is missing
          * @example
-         * // returns ['the','quick','brown','fox jumps over the lazy dog']
          * Stryng.lsplit('the quick brown fox jumps over the lazy dog', null, 3);
+         * // returns ['the','quick','brown','fox jumps over the lazy dog']
          *
-         * // returns the same as native split
          * Stryng.lsplit('the quick brown fox jumps over the lazy dog');
+         * // returns the same as native split
          */
         lsplit: function(input, delimiter, n)
         {
             if(delimiter == null)
             {
-                return input.split(reWhitespace);
+                return input.split(reWSs);
             }
-            else if(n == null)
+
+            if(n == null)
             {
                 return input.split(delimiter);
             }
-            else if((n = toNat(n)) === 0 || !isFinite(n))
+
+            n = toNat(n);
+
+            if(n === 0 || !isFinite(n))
             {  
                 return []; // conform with native split
             }
-            else
+
+            var // map to native split
+                result = input.split(delimiter, n),
+            
+                // sum up delimiter lengths
+                i = result.length,
+                index = i * delimiter.length;
+
+            while(i--)
             {
-                var // map to native split
-                    result = input.split(delimiter, n),
-                
-                    // sum up delimiter lengths
-                    i = result.length,
-                    index = i * delimiter.length;
-
-                while(i--)
-                {
-                    // sum up splitted items' lengths
-                    index += result[i].length; 
-                }
-
-                // restore the remainder
-                result.push(input.substring(index));
-
-                return result;
+                // sum up splitted items' lengths
+                index += result[i].length; 
             }
+
+            // restore the remainder
+            result.push(input.substring(index));
+
+            return result;
         },
 
         /**
@@ -879,7 +933,7 @@
         {
             if (delimiter == null)
             {
-                return input.split(reWhitespace);
+                return input.split(reWSs);
             }
 
             if(n == null)
@@ -917,10 +971,7 @@
          */
         wrap: function(input, outifx, n)
         {
-            if(input == null || outifx == null)
-            {
-                exit('Stryng.wrap()', arguments);
-            }
+            if(input == null || outifx == null) exit('Stryng.wrap', arguments);
 
             for(n = toNat(n, 1); n--;)
             {
@@ -938,10 +989,7 @@
          */
         quote: function(input)
         {
-            if(input == null)
-            {
-                exit('Stryng.quote()', arguments);
-            }
+            if(input == null) exit('Stryng.quote', arguments);
 
             return '"' + input + '"';
         },
@@ -1027,12 +1075,9 @@
             var args = arguments, // promote compression
                 i = args.length;
 
-            if(i < 2)
-            {
-                exit('Stryng.isEqual()', args);
-            }
+            if(i < 2) exit('Stryng.isEqual', args);
             
-            while(args[i--] === input);
+            while(i-- && args[i] === input);
             
             return i === -1;
         },
@@ -1052,31 +1097,28 @@
             var args = arguments, // promote compression
                 i = args.length;
 
-            if(i < 2)
-            {
-                exit('Stryng.isEqual()', args);
-            }
+            if(i < 2) exit('Stryng.isEqual', args);
 
             input = input.toLowerCase();
             
-            while(args[i--].toLowerCase === input);
+            while(i-- && args[i].toLowerCase() !== input);
             
-            return i === -1;
+            return i !== -1;
         },
 
         /**
          * wraps access to <code>input.length</code>.
-         * @function Stryng.length
+         * @function Stryng.len
          * @param {string} input
          * @returns {number} <code>input.length</code>
          * @throws {TypeError} if any required argument is missing
          * @example usage:
          * var pangram = ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'];
          *  
+         * pangram.map(Stryng.len) == pluck(pangram, 'length')
          * // returns true - given the pluck is implemented somewhere
-         * pangram.map(Stryng.length) == pluck(pangram, 'length')
          */
-        length: function(input)
+        len: function(input) // "length" is a reserved Function property
         {
             return input.length;
         },
@@ -1103,7 +1145,7 @@
          */
         isBlank: function(input)
         {
-            return input.length === 0 || reNotWhitespace.test(input);
+            return input.length === 0 || reNoWS.test(input);
         },
 
         /**
@@ -1112,60 +1154,15 @@
          * @return {boolean} whether the string is numeric
          * @throws {Error} if any required argument is missing
          * @example
-         * // returns false
          * Stryng.isNumeric('123,00')
+         * // returns false
          *
-         * // returns true
          * Stryng.isNumeric('123.00')
+         * // returns true
          */
         isNumeric: function(input)
         {
-            if(input == null)
-            {
-                exit('Stryng.isNumeric()', arguments);
-            }
-
-            input = +input;
-
-            return input === input; // true if not NaN
-        },
-
-        /**
-         * @function Stryng.isPrintable
-         * @param  {String}  input
-         * @return {Boolean}
-         *   whether the input holds any non
-         *   ASCII printable characters (32 to 126 both inclusive);
-         * @throws {Error} if any required argument is missing
-         */
-        isPrintable: function(input)
-        {
-            if(input == null)
-            {
-                exit('Stryng.isPrintable()', arguments)
-            }
-
-            return !reNotPrintable.test(input);
-        },
-        
-        /**
-         * @function Stryng.isPrintable2
-         * @deprecated slower - use {@link Stryng.isPrintable}
-         * @todo merge into isPrintable for inputs shorter than 30
-         */
-        isPrintable2: function(input)
-        {
-            for(var i = input.length; i--;)
-            {
-                var charCode = input.charCodeAt(i);
-
-                if(32 > charCode || charCode > 126)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return input.length && (input = +input) === input;
         },
         
         /**
@@ -1175,19 +1172,19 @@
          * @param  {number} maxLength
          *   parsed by {@link Stryng.toNat}
          * @param  {string} [ellipsis='...']
-         * @param  {boolean} [byChars=false]
+         * @param  {boolean} [exact=false]
          *   whether to search for the nearest word boundary
          *   or cut off at the exact index
          * @return {string}
          * @todo how to handle situations where ellipsis is longer than input?
          * @todo <code>exact</code> not yet implemented
          */
-        truncate: function(input, maxLength, ellipsis, byChars)
+        truncate: function(input, maxLength, ellipsis, exact)
         {
             ellipsis = ellipsis == null ? '...' : ellipsis;
             maxLength = toNat(maxLength) - ellipsis.length;
 
-            if(byChars)
+            if(exact)
             {
                 return input.substring(0, maxLength) + ellipsis;
             }
@@ -1294,7 +1291,7 @@
             return value;
         },
 
-        formatQueryValue: decodeURIComponent,
+        formatQueryValue: encodeURIComponent,
         
         /**
          * parses an HTTP query-string to an object
@@ -1361,13 +1358,13 @@
     forOwn.call(StryngGenerics, function(fn, fnName){
 
         // static methods
-        Stryng[fnName] = StryngGenerics[fnName];
+        Stryng[fnName] = fn;
 
         // instance methods
         Stryng.prototype[fnName] = function()
         {
             // prepend the context
-            unshift.call(arguments, this.value);
+            unshift.call(arguments, this._value);
 
             var result = fn.apply(null, arguments);
 
@@ -1375,12 +1372,12 @@
             // the wrapped object if the result is a string
             if(is.String(result))
             {
-                this.value = result;
+                this._value = result;
                 return this;
             }
 
             return result;
-        }
+        };
     });
 
     ////////////
@@ -1393,6 +1390,7 @@
 
         if(is.Function(fn))
         {
+
             // static methods
             Stryng[fnName] = function()
             {
@@ -1401,7 +1399,7 @@
                 // and then again to a string '[object global]' on node
                 if(arguments[0] == null)
                 {
-                    throw new Error('Cannot call ' + fnName + ' of undefined');
+                    throw new Error('Cannot call "' + fnName + '" of undefined');
                 }
 
                 return Function.call.apply(fn, arguments);
@@ -1410,20 +1408,20 @@
             // instance methods
             Stryng.prototype[fnName] = function()
             {
-                var result = fn.apply(this.value, arguments);
+                var result = fn.apply(this._value, arguments);
 
                 if(is.String(result))
                 {
-                    this.value = result;
+                    this._value = result;
                     return this;
                 }
                 return result;
-            }
+            };
         }
     });
 
     // convenience getter identity
-    Stryng.prototype.value = function(){ return this.value }
+    Stryng.prototype.value = function(){ return this._value }
 
     /////////////////////////////
     // purely static functions //
@@ -1432,7 +1430,7 @@
     /**
      * counterpart of {@link Stryng.parseQueryString}
      * @function Stryng.fromQueryParams
-     * @param {Object} key-value pairs
+     * @param {Object} obj key-value pairs to render
      * @returns {string} the URI encoded query string with leading '?'
      */
     Stryng.formatQueryParams = function(object, arraySuffix, formatter)
