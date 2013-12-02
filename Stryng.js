@@ -331,14 +331,18 @@
         trimRight: function(input)
         {
             if(input == null) exit('Stryng.trimRight', arguments);
-            for(var i = input.length - 1; reWS.test(input.charAt(i)) && i--;);
-            return i > 0 ? input.slice(0, ++i) : '';
+
+            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
+
+            return i > 0 ? input.slice(0, i + 1) : '';
         },
 
         trimRight2: function(input)
         {
             if(input == null) exit('Stryng.trimRight2', arguments);
-            for(var i = input.length - 1; ws.indexOf(input.charAt(i)) !== -1 && i--;);
+
+            for(var i = input.length; i-- && ws.indexOf(input.charAt(i)) !== -1;);
+            
             return i > 0 ? input.slice(0, ++i) : '';
         },
 

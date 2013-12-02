@@ -8,10 +8,12 @@ describe('Stryng', function(){
 
 
 	// blow away the stack trace here
+	try{
 	beforeEach(function(done){
 
 		setTimeout(done, 0);
 	});
+}catch(e){console.log(e)}
 
 	describe('.capitalize', function(){
 
@@ -30,7 +32,7 @@ describe('Stryng', function(){
 
 		it('should return the empty string', function(){
 			
-			expect( Stryng.trimRight('') ).to.equal('');
+			expect( Stryng.trimRight2('') ).to.equal('');
 		});
 
 		it('should trim trailing whitespace', function () {
@@ -49,7 +51,7 @@ describe('Stryng', function(){
 
 		    padded = msg + ws;
 
-		    expect( Stryng.trimRight(padded) ).to.equal(msg);
+		    expect( Stryng.trimRight2(padded) ).to.equal(msg);
 
 		});
 	});
