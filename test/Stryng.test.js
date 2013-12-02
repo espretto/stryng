@@ -8,12 +8,11 @@ describe('Stryng', function(){
 
 
 	// blow away the stack trace here
-	try{
+	// breaks FF3.0
 	beforeEach(function(done){
 
-		setTimeout(done, 0);
+		setTimeout(function(){done()}, 0);
 	});
-}catch(e){console.log(e)}
 
 	describe('.capitalize', function(){
 
