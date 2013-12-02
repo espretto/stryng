@@ -1,6 +1,6 @@
 
 Stryng = require('./../Stryng.js');
-expect = require('chai').expect;
+expect = require('expect.js');
 
 // checkout sinonjs.org
 
@@ -15,28 +15,22 @@ describe('Stryng', function(){
 
 	describe('.capitalize', function(){
 
-		it('should return the empty string', function () {
+		it('should return the empty string', function(){
 
-			expect(
-				Stryng.capitalize('')
-			).to.equal('');
-			
+			expect( Stryng.capitalize('') ).to.equal('');
 		});
 
-		it('should upper case the first letter', function () {
-			
-			expect(
-				Stryng.capitalize('foo')
-			).to.equal('Foo');
+		it('should upper case the first letter', function(){
+
+			expect( Stryng.capitalize('foo') ).to.equal('Foo');
 		});
 	});
 
 	describe('.trimRight', function(){
 
-		it('should return the empty string', function () {
+		it('should return the empty string', function(){
 			
-			expect(Stryng.trimRight('')).to.equal('');
-
+			expect( Stryng.trimRight('') ).to.equal('');
 		});
 
 		it('should trim trailing whitespace', function () {
@@ -55,7 +49,7 @@ describe('Stryng', function(){
 
 		    padded = msg + ws;
 
-		    expect(Stryng.trimRight(padded)).to.equal(msg);
+		    expect( Stryng.trimRight(padded) ).to.equal(msg);
 
 		});
 	});
