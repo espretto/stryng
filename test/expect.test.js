@@ -9,7 +9,7 @@ describe('function', function(){
 		
 		var fn = function(){ done() };
 
-		expect(fn).not.to.throw();
+		expect(fn).not.to.throwError();
 
 	});
 
