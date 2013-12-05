@@ -86,7 +86,7 @@
         // no spec-compliant polyfill intended - for internal use only
 
         // faster, higher, better .. ill-egible
-        for(var
+        for(var 
             self = this,
             length = self.length,
             i = -1;
@@ -128,11 +128,11 @@
     // regular expressions (precompiled) //
     ///////////////////////////////////////
 
-    reFloat = /^\d+\.?\d*e?[\+-]?\d*$/,
-
     reWord = /\w/,
 
     reQuote = /^['|"]+|["|']+$/g,
+
+    reFloat = /^\d+\.?\d*e?[\+-]?\d*$/,
 
     /////////////////////////
     // class / type checks //
@@ -142,8 +142,10 @@
         // 'Arguments': function(o){ return toString.call(o) === '[object Arguments]' || o && o.callee != null },
         'Array': Array.isArray || function(o){ return toString.call(o) === '[object Array]' },
         // 'Boolean': function(o){ return typeof o === 'boolean' || toString.call(o) === '[object Boolean]' },
-        // 'Date': function(o){ return toString.call(o) === '[object Date]' }
-        'Function': function(o){ return typeof o === 'function' || toString.call(o) === '[object Function]' },
+        // 'Date': function(o){ return toString.call(o) === '[object Date]' },
+        'Function': typeof reFloat === 'object' ?
+            function(o){ return typeof o === 'function' } :
+            function(o){ return toString.call(o) === '[object Function]' },
         // 'Number': function(o){ return typeof o === 'number' || toString.call(o) === '[object Number]' },
         // 'Object': function(o){ return toString.call(o) === '[object Object]' },
         'RegExp': function(o){ return toString.call(o) === '[object RegExp]' },
@@ -324,14 +326,11 @@
 
         trimLeft: function(input)
         {
-            if(input == null) exit('Stryng.trimLeft', arguments);
             return input.replace(reTrimLeft, '');
         },
 
         trimRight: function(input)
         {
-            if(input == null) exit('Stryng.trimRight', arguments);
-
             for(var i = input.length; i-- && reWS.test(input.charAt(i)););
 
             return i > 0 ? input.slice(0, i + 1) : '';
@@ -339,8 +338,6 @@
 
         trimRight2: function(input)
         {
-            if(input == null) exit('Stryng.trimRight2', arguments);
-
             for(var i = input.length; i-- && ws.indexOf(input.charAt(i)) !== -1;);
             
             return i > 0 ? input.slice(0, ++i) : '';
@@ -348,10 +345,9 @@
 
         trim: function(input)
         {
-            if(input == null) exit('Stryng.trim', arguments);
             input = input.replace(reTrimLeft, '');
-            for(var i = input.length; reWS.test(input.charAt(--i)) && i;);
-            return i ? input.slice(0, i) : '';
+            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
+            return i ? input.slice(0, i + 1) : '';
         },
 
         contains: function(input, search)
@@ -362,15 +358,26 @@
         // startsWith as well as indexOf act as if there was no offset specified if negative
         startsWith: function(input, search, offset)
         {
-            return input.indexOf(search, toInt(offset)) === 0;
+            offset = toInt(offset);
+            return input.indexOf(search, offset) === (offset > 0 ? offset : 0);
         },
 
         // endsWith as well as lastIndexOf act as if there was no offset specified if negative
-        endsWith: function(input, search, offset)
+        endsWith: function(input, search)
         {
-            offset = toInt(offset, input.length);
-            var i = input.lastIndexOf(search, offset);
-            return i !== -1 && i + search.length === offset;
+            var i = input.lastIndexOf(search);
+            return i !== -1 && i + String(search).length === input.length;
+        },
+
+        repeat: function(input, n)
+        {
+            if(input == null) exit('Stryng.repeat', arguments);
+            
+            for(n = toNat(n); n--;)
+            {
+                input += input;
+            }
+            return input;
         },
 
         /**
@@ -401,34 +408,65 @@
          *                                      (<code>g</code>-flag has to be set) to search for.
          * @return   {number}                
          * @throws   {Error}                    if any required argument is missing
+         * @example
+         * // sort by length descending
+         * a.sort(function(a,b){return b.length - a.length})
+         *
+         * // then count
+         * 
          */
         count: function(input, search)
         {
-            var count = 0,
-                i = search.length;
+            search = String(search);
 
-            if (is.RegExp(search))
+            var count = 0,
+                sLength = search.length,
+                i = input.indexOf(search);
+
+            if(sLength === 0)
             {
-                while(search.exec(input))
-                {
-                    count++;
-                }
+                return input.length - 1;
             }
-            // prevent unexpected behaviors like
-            // 
-            //     // evaluates to true
-            //     '[object Object]'.indexOf({}) == 0
-            //     
-            else if(i === 0)
+
+            for(; i !== -1; count++)
             {
-                count = input.length - 1;
+                i = input.indexOf(search, i + sLength);
             }
-            else
-            {
-                for(var index = input.indexOf(search); index !== -1; count++)
+
+            return count;
+        },
+
+        count2: function(input /* searches */)
+        {
+            if(input == null) exit('Stryng.count', arguments);
+
+            var re = new RegExp('(' + slice.call(arguments, 1).join('|') + ')', 'g'),
+                result = {};
+
+            String(input).replace(re, function(match){
+
+                if(result.hasOwnProperty(match))
                 {
-                    index = input.indexOf(search, index + i);
+                    result[match]++;
                 }
+                else
+                {
+                    result[match] = 0;
+                }
+            });
+
+            return result;
+        },
+
+        countRegex: function(input, re)
+        {
+            if(input == null) exit('Stryng.countRegex', arguments);
+
+            var count = 0;
+
+            while(search.exec(input))
+            {
+                count++;
             }
 
             return count;

@@ -3,18 +3,25 @@
 // Setup //
 ///////////
 
-testmap =
+if(typeof document === 'undefined')
 {
-	'String':
-	{
+	document = {
+		documentElement:{
+			childNodes: []
+		},
+		createElement: function(){ return {} },
+		getElementsByTagName: function(){ return [] }
+	};
+}
+
+testmap = {
+	'String': {
 		"'foo'": 'foo',
 		"String('foo')": String('foo'),
 		"new String('foo')": new String('foo'),
 		constructor: String
 	},
-
-	'Number':
-	{
+	'Number': {
 		"123": 123,
 		"Number(123)": Number(123),
 		"new Number(123)": new Number(123),
@@ -22,39 +29,39 @@ testmap =
 		"Infinity": Infinity,
 		constructor: Number
 	},
-
-	'RegExp':
-	{
+	'RegExp': {
 		"/./": /./,
 		"new RegExp('\\\\.')": new RegExp("\\."),
 		constructor: RegExp
 	},
-
-	'Function':
-	{
+	'Function': {
 		"function(){}": function() {},
 		"Function()": Function(),
 		"new Function(){}": new Function(),
+		"document.createElement": document.createElement,
 		constructor: Function
 	},
-
-	'Array':
-	{
+	'Array': {
 		"[]": [],
 		"Array()": Array(),
 		"new Array()": new Array(),
+		"document.documentElement.childNodes": document.documentElement.childNodes,
+		"document.getElementsByTagName('head')": document.getElementsByTagName('head'),
 		constructor: Array
 	},
-
-	'Object':
-	{
+	'Object': {
 		"{}": {},
 		"Object()": Object(),
 		"new Object()": new Object(),
-		"undefined": undefined,
-		"void 0": void 0,
+		"document.createElement('div')": document.createElement('div'),
+		"undefined": void 0,
 		"null": null,
 		constructor: Object
+	},
+	'Date': {
+		"Date()": Date(),
+		"new Date()": new Date(),
+		constructor: Date
 	}
 };
 

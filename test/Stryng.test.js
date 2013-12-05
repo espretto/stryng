@@ -134,4 +134,23 @@ describe('Stryng', function(){
 			expect( Stryng.endsWith('foo bar', 'foo') ).not.to.be.ok();
 		});
 	});
+
+	describe('.count', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.count ).to.throwError();			
+		});
+
+		it('should return length minus one searching the empty string', function () {
+			expect( Stryng.count('foo', '') ).to.be(2);
+		});
+
+		it('should return the number of non-overlapping occurences', function () {
+			expect( Stryng.count('foo foo foo', 'foo') ).to.be(3);
+		});
+
+		it('should call the toString method on the search', function () {
+			expect( Stryng.count('123', 2) ).to.be(1);
+		});
+	})
 });

@@ -15,9 +15,30 @@ functional programming.
 Error Reports
 -------------
 
-None of the functions fail silently if invalidly used. Most error messages
-will report the function name and arguments of the invocation. See the docs for
-the signatures of the added functions and browse the web on how to use the natives.
+The API is designed to throw Errors where arguments passed would produce unexpected results.
+However, the degree of code integrity is not meant to exceed javascript's for reasons - naturally - of my own picking:
+
+1. calling `Object.prototype.toString` on every argument of every function is costly
+2. trying to introduce strict typing into a loosely typed language
+   rather denies the benefits of implicit overloading than providing comfort
+
+In the end the API comsumer needs to know how values get parsed and the simpler
+*or* - in case of javascript - notorious the rules are, the faster he understands the inner workings.
+It then relies on the programmer's experience and discipline to adhere a *good* code style.
+
+Stryng applies these rules:
+
+1. functions will throw errors if the number of arguments excluding those with default values
+   is lower than the required minimum
+2. null checks on instances to work on are only performed if the function code does
+   not already provide for it by e.g. accessing the `length` property of strings which would throw a `TypeError`.
+3. arguments expected to be strings are ensured to be implicitely parsed by native methods
+   or explicitely by calling `String(value)`.
+4. arguments expected to be numbers are always parsed by [`Stryng.toInt`]{http://espretto.github.io/Stryng/#toInt}
+   which is total / has an answer to no matter what you throw at it.
+5. arguments expected to be positive numbers are always parsed by [`Stryng.toInt`]{http://espretto.github.io/Stryng/#toInt}
+   as well but default to zero if the result is negative.
+
 
 Documentation
 -------------

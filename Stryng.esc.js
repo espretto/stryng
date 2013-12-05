@@ -48,7 +48,7 @@
 
         var re = '';
 
-        forOwn(
+        forOwn.call(
 
         	HTMLDelimiterMap,
 
@@ -67,25 +67,18 @@
 	// class / type checks //
 	//////////////////////////
 
-    is = forOwn(
-
-    	{
-	        'Array': Array.isArray || function(o){ toString.call(o) === is.ObjectArray },
-	        'Function': function(o){ typeof o === is.TypeFunction || toString.call(o) === is.ObjectFunction },
-	        'RegExp': function(o){ toString.call(o) === is.ObjectRegExp },
-	        'String': function(o){ typeof o === is.TypeString || toString.call(o) === is.ObjectString }
-	        // 'Arguments',
-	        // 'Boolean',
-	        // 'Number',
-	        // 'Object',
-	    },
-
-	    function(type)
-	    {
-	        is['Type' + type] = type.toLowerCase();
-	        is['Object' + type] = '[object ' + type + ']';
-	    }
-	)
+    is =
+    {
+        // 'Arguments': function(o){ return toString.call(o) === '[object Arguments]' || o && o.callee != null },
+        'Array': Array.isArray || function(o){ return toString.call(o) === '[object Array]' },
+        // 'Boolean': function(o){ return typeof o === 'boolean' || toString.call(o) === '[object Boolean]' },
+        // 'Date': function(o){ return toString.call(o) === '[object Date]' }
+        'Function': function(o){ return typeof o === 'function' || toString.call(o) === '[object Function]' },
+        // 'Number': function(o){ return typeof o === 'number' || toString.call(o) === '[object Number]' },
+        // 'Object': function(o){ return toString.call(o) === '[object Object]' },
+        'RegExp': function(o){ return toString.call(o) === '[object RegExp]' },
+        'String': function(o){ return typeof o === 'string' || toString.call(o) === '[object String]' }
+    }
 
 	; // end var block
 
@@ -194,7 +187,7 @@
 	     */
 	    escapeRegex: function(input)
 	    {
-	    	return input.replace(/[\\\?\:\(\)\{\}\^\.\!\+\*\=\[\]]/);
+	    	return input.replace(/([\\\?\:\(\)\{\}\^\.\!\+\*\=\[\]])/g, '\\$1');
 	    },
 
 	    /**
