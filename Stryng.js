@@ -65,7 +65,7 @@
         'localeCompare', 'match', 'normalize', 'replace', 'search',
         'slice', 'split', 'startsWith', 'substr', 'substring',
         'toLocaleLowerCase', 'toLocaleUpperCase', 'toLowerCase',
-        'toUpperCase', 'trim', 'trimLeft', 'trimRight'
+        'toUpperCase'/*, 'trim', 'trimLeft', 'trimRight'*/
     ],
 
     ////////////////////////////////
@@ -646,10 +646,9 @@
          */
         insert: function(input, index, insertion)
         {
-            // input != null && (input = String(input)) || exit(arguments);
-
             if(index === 1/0) index = input.length;
             if(insertion === '' && is.String(input)) return input;
+            index = ~~index;
             return input.slice(0, index) + insertion + input.slice(index);
         },
 

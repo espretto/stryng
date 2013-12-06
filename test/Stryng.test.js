@@ -281,16 +281,24 @@ describe('Stryng', function(){
 			expect( Stryng.insert ).to.throwError();
 		});
 
-		it('should insert "undefined" if neither index nor insertion provided', function (){
+		it('should prepend "undefined" if neither index nor insertion provided', function (){
 			expect( Stryng.insert('foo') ).to.equal('undefinedfoo');
 		});
 
-		it('should lower limit the index to zero', function (){
-			expect( Stryng.insert('foo', -1, 'bar') ).to.equal('barfoo');
+		it('should append if the index exceed the input\'s length', function (){
+			expect( Stryng.insert('foo', Infinity, 'bar') ).to.equal('foobar');
 		});
 
-		it('should upper limit the index to the input\'s length i.e. append', function (){
-			expect( Stryng.insert('foo', Infinity, 'bar') ).to.equal('foobar');
+		it('should prepend if the index is negative but its absolute value exceeds the input\'s length', function (){
+			expect( Stryng.insert('foo', -Infinity, 'bar') ).to.equal('barfoo');
+		});
+
+		it('should insert at the given position counting from the beginning', function () {
+			expect( Stryng.insert('the fox', 4, 'quick ') ).to.equal('the quick fox');
+		});
+
+		it('should insert at the given position counting from the end', function () {
+			expect( Stryng.insert('the fox', -3, 'quick ') ).to.equal('the quick fox');
 		});
 	});
 });
