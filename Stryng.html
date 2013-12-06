@@ -81,7 +81,7 @@ native instance of <code>String</code> get mixed in with inverted signatures.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line292">line 292</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line324">line 324</a>
     </li></ul></dd>
     
     
@@ -136,6 +136,7 @@ native instance of <code>String</code> get mixed in with inverted signatures.
     
     <div class="description">
         upper-cases the first letter. ignores the empty string.
+neither supports ligatures nor diacritics.
     </div>
     
 
@@ -216,7 +217,7 @@ native instance of <code>String</code> get mixed in with inverted signatures.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line311">line 311</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line343">line 343</a>
     </li></ul></dd>
     
     
@@ -242,7 +243,7 @@ native instance of <code>String</code> get mixed in with inverted signatures.
 <dl>
     <dt>
         <div class="param-desc">
-        if any required argument is missing
+        if <code>input</code> is not of duck-type <code>String</code>
         </div>
     </dt>
     <dt>
@@ -267,6 +268,10 @@ native instance of <code>String</code> get mixed in with inverted signatures.
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    <code>input</code> with first letter uppercased.
+</div>
+
 
 
 <dl>
@@ -289,7 +294,7 @@ native instance of <code>String</code> get mixed in with inverted signatures.
         
             
 <dt>
-    <h4 class="name" id="count"><span class="type-signature">&lt;static> </span>count<span class="signature">(input, search)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id="contains"><span class="type-signature">&lt;static> </span>contains<span class="signature">(input, <span class="optional">search</span>)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
     
 </dt>
@@ -297,10 +302,7 @@ native instance of <code>String</code> get mixed in with inverted signatures.
     
     
     <div class="description">
-        counts the number of non-overlapping occurences
-of <code>search</code>. returns <code>input.length - 1</code>
-if <code>search</code> is the empty string,
-having <code>'foo'.split('').length - 1</code> in mind.
+        shim for native String#contains
     </div>
     
 
@@ -322,7 +324,11 @@ having <code>'foo'.split('').length - 1</code> in mind.
 		<th>Type</th>
 		
 		
+		<th>Argument</th>
 		
+		
+		
+		<th>Default</th>
 		
 		
 		<th class="last">Description</th>
@@ -347,7 +353,19 @@ having <code>'foo'.split('').length - 1</code> in mind.
             </td>
             
             
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
             
+            
+            
+                <td class="default">
+                
+                </td>
             
             
             <td class="description last"></td>
@@ -364,20 +382,32 @@ having <code>'foo'.split('').length - 1</code> in mind.
             
                 
 <span class="param-type">string</span>
-|
-
-<span class="param-type">RegExp</span>
 
 
             
             </td>
             
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
             
             
             
-            <td class="description last">the character, string or regular expression
-                                     (<code>g</code>-flag has to be set) to search for.</td>
+                <td class="default">
+                
+                    "undefined"
+                
+                </td>
+            
+            
+            <td class="description last"></td>
         </tr>
 	
 	
@@ -408,7 +438,7 @@ having <code>'foo'.split('').length - 1</code> in mind.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line328">line 328</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line417">line 417</a>
     </li></ul></dd>
     
     
@@ -434,7 +464,226 @@ having <code>'foo'.split('').length - 1</code> in mind.
 <dl>
     <dt>
         <div class="param-desc">
-        if any required argument is missing
+        if <code>input == null</code>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    whether or not <code>input</code>
+  contains the substring <code>search</code>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="count"><span class="type-signature">&lt;static> </span>count<span class="signature">(input, <span class="optional">search</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>search</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                    "undefined"
+                
+                </td>
+            
+            
+            <td class="description last">substring to search for</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line502">line 502</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        if <code>String(search).length === 0</code>
+  or <code>input</code> is not of class <code>String</code>
         </div>
     </dt>
     <dt>
@@ -459,6 +708,11 @@ having <code>'foo'.split('').length - 1</code> in mind.
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    number of non-overlapping occurences of
+  <code>search</code> within <code>input</code>
+</div>
+
 
 
 <dl>
@@ -520,7 +774,7 @@ having <code>'foo'.split('').length - 1</code> in mind.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line373">line 373</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line536">line 536</a>
     </li></ul></dd>
     
     
@@ -548,6 +802,201 @@ having <code>'foo'.split('').length - 1</code> in mind.
     
     
     
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="endsWith"><span class="type-signature">&lt;static> </span>endsWith<span class="signature">(input, <span class="optional">search</span>)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        shim for native String#endsWith
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>search</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                    "undefined"
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line455">line 455</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    whether or not <code>input</code>
+  ends with substring <code>search</code>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
 </dd>
@@ -772,7 +1221,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line463">line 463</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line624">line 624</a>
     </li></ul></dd>
     
     
@@ -848,7 +1297,7 @@ will be replaced first.
         
             
 <dt>
-    <h4 class="name" id="fromQueryParams"><span class="type-signature">&lt;static> </span>fromQueryParams<span class="signature">(key-value)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id="fromQueryParams"><span class="type-signature">&lt;static> </span>fromQueryParams<span class="signature">(obj)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
     
 </dt>
@@ -890,7 +1339,7 @@ will be replaced first.
 	
         <tr>
             
-                <td class="name"><code>key-value</code></td>
+                <td class="name"><code>obj</code></td>
             
             
             <td class="type">
@@ -906,7 +1355,7 @@ will be replaced first.
             
             
             
-            <td class="description last">pairs</td>
+            <td class="description last">key-value pairs to render</td>
         </tr>
 	
 	
@@ -937,7 +1386,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1424">line 1424</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1549">line 1549</a>
     </li></ul></dd>
     
     
@@ -1072,7 +1521,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1088">line 1088</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1243">line 1243</a>
     </li></ul></dd>
     
     
@@ -1235,7 +1684,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1077">line 1077</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1232">line 1232</a>
     </li></ul></dd>
     
     
@@ -1444,7 +1893,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1010">line 1010</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1171">line 1171</a>
     </li></ul></dd>
     
     
@@ -1649,7 +2098,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1033">line 1033</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1191">line 1191</a>
     </li></ul></dd>
     
     
@@ -1810,7 +2259,7 @@ will be replaced first.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1102">line 1102</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1257">line 1257</a>
     </li></ul></dd>
     
     
@@ -1847,9 +2296,6 @@ will be replaced first.
             <dd>
                 
 <span class="param-type">Error</span>
-|
-
-<span class="param-type">TypeError</span>
 
 
             </dd>
@@ -1887,11 +2333,11 @@ will be replaced first.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// returns false
-Stryng.isNumeric('123,00')
+    <pre class="prettyprint"><code>Stryng.isNumeric('123,00')
+// returns false
 
-// returns true
-Stryng.isNumeric('123.00')</code></pre>
+Stryng.isNumeric('123.00')
+// returns true</code></pre>
 
     
 </dd>
@@ -1899,244 +2345,7 @@ Stryng.isNumeric('123.00')</code></pre>
         
             
 <dt>
-    <h4 class="name" id="isPrintable"><span class="type-signature">&lt;static> </span>isPrintable<span class="signature">(input)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>input</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1126">line 1126</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    <h5>Throws:</h5>
-    
-            
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        if any required argument is missing
-        </div>
-    </dt>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-</dl>
-
-
-        
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    whether the input holds any non
-  ASCII printable characters (32 to 126 both inclusive);
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Boolean</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="isPrintable2"><span class="type-signature">&lt;static> </span>isPrintable2<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>slower - use <a href="Stryng.html#isPrintable">Stryng.isPrintable</a></li><ul></dd>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1144">line 1144</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-todo">To Do:</dt>
-    <dd class="tag-todo">
-        <ul>
-            <li>merge into isPrintable for inputs shorter than 30</li>
-        </ul>
-    </dd>
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="join"><span class="type-signature">&lt;static> </span>join<span class="signature">(delimiter, strings)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id="join"><span class="type-signature">&lt;static> </span>join<span class="signature">(<span class="optional">delimiter</span>, strings)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
     
 </dt>
@@ -2172,6 +2381,8 @@ to avoid unexpected behavior. takes at least two arguments.
 		
 		
 		
+		<th>Default</th>
+		
 		
 		<th class="last">Description</th>
 	</tr>
@@ -2197,6 +2408,8 @@ to avoid unexpected behavior. takes at least two arguments.
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
                     
                 
                     
@@ -2204,6 +2417,12 @@ to avoid unexpected behavior. takes at least two arguments.
                 </td>
             
             
+            
+                <td class="default">
+                
+                    ","
+                
+                </td>
             
             
             <td class="description last">separator</td>
@@ -2241,8 +2460,13 @@ to avoid unexpected behavior. takes at least two arguments.
             
             
             
+                <td class="default">
+                
+                </td>
             
-            <td class="description last">strings or (nested) array(s) of strings. arguments will be flattened.</td>
+            
+            <td class="description last">strings or (nested) array(s) of strings.
+  arguments will be flattened.</td>
         </tr>
 	
 	
@@ -2273,7 +2497,7 @@ to avoid unexpected behavior. takes at least two arguments.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line411">line 411</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line570">line 570</a>
     </li></ul></dd>
     
     
@@ -2292,36 +2516,6 @@ to avoid unexpected behavior. takes at least two arguments.
     
     
     
-    <h5>Throws:</h5>
-    
-            
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        if any required argument is missing
-        </div>
-    </dt>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-|
-
-<span class="param-type">TypeError</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-</dl>
-
-
-        
     
     
     <h5>Returns:</h5>
@@ -2346,8 +2540,8 @@ to avoid unexpected behavior. takes at least two arguments.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// returns 'the quick brown fox jumps over the lazy dog'
-Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['lazy', ['dog']]]]]]]])</code></pre>
+    <pre class="prettyprint"><code>Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['lazy', ['dog']]]]]]]])
+// returns 'the quick brown fox jumps over the lazy dog'</code></pre>
 
     
 </dd>
@@ -2355,7 +2549,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['
         
             
 <dt>
-    <h4 class="name" id="length"><span class="type-signature">&lt;static> </span>length<span class="signature">(input)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id="len"><span class="type-signature">&lt;static> </span>len<span class="signature">(input)</span><span class="type-signature"> &rarr; {number}</span></h4>
     
     
 </dt>
@@ -2444,7 +2638,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1060">line 1060</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1215">line 1215</a>
     </li></ul></dd>
     
     
@@ -2521,8 +2715,8 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['
     <pre class="prettyprint"><code> usage:
 var pangram = ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'];
  
-// returns true - given the pluck is implemented somewhere
-pangram.map(Stryng.length) == pluck(pangram, 'length')</code></pre>
+pangram.map(Stryng.len) == pluck(pangram, 'length')
+// returns true - given the pluck is implemented somewhere</code></pre>
 
     
 </dd>
@@ -2688,7 +2882,7 @@ do not confuse this with the indicated default input for <code>n</code>.
             
             
             <td class="description last">parsed by <a href="Stryng.html#toNat">Stryng.toNat</a>.
-                                     maximum number of split operations.</td>
+  maximum number of split operations.</td>
         </tr>
 	
 	
@@ -2719,7 +2913,7 @@ do not confuse this with the indicated default input for <code>n</code>.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line802">line 802</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line964">line 964</a>
     </li></ul></dd>
     
     
@@ -2792,11 +2986,11 @@ do not confuse this with the indicated default input for <code>n</code>.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// returns ['the','quick','brown','fox jumps over the lazy dog']
-Stryng.lsplit('the quick brown fox jumps over the lazy dog', null, 3);
+    <pre class="prettyprint"><code>Stryng.lsplit('the quick brown fox jumps over the lazy dog', null, 3);
+// returns ['the','quick','brown','fox jumps over the lazy dog']
 
-// returns the same as native split
-Stryng.lsplit('the quick brown fox jumps over the lazy dog');</code></pre>
+Stryng.lsplit('the quick brown fox jumps over the lazy dog');
+// returns the same as native split</code></pre>
 
     
 </dd>
@@ -2804,7 +2998,7 @@ Stryng.lsplit('the quick brown fox jumps over the lazy dog');</code></pre>
         
             
 <dt>
-    <h4 class="name" id="lstrip"><span class="type-signature">&lt;static> </span>lstrip<span class="signature">(input, prefix, <span class="optional">n</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id="lstrip"><span class="type-signature">&lt;static> </span>lstrip<span class="signature">(input, prefix, <span class="optional">limit</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
     
 </dt>
@@ -2922,7 +3116,7 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</c
 	
         <tr>
             
-                <td class="name"><code>n</code></td>
+                <td class="name"><code>limit</code></td>
             
             
             <td class="type">
@@ -2949,13 +3143,13 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</c
             
                 <td class="default">
                 
-                    1
+                    Infinity
                 
                 </td>
             
             
             <td class="description last">parsed by <a href="Stryng.html#toNat">Stryng.toNat</a>.
-                          number of operations (recursion depth)</td>
+  number of operations (recursion depth)</td>
         </tr>
 	
 	
@@ -2986,7 +3180,7 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</c
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line597">line 597</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line758">line 758</a>
     </li></ul></dd>
     
     
@@ -3022,9 +3216,6 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</c
             </dt>
             <dd>
                 
-<span class="param-type">Error</span>
-|
-
 <span class="param-type">TypeError</span>
 
 
@@ -3059,11 +3250,11 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</c
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// returns 'loosy'
-Stryng.lstrip('lefty loosy', 'lefty ');
+    <pre class="prettyprint"><code>Stryng.lstrip('lefty loosy', 'lefty ');
+// returns 'loosy'
 
-// returns the empty string
-Stryng.lstrip('blubblubblub', 'blub');</code></pre>
+Stryng.lstrip('blubblubblub', 'blub');
+// returns the empty string</code></pre>
 
     
 </dd>
@@ -3110,7 +3301,7 @@ Stryng.lstrip('blubblubblub', 'blub');</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line634">line 634</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line798">line 798</a>
     </li></ul></dd>
     
     
@@ -3186,7 +3377,7 @@ Stryng.lstrip('blubblubblub', 'blub');</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line656">line 656</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line818">line 818</a>
     </li></ul></dd>
     
     
@@ -3263,7 +3454,7 @@ restores whatever was assigned to <code>Stryng</code> before
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line30">line 30</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line39">line 39</a>
     </li></ul></dd>
     
     
@@ -3343,7 +3534,7 @@ by inverting the signature.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1486">line 1486</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1611">line 1611</a>
     </li></ul></dd>
     
     
@@ -3556,7 +3747,7 @@ in one go, use <a href="Stryng.html#wrap">Stryng.wrap</a>.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line486">line 486</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line647">line 647</a>
     </li></ul></dd>
     
     
@@ -3830,7 +4021,7 @@ to native <code>String.prototype.concat</code>.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line559">line 559</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line720">line 720</a>
     </li></ul></dd>
     
     
@@ -3873,10 +4064,9 @@ to native <code>String.prototype.concat</code>.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// returns 'Hello World!'
-Stryng.prepend('!', 'World', ' ', 'Hello');
+    <pre class="prettyprint"><code>Stryng.prepend('!', 'World', ' ', 'Hello'); // returns 'Hello World!'
 
-// which equals the more intuitive
+// which equals the more intuitive (the former is faster)
 ['!', 'World', ' ', 'Hello'].reverse().join('');</code></pre>
 
     
@@ -3924,7 +4114,7 @@ Stryng.prepend('!', 'World', ' ', 'Hello');
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line587">line 587</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line748">line 748</a>
     </li></ul></dd>
     
     
@@ -4044,7 +4234,7 @@ Stryng.prepend('!', 'World', ' ', 'Hello');
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line926">line 926</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1090">line 1090</a>
     </li></ul></dd>
     
     
@@ -4100,6 +4290,471 @@ Stryng.prepend('!', 'World', ' ', 'Hello');
             
 <div class="param-desc">
     <code>input</code> wrapped in double quotes
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="random"><span class="type-signature">&lt;static> </span>random<span class="signature">(n, <span class="optional">from</span>, <span class="optional">to</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        generates a string of random characters
+which default to the ASCII printables.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last">length. parsed by <a href="Stryng.html#toNat">Stryng.toNat</a></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                    32
+                
+                </td>
+            
+            
+            <td class="description last">min char code (inclusive) or character
+  sequence to choose from. in case of the latter
+  parameter <code>to</code> will be ignored.
+  in case of the former <code>from</code> will be
+  parsed by <a href="Stryng.html#toNat">Stryng.toNat</a></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                    126
+                
+                </td>
+            
+            
+            <td class="description last">max char code (inclusive).
+  parsed by <a href="Stryng.html#toNat">Stryng.toNat</a></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1308">line 1308</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="repeat"><span class="type-signature">&lt;static> </span>repeat<span class="signature">(input, <span class="optional">n</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        shim for native String#repeat
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line470">line 470</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        if
+  <ul>
+    <li><code>input == null</code></li>
+    <li><code>n == Infinity</code></li>
+    <li><code>~~n < 0</code></li>
+  </ul>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    the <code>input</code> <code>n</code> times
+  concatenated to the empty string
 </div>
 
 
@@ -4213,7 +4868,7 @@ Stryng.prepend('!', 'World', ' ', 'Hello');
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line434">line 434</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line595">line 595</a>
     </li></ul></dd>
     
     
@@ -4328,7 +4983,7 @@ Stryng.prepend('!', 'World', ' ', 'Hello');
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line453">line 453</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line614">line 614</a>
     </li></ul></dd>
     
     
@@ -4549,7 +5204,7 @@ searching backwards.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line859">line 859</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1026">line 1026</a>
     </li></ul></dd>
     
     
@@ -4805,7 +5460,7 @@ searching backwards.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line699">line 699</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line861">line 861</a>
     </li></ul></dd>
     
     
@@ -5011,7 +5666,7 @@ searching backwards.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line775">line 775</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line937">line 937</a>
     </li></ul></dd>
     
     
@@ -5237,7 +5892,7 @@ searching backwards.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line731">line 731</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line893">line 893</a>
     </li></ul></dd>
     
     
@@ -5402,7 +6057,7 @@ searching backwards.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line746">line 746</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line908">line 908</a>
     </li></ul></dd>
     
     
@@ -5644,7 +6299,7 @@ for the details.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line217">line 217</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line261">line 261</a>
     </li></ul></dd>
     
     
@@ -5835,7 +6490,7 @@ parseFloat('5.99$') // returns 5.99</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line205">line 205</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line244">line 244</a>
     </li></ul></dd>
     
     
@@ -5878,6 +6533,566 @@ parseFloat('5.99$') // returns 5.99</code></pre>
 </dl>
 
         
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="trim"><span class="type-signature">&lt;static> </span>trim<span class="signature">(input)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        shim for native String#trim
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line402">line 402</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        if <code>input == null</code>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="trimLeft"><span class="type-signature">&lt;static> </span>trimLeft<span class="signature">(input)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        shim for [native] String#trimLeft
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line363">line 363</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        if <code>input == null</code>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="trimRight"><span class="type-signature">&lt;static> </span>trimRight<span class="signature">(input)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        shim for [native] String#trimRight
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line375">line 375</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        if <code>input == null</code>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">TypeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="trimRight2"><span class="type-signature">&lt;static> </span>trimRight2<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>slower - use <a href="Stryng.html#trimRight">Stryng.trimRight</a> instead</li><ul></dd>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line390">line 390</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>test and benchmark across browsers</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
     
     
 </dd>
@@ -5974,7 +7189,7 @@ parseFloat('5.99$') // returns 5.99</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line942">line 942</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1103">line 1103</a>
     </li></ul></dd>
     
     
@@ -6231,7 +7446,7 @@ to do the opppsite use <a href="Stryng.html#strip">Stryng.strip</a>.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line900">line 900</a>
+        <a href="Stryng.js.html">Stryng.js</a>, <a href="Stryng.js.html#line1067">line 1067</a>
     </li></ul></dd>
     
     
@@ -6326,7 +7541,7 @@ to do the opppsite use <a href="Stryng.html#strip">Stryng.strip</a>.
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha2</a> on Tue Nov 26 2013 14:35:55 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha2</a> on Thu Dec 05 2013 18:02:43 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
