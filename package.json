@@ -24,7 +24,7 @@
       "safari/6.0"
     ],
     "harness": "mocha",
-    "files": "test/Stryng.test.js"
+    "files": "test/*.test.js"
   }
   
 }
