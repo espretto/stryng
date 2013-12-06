@@ -1,4 +1,8 @@
 
+This is a work in process
+-------------------------
+it's yet on guthub to leverage browserling for cross browser testing.
+
 The methods available for string manipulation in javascript are scarce. Stryng inherits from the build-in
 javascript `String` object, and extends that existing set of functions with its own utilities.
 
@@ -38,7 +42,18 @@ Stryng applies these rules:
    which is total / has an answer to no matter what you throw at it.
 5. arguments expected to be positive numbers are always parsed by [`Stryng.toInt`]{http://espretto.github.io/Stryng/#toInt}
    as well but default to zero if the result is negative.
+6. defaults only apply when the input is missing. for ease of development and
+   performance consideration (accessing arguments.length is slow) though values `null` and `undefined` are regarded the same!
 
+polyfills are intended to produce the same results except they only know of one error type to throw.
+
+if you want to satisfy the requirement of the first value to be a string
+and not rely on its duck-type you might rather use OOP style like
+
+`Stryng(someValue).someMethod(with, some, args);`
+
+the constructor does parse the input using `String(value)`
+and defaults to the empty string.
 
 Documentation
 -------------

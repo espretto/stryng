@@ -83,18 +83,15 @@
 
     forEach = methods.forEach || function(iterator, context)
     {
-        // no spec-compliant polyfill intended - for internal use only
-
-        // faster, higher, better .. ill-egible
-        for(var 
-            self = this,
-            length = self.length,
+        for(var o = Object(this),
+            length = o.length >>> 0,
             i = -1;
+            
             ++i !== length;
         ){
-            if(i in self)
+            if(i in o)
             {
-                iterator.call(context, self[i], i, self);
+                iterator.call(context, o[i], i, o);
             }
         }
     },
@@ -102,13 +99,14 @@
     // for the w3c-wishlist
     forOwn = function(iterator, context)
     {
-        var self = this, key;
+        var o = Object(this),
+            i;
 
-        for(key in self)
+        for(i in o)
         {
-            if(self.hasOwnProperty(key))
+            if(o.hasOwnProperty(i))
             {
-                iterator.call(context, self[key], key, self);
+                iterator.call(context, o[i], i, o);
             }
         }
     },
@@ -138,23 +136,46 @@
     // class / type checks //
     /////////////////////////
 
-    is = {
-        // 'Arguments': function(o){ return toString.call(o) === '[object Arguments]' || o && o.callee != null },
-        'Array': Array.isArray || function(o){ return toString.call(o) === '[object Array]' },
-        // 'Boolean': function(o){ return typeof o === 'boolean' || toString.call(o) === '[object Boolean]' },
-        // 'Date': function(o){ return toString.call(o) === '[object Date]' },
-        'Function': typeof reFloat === 'object' ?
-            function(o){ return typeof o === 'function' } :
-            function(o){ return toString.call(o) === '[object Function]' },
-        // 'Number': function(o){ return typeof o === 'number' || toString.call(o) === '[object Number]' },
-        // 'Object': function(o){ return toString.call(o) === '[object Object]' },
-        'RegExp': function(o){ return toString.call(o) === '[object RegExp]' },
-        'String': function(o){ return typeof o === 'string' || toString.call(o) === '[object String]' }
-    },
+    is = {};
+
+    forEach.call(['Array', 'Date', 'Function', 'Object', 'RegExp', 'Boolean', 'Number', 'String'], function(clazz){
+
+        var repr = '[object ' + clazz + ']';
+            
+        if('String Number Boolean'.indexOf(clazz) !== -1)
+        {
+            var type = clazz.toLowerCase();
+            
+            // early exit null, undefined, empty string, zero, false and literals by typeof-ing
+            is[clazz] = function(o){ return o != null && ( typeof o === type || toString.call(o) === repr ) };
+        }
+        else
+        {
+            // early exit all falsies
+            is[clazz] = function(o){ return o && toString.call(o) === repr }
+        }
+    });
+
+    // adopt native if available
+    if(Array.isArray)
+    {
+        is.Array = Array.isArray;
+    }
+
+    // workaround webkit returning 'function' here
+    if(typeof reFloat === 'object') 
+    {
+        is.Function = function(o){return o && typeof o === 'function'}
+    }
+
+    // duck type arguments as fallback
+    is.Arguments = function(o){ return o && ( toString.call(o) === '[object Arguments]' || o.callee ) };
 
     /////////////////////////////////
     // shim whitespace recognition //
     /////////////////////////////////
+
+    var
 
     ws = '\u0009\u000A\u000B\u000C'
        + '\u00A0\u000D\u0020\u1680'
@@ -165,7 +186,8 @@
        + '\u3000\uFEFF',
 
     strWS = '\\s',
-    reWS  = /\s/; // new RegExp(strWS)
+    reWS  = /\s/, // new RegExp(strWS)
+    reNoWS = /\S/;
 
     for(var i = ws.length; i--;)
     {
@@ -177,27 +199,28 @@
         }
     }
 
-    // redefine if not compliant
+    // redefine if insecure
     if(strWS.length > 2)
     {
+        reNoWS = new RegExp('[^' + strWS + ']');
         strWS = '[' + strWS + ']';
         reWS  = new RegExp(strWS);
     }
 
     var reWSs      = new RegExp(strWS + '+'),
-        reTrimLeft = new RegExp('^' + strWS + strWS + '*'),
-        reNoWS     = new RegExp('[^' + strWS.substring(1) + ']');
+        reTrimLeft = new RegExp('^' + strWS + strWS + '*');
 
     ///////////////////////
     // utility functions //
     ///////////////////////
 
-    function exit(path, args)
+    function exit(args)
     {
-        throw new Error('invalid usage of "' + path + '" with given args [' + slice.call(args) + ']');
+        // only applicable by members of StryngGenerics
+        throw new Error('invalid usage of "' + args.callee._name + '" with args [' + slice.call(args) + ']');
     }
 
-    // works on the array - does not copy
+    // does not copy
     function flatten(array) 
     {
         // length changes by splicing
@@ -207,7 +230,7 @@
 
             if(is.Array(item))
             {
-                item.unshift(i, 0);
+                item.unshift(i, 1);
                 splice.apply(array, item);
             }
             else
@@ -227,7 +250,12 @@
      */
     function toNat(n, m)
     {
-        return abs(toInt(n, m));
+        if(n == null || (n = +n) !== n)
+        {
+            return m === void 0 ? 0 : m;
+        }
+        if(isFinite(n)) n |= 0; // Math.round
+        return n;
     }
 
     /**
@@ -256,21 +284,11 @@
      */
     function toInt(n, m)
     {
-        if (n == null || (n = +n) !== n)
+        if(n == null || (n = +n) !== n)
         {
-            if(m == null)
-            {
-                return 0;
-            }
-
-            return toInt(m);
+            return m === void 0 ? 0 : m;
         }
-        
-        if(isFinite(n))
-        {
-            n |= 0; // Math.floor
-        }
-
+        if(isFinite(n)) n |= 0; // Math.round
         return n;
     }
 
@@ -288,16 +306,14 @@
      */
     function toFloat(n, m)
     {
+        if(m == null)
+        {
+            return ~~n;
+        }
         if(n == null || is.String(n) && !reFloat.test(n))
         {
-            if(m == null)
-            {
-                return 0;
-            }
-            
-            return toFloat(m);
+            return m === void 0 ? 0.0 : m;
         }
-
         return parseFloat(n);
     }
 
@@ -324,68 +340,15 @@
         toInt: toInt,
         toFloat: toFloat,
 
-        trimLeft: function(input)
-        {
-            return input.replace(reTrimLeft, '');
-        },
-
-        trimRight: function(input)
-        {
-            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
-
-            return i > 0 ? input.slice(0, i + 1) : '';
-        },
-
-        trimRight2: function(input)
-        {
-            for(var i = input.length; i-- && ws.indexOf(input.charAt(i)) !== -1;);
-            
-            return i > 0 ? input.slice(0, ++i) : '';
-        },
-
-        trim: function(input)
-        {
-            input = input.replace(reTrimLeft, '');
-            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
-            return i ? input.slice(0, i + 1) : '';
-        },
-
-        contains: function(input, search)
-        {
-            return input.indexOf(search) !== -1;
-        },
-
-        // startsWith as well as indexOf act as if there was no offset specified if negative
-        startsWith: function(input, search, offset)
-        {
-            offset = toInt(offset);
-            return input.indexOf(search, offset) === (offset > 0 ? offset : 0);
-        },
-
-        // endsWith as well as lastIndexOf act as if there was no offset specified if negative
-        endsWith: function(input, search)
-        {
-            var i = input.lastIndexOf(search);
-            return i !== -1 && i + String(search).length === input.length;
-        },
-
-        repeat: function(input, n)
-        {
-            if(input == null) exit('Stryng.repeat', arguments);
-            
-            for(n = toNat(n); n--;)
-            {
-                input += input;
-            }
-            return input;
-        },
-
         /**
          * upper-cases the first letter. ignores the empty string.
+         * neither supports ligatures nor diacritics.
          * @function Stryng.capitalize
          * @param  {string} input
          * @return {string}
-         * @throws {TypeError}  if any required argument is missing
+         *   <code>input</code> with first letter uppercased.
+         * @throws {TypeError}
+         *   if <code>input</code> is not of duck-type <code>String</code>
          */
         capitalize: function(input)
         {
@@ -398,75 +361,174 @@
         },
 
         /**
-         * counts the number of non-overlapping occurences
-         * of <code>search</code>. returns <code>input.length - 1</code>
-         * if <code>search</code> is the empty string,
-         * having <code>'foo'.split('').length - 1</code> in mind.
-         * @function Stryng.count
-         * @param    {string}                   input
-         * @param    {(string|RegExp)} search - the character, string or regular expression
-         *                                      (<code>g</code>-flag has to be set) to search for.
-         * @return   {number}                
-         * @throws   {Error}                    if any required argument is missing
-         * @example
-         * // sort by length descending
-         * a.sort(function(a,b){return b.length - a.length})
-         *
-         * // then count
-         * 
+         * shim for [native] String#trimLeft
+         * @function Stryng.trimLeft
+         * @param  {string} input
+         * @return {string}
+         * @throws {TypeError} if <code>input == null</code>
          */
-        count: function(input, search)
+        trimLeft: function(input)
         {
-            search = String(search);
-
-            var count = 0,
-                sLength = search.length,
-                i = input.indexOf(search);
-
-            if(sLength === 0)
-            {
-                return input.length - 1;
-            }
-
-            for(; i !== -1; count++)
-            {
-                i = input.indexOf(search, i + sLength);
-            }
-
-            return count;
+            return input.replace(reTrimLeft, '');
         },
 
-        count2: function(input /* searches */)
+        /**
+         * shim for [native] String#trimRight
+         * @function Stryng.trimRight
+         * @param  {string} input
+         * @return {string}
+         * @throws {TypeError}
+         *   if <code>input == null</code>
+         */
+        trimRight: function(input)
         {
-            if(input == null) exit('Stryng.count', arguments);
+            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
 
-            var re = new RegExp('(' + slice.call(arguments, 1).join('|') + ')', 'g'),
-                result = {};
+            return i > 0 ? input.slice(0, ++i) : '';
+        },
 
-            String(input).replace(re, function(match){
+        /**
+         * @function Stryng.trimRight2
+         * @deprecated slower - use {@link Stryng.trimRight} instead
+         * @todo test and benchmark across browsers
+         */
+        trimRight2: function(input)
+        {
+            for(var i = input.length; i-- && ws.indexOf(input.charAt(i)) !== -1;);
+            
+            return i > 0 ? input.slice(0, ++i) : '';
+        },
 
-                if(result.hasOwnProperty(match))
-                {
-                    result[match]++;
-                }
-                else
-                {
-                    result[match] = 0;
-                }
-            });
+        /**
+         * shim for native String#trim
+         * @function Stryng.trim
+         * @param  {string} input
+         * @return {string}
+         * @throws {TypeError}
+         *   if <code>input == null</code>
+         */
+        trim: function(input)
+        {
+            input = input.replace(reTrimLeft, '');
+            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
+            return i > 0 ? input.slice(0, ++i) : '';
+        },
+
+        /**
+         * shim for native String#contains
+         * @function Stryng.contains
+         * @param  {string} input
+         * @param  {string} [search="undefined"]
+         * @return {boolean}
+         *   whether or not <code>input</code>
+         *   contains the substring <code>search</code>
+         * @throws {TypeError}
+         *   if <code>input == null</code>
+         */
+        contains: function(input, search)
+        {
+            return input.indexOf(search) !== -1;
+        },
+
+        /**
+         * shim for native String#startsWith
+         * @function String.startsWith
+         * @param  {string} input
+         * @param  {string} [search="undefined"]
+         * @param  {number} [offset=0]
+         *   default applies for values parsed to <code>NaN</code>
+         *   and negative ones
+         * @return {boolean}
+         *   whether or not <code>input</code> at index <code>offset</code>
+         *   begins with substring <code>search</code>
+         * @throws {TypeError}
+         *   if <code>input == null</code>
+         */
+        startsWith: function(input, search, offset)
+        {
+            if(offset === 1/0) return false; // positive Infinity only
+            offset = ~~offset;
+            if(offset < 0) offset = 0; // ignore negatives
+            return input.indexOf(search, offset) === offset;
+        },
+
+        /**
+         * shim for native String#endsWith
+         * @function Stryng.endsWith
+         * @param  {string} input
+         * @param  {string} [search="undefined"]
+         * @return {boolean}
+         *   whether or not <code>input</code>
+         *   ends with substring <code>search</code>
+         */
+        endsWith: function(input, search)
+        {
+            var i = input.lastIndexOf(search);
+            return i !== -1 && i + String(search).length === input.length;
+        },
+
+        /**
+         * shim for native String#repeat
+         * @function Stryng.repeat
+         * @param  {string} input
+         * @param  {number} [n=0]
+         * @return {string}
+         *   the <code>input</code> <code>n</code> times
+         *   concatenated to the empty string 
+         * @throws {Error} if
+         *   <ul>
+         *     <li><code>input == null</code></li>
+         *     <li><code>n == Infinity</code></li>
+         *     <li><code>~~n < 0</code></li>
+         *   </ul>
+         */
+        repeat: function(input, n)
+        {
+            if(input == null || n === 1/0) exit(arguments);
+            
+            n = ~~n;
+
+            if(n < 0) exit(arguments);
+            if(n === 0) return '';
+
+            for(var result = ''; n--;)
+            {
+                // implicit parsing for spec compliance
+                result += input;
+            }
 
             return result;
         },
 
-        countRegex: function(input, re)
+        /**
+         * @function Stryng.count
+         * @param {string} input
+         * @param {string} [search="undefined"]
+         *   substring to search for
+         * @return {number}
+         *   number of non-overlapping occurences of
+         *   <code>search</code> within <code>input</code>
+         * @throws {Error}
+         *   if <code>String(search).length === 0</code>
+         *   or <code>input</code> is not of class <code>String</code>
+         */
+        count: function(input, search)
         {
-            if(input == null) exit('Stryng.countRegex', arguments);
+            // force type to prevent unexpected results passing an array
+            if(!is.String(input)) exit(arguments);
 
-            var count = 0;
+            search = String(search);
 
-            while(search.exec(input))
+            var length = search.length;
+
+            if(length === 0) exit(arguments);
+
+            var count = 0,
+                i = input.indexOf(search);
+
+            for(; i !== -1; count++)
             {
-                count++;
+                i = input.indexOf(search, i + length);
             }
 
             return count;
@@ -479,18 +541,15 @@
          */
         count2: function(input, search)
         {
-            var count = 0;
-                i = search.length;
+            search = String(search);
 
-            if (is.RegExp(search))
-            {
-                count = input.split(search).length - 1;
-            }
-            else if(i === 0)
-            {
-                count = input.length - 1;
-            }
-            else if(i === 1)
+            var length = search.length;
+
+            if(length === 0) exit(arguments);
+
+            var count = 0;
+
+            if(length === 1)
             {
                 for(var j = input.length; j--;)
                 {
@@ -500,10 +559,9 @@
             }
             else
             {
-                for(var index = input.indexOf(search); index !== -1;)
+                for(var i = input.indexOf(search); i !== -1; count++)
                 {
-                    count++;
-                    index = input.indexOf(search, index + i);
+                    i = input.indexOf(search, i + length);
                 }
             }
 
@@ -515,30 +573,38 @@
          * passed arguments (or array items) should be strings
          * to avoid unexpected behavior. takes at least two arguments.
          * @function Stryng.join
-         * @param  {string}               delimiter - separator
-         * @param  {...(string|string[])} strings   - strings or (nested) array(s) of strings. arguments will be flattened.
+         * @param {string} [delimiter=","]
+         *   separator
+         * @param {...(string|string[])} strings
+         *   strings or (nested) array(s) of strings.
+         *   arguments will be flattened.
          * @return {string}
-         * @throws {(Error|TypeError)} if any required argument is missing
          * @example
-         * // returns 'the quick brown fox jumps over the lazy dog'
          * Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['lazy', ['dog']]]]]]]])
+         * // returns 'the quick brown fox jumps over the lazy dog'
          */
-        join: function(input /* strings */)
+        join: function(delimiter /* strings */)
         {
-            if(arguments.length < 2) exit('Stryng.join', arguments);
-            return flatten(slice.call(arguments, 1)).join(input);
+            var args = arguments;
+
+            if(args.length < 2) exit(args);
+            if(delimiter == null) delimiter = ',';
+            
+            return flatten(slice.call(args, 1)).join(delimiter);
         },
 
         /**
-         * reverses the given string.
          * @function Stryng.reverse
          * @param  {string} input
          * @return {string}
-         * @throws {(Error|TypeError)} if any required argument is missing
+         * @throws {TypeError}
+         *   if <code>input</code> does not match <code>String</code>
+         *   by duck-type
          */
         reverse: function(input)
         {
-            var result = '', i;
+            var result = '',
+                i;
             
             for(i = input.length; i--;)
             {
@@ -555,7 +621,36 @@
          */
         reverse2: function(input)
         {
-            return input.split('').reverse().join('');
+            var length = input.length;
+
+            if(length < 2) return input;
+            
+            for(var i = --length; i--;)
+            {
+                input += input.charAt(i);
+            }
+
+            return input.substring(length);
+        },
+
+        /**
+         * @function Stryng.insert
+         * @param  {string} input
+         * @param  {number} [index=0]
+         *   position where to insert. gets parsed by
+         *   <code>~~</code> thus the default.
+         * @param  {string} [insertion="undefined"]
+         * @return {string}
+         *   <code>input</code> split at <code>index</code>
+         *   and rejoined using <code>insertion</code>
+         */
+        insert: function(input, index, insertion)
+        {
+            // input != null && (input = String(input)) || exit(arguments);
+
+            if(index === 1/0) index = input.length;
+            if(insertion === '' && is.String(input)) return input;
+            return input.slice(0, index) + insertion + input.slice(index);
         },
 
         /**
@@ -573,12 +668,12 @@
          */
         exchange: function(input, oldString, newString, n)
         {
-            if(newString == null || oldString == null) exit('Stryng.exchange', arguments);
-            n = toInt(n);
-            if(n == null || !isFinite(n)) return input.split(oldString).join(newString);
-            else if(n === 0) return input;
-            else if(n > 0) return Stryng.lsplit(input, oldString, n);
-            else /* if(n < 0) */ return Stryng.rsplit(input, oldString, n);
+            if(newString == null || oldString == null) exit(arguments);
+            if(n == null || n === 1/0 || n === -1/0) return input.split(oldString).join(newString);
+            n = ~~n;
+            if(n > 0) return Stryng.lsplit(input, oldString, n).join(newString);
+            if(n < 0) return Stryng.rsplit(input, oldString, n).join(newString);
+            return input;
         },
 
         /**
@@ -615,7 +710,7 @@
 
             maxLength = toInt(maxLength);
 
-            if(maxLength === 0 || !isFinite(maxLength)) exit('Stryng.pad', arguments);
+            if(maxLength === 0 || !isFinite(maxLength)) exit(arguments);
             
             var pLength = padding.length;
 
@@ -664,16 +759,17 @@
          * @example
          * Stryng.prepend('!', 'World', ' ', 'Hello'); // returns 'Hello World!'
          *
-         * // which equals the more intuitive
+         * // which equals the more intuitive (the former is faster)
          * ['!', 'World', ' ', 'Hello'].reverse().join('');
          */
         prepend: function(/* input, prefixes */)
         {
-            var args   = arguments,         // promote compression
-                i      = args.length - 1,   // skip last
-                result = args[i];           // append to reversely
+            var args   = arguments,     // promote compression
+                i      = args.length;
 
-            while(i--)
+            if(i === 0) exit(args);
+
+            for(var result = args[--i]; i--;) // append reversely
             {
                 result += args[i];
             }
@@ -1013,7 +1109,7 @@
          */
         wrap: function(input, outifx, n)
         {
-            if(input == null || outifx == null) exit('Stryng.wrap', arguments);
+            if(input == null || outifx == null) exit(arguments);
 
             for(n = toNat(n, 1); n--;)
             {
@@ -1031,7 +1127,7 @@
          */
         quote: function(input)
         {
-            if(input == null) exit('Stryng.quote', arguments);
+            if(input == null) exit(arguments);
 
             return '"' + input + '"';
         },
@@ -1117,7 +1213,7 @@
             var args = arguments, // promote compression
                 i = args.length;
 
-            if(i < 2) exit('Stryng.isEqual', args);
+            if(i < 2) exit(args);
             
             while(i-- && args[i] === input);
             
@@ -1139,7 +1235,7 @@
             var args = arguments, // promote compression
                 i = args.length;
 
-            if(i < 2) exit('Stryng.isEqual', args);
+            if(i < 2) exit(args);
 
             input = input.toLowerCase();
             
@@ -1393,12 +1489,25 @@
         }
     };
 
+    // correct String#substr
+    if('ab'.substr(-1) !== 'b')
+    {
+        StryngGenerics.substr = function(input, i, n)
+        {
+            if(i < 0) i += input.length;
+            return input.susbstr(i,n);
+        }
+    }
+
     /////////////
     // foreign //
     /////////////
 
     forOwn.call(StryngGenerics, function(fn, fnName){
 
+        // give them a name property for easier error reporting
+        fn._name = fnName;
+        
         // static methods
         Stryng[fnName] = fn;
 
