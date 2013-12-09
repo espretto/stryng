@@ -25,11 +25,9 @@ expect.Assertion.prototype.withArgs = function(){
 // console polyfill //
 //////////////////////
 
-(function(window){
+(function(root){
 	
-	window = window || {};
-
-	var console = window.console = window.console || {},
+	var console = root.console = root.console || {},
 		methods = [
 			"assert", "count", "debug", "dir", "dirxml", "error",
 			"exception", "group", "groupCollapsed", "groupEnd",
@@ -44,7 +42,7 @@ expect.Assertion.prototype.withArgs = function(){
 		console[methodName] = console[methodName] || noop;
 	}
 
-})(window)
+})(this);
 
 // checkout sinonjs.org
 
