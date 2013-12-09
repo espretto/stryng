@@ -53,6 +53,8 @@
 
 }(this, function(){ var
 
+    String = ''.constructor, // promote compression
+
     ////////////////////////////////////////////
     // String instance methods which's        //
     // generic versions Stryng hopes to adopt //
@@ -331,7 +333,7 @@
     function Stryng(obj)
     {
         if(!(this instanceof Stryng)) return new Stryng(obj);
-        this._value = String(obj);
+        this._value = obj == null ? '' : String(obj);
     }
 
     var StryngGenerics = {
@@ -1184,9 +1186,7 @@
          */
         quote: function(input)
         {
-            if(input == null) exit(arguments);
-
-            return '"' + input + '"';
+            return input != null ? '"' + input + '"' : exit(args);
         },
 
         /**
@@ -1198,6 +1198,7 @@
          */
         unquote: function(input)
         {
+            input = input != null ? String(input) : exit(arguments);
             return input.replace(reQuote, '');
         },
 
@@ -1267,14 +1268,17 @@
          */
         isEqual: function(input /* comparables */)
         {
-            var args = arguments, // promote compression
-                i = args.length;
+            input = input != null ? String(input) : exit(arguments);
 
-            if(i < 2) exit(args);
+            var args = arguments, // promote compression
+                length = args.length,
+                i = 0;
+
+            if(length < 2) exit(args);
             
-            while(i-- && args[i] === input);
+            while(++i !== length && args[i] === input); // skips first argument
             
-            return i === -1;
+            return i === length;
         },
 
         /**
@@ -1289,16 +1293,17 @@
          */
         isEquali: function(input /*comparables */)
         {
+            input = input != null ? String(input).toLowerCase() : exit(arguments);
+
             var args = arguments, // promote compression
-                i = args.length;
+                length = args.length,
+                i = 0;
 
-            if(i < 2) exit(args);
-
-            input = input.toLowerCase();
+            if(length < 2) exit(args);
             
-            while(i-- && args[i].toLowerCase() !== input);
+            while(++i !== length && args[i].toLowerCase() === input); // skips first argument
             
-            return i !== -1;
+            return i === length;
         },
 
         /**
@@ -1315,7 +1320,7 @@
          */
         len: function(input) // "length" is a reserved Function property
         {
-            return input.length;
+            return input != null ? String(input).length : exit(arguments);
         },
 
         /**
@@ -1326,7 +1331,7 @@
          */
         isEmpty: function(input)
         {
-            return input.length === 0;
+            return input != null ? String(input).length === 0 : exit(arguments);
         },
 
         /**
@@ -1340,6 +1345,7 @@
          */
         isBlank: function(input)
         {
+            input = input != null ? String(input) : exit(arguments);
             return input.length === 0 || reNoWS.test(input);
         },
 
@@ -1357,6 +1363,7 @@
          */
         isNumeric: function(input)
         {
+            input = input != null ? String(input) : exit(arguments);
             return input.length && (input = +input) === input;
         },
         
@@ -1376,6 +1383,8 @@
          */
         truncate: function(input, maxLength, ellipsis, exact)
         {
+            input = input != null ? String(input) : exit(arguments);
+
             ellipsis = ellipsis == null ? '...' : ellipsis;
             maxLength = toNat(maxLength) - ellipsis.length;
 

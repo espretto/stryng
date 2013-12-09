@@ -129,7 +129,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return true with args ["undefined"]', function (){
-			expect( Stryng(void 0).contains(/* (undefined).toString() */) ).to.be.ok();
+			expect( Stryng('undefined').contains(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should find the empty string in any string', function (){
@@ -152,7 +152,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return true with args ["undefined"]', function (){
-			expect( Stryng(void 0).startsWith(/* (undefined).toString() */) ).to.be.ok();
+			expect( Stryng('undefined').startsWith(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should return true searching the empty string', function (){
@@ -187,7 +187,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return true with args ["undefined"]', function (){
-			expect( Stryng(void 0).endsWith(/* (undefined).toString() */) ).to.be.ok();
+			expect( Stryng('undefined').endsWith(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should return true searching the empty string', function (){
@@ -233,7 +233,7 @@ describe('Stryng', function(){
 		});
 
 		it('should search for "undefined" by default', function () {
-			expect( Stryng(void 0).count(/* (undefined).toString() */) ).to.equal(1);
+			expect( Stryng('undefined').count(/* (undefined).toString() */) ).to.equal(1);
 		});
 
 		it('should return length + 1 when counting the empty string', function () {
