@@ -371,7 +371,7 @@ describe('Stryng', function(){
 		});
 
 		it('should split by arbitrary whitespace if no delimiter specified', function () {
-			expect( Stryng.lsplit('the\nquick\tbrown\rfox\f', null, 4) )
+			expect( Stryng.lsplit('the\nquick\tbrown\rfox\u000C', null, 4) )
 			.to.eql(['the','quick','brown','fox','']);
 		});
 
