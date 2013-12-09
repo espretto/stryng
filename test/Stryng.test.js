@@ -13,6 +13,26 @@ describe('Stryng', function(){
 		setTimeout(function(){ done() }, 0);
 	});
 
+	describe('Error Polyfills', function(){
+
+		function RangeError(msg){
+			this.name = 'RangeError';
+			this.message = msg || 'a RangeError has occured';
+		}
+
+		RangeError.prototype = new Error();
+		RangeError.prototype.constructor = RangeError;
+
+		it('should throw a RangeError ', function () {
+			
+			expect(function(){
+
+				throw RangeError('something went wrong');
+				
+			}).to.throwError(/^something went wrong$/);
+		});
+	})
+
 	describe('.capitalize', function(){
 
 		it('should fail if input\'s missing', function (){
@@ -178,15 +198,11 @@ describe('Stryng', function(){
 		});
 
 		it('should fail if n is positive Infinity', function (){
-			expect( function(){
-				Stryng.repeat('', Infinity)
-			}).to.throwError();
+			expect( Stryng.repeat ).withArgs('', Infinity).to.throwError();
 		});
 
 		it('should fail if n is negative', function (){
-			expect( function(){
-				Stryng.repeat('', -1);
-			}).to.throwError();
+			expect( Stryng.repeat ).withArgs('', -1).to.throwError();
 		});
 
 		it('should return the empty string if n is zero', function (){
@@ -205,21 +221,15 @@ describe('Stryng', function(){
 		});
 
 		it('should fail if trying to count occurences of the empty string', function (){
-			expect( function(){
-				Stryng.count('foo', '');
-			}).to.throwError()
+			expect( Stryng.count ).withArgs.('foo', '').to.throwError()
 		});
 
 		it('should fail if input is not of duck-type String', function (){
-			expect(function(){
-				Stryng.count({}, 'hello');
-			}).to.throwError()
+			expect( Stryng.count ).withArgs({}, 'hello').to.throwError()
 		});
 
 		it('should fail for input of type other than String work for arrays of strings, too', function (){
-			expect( function(){
-				Stryng.count(['foo', 'foo', 'bar'], 'foo');
-			}).to.throwError();
+			expect( Stryng.count ).withArgs(['foo', 'foo', 'bar'], 'foo').to.throwError();
 		});
 
 		it('should return the number of non-overlapping occurences', function (){
@@ -238,9 +248,7 @@ describe('Stryng', function(){
 		});
 
 		it('should fail if strings to join are missing', function (){
-			expect(function(){
-				Stryng.join(',');
-			}).to.throwError()
+			expect( Stryng.join ).withArgs(',').to.throwError()
 		});
 
 		it('should join with commata by default', function (){
