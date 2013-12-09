@@ -27,8 +27,6 @@ expect.Assertion.prototype.withArgs = function(){
 // go for it //
 ///////////////
 
-util = require('util')
-
 describe('Stryng', function(){
 
 
@@ -274,11 +272,11 @@ describe('Stryng', function(){
 	describe('.reverse', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.reverse ).to.throwError()
+			expect( Stryng.reverse ).to.throwError();
 		});
 
 		it('should return the empty string unchanged', function (){
-			expect( Stryng.reverse('') ).to.equal('')
+			expect( Stryng.reverse('') ).to.equal('');
 		});
 
 		it('should rerturn a single character unchanged', function (){
@@ -347,16 +345,16 @@ describe('Stryng', function(){
 		});
 
 		it('should split by arbitrary whitespace if no delimiter specified', function () {
-			expect( Stryng.lsplit('the\nquick\tbrown\rfox\f', null, 4) )
+			expect( Stryng.lsplit('the\nquick\tbrown\rfox\f', null, 4) );
 			.to.eql(['the','quick','brown','fox','']);
 		});
 
 		it('should split if input ends with delimiter and limit matches #occurences of delimiter', function () {
-			expect( Stryng.lsplit('foo bar ', ' ', 2) ).to.eql(['foo', 'bar', ''])
+			expect( Stryng.lsplit('foo bar ', ' ', 2) ).to.eql(['foo', 'bar', '']);
 		});
 
 		it('should split if input starts with delimiter and limit matches #occurences of delimiter', function () {
-			expect( Stryng.lsplit(' foo bar', ' ', 2) ).to.eql(['', 'foo', 'bar'])
+			expect( Stryng.lsplit(' foo bar', ' ', 2) ).to.eql(['', 'foo', 'bar']);
 		});
 
 		it('should deal with Infinity', function () {
@@ -377,7 +375,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return an array of two empty strings if splitting by itself', function () {
-			expect( Stryng.lsplit('foo', 'foo') ).to.eql(['', ''])
+			expect( Stryng.lsplit('foo', 'foo') ).to.eql(['', '']);
 		});
 
 		it('should return an empty array if splitting the empty string by itself', function () {
@@ -397,11 +395,11 @@ describe('Stryng', function(){
 		});
 
 		it('should split if input ends with delimiter and limit matches #occurences of delimiter', function () {
-			expect( Stryng.rsplit('foo bar ', ' ', 2) ).to.eql(['foo', 'bar', ''])
+			expect( Stryng.rsplit('foo bar ', ' ', 2) ).to.eql(['foo', 'bar', '']);
 		});
 
 		it('should split if input starts with delimiter and limit matches #occurences of delimiter', function () {
-			expect( Stryng.rsplit(' foo bar', ' ', 2) ).to.eql(['', 'foo', 'bar'])
+			expect( Stryng.rsplit(' foo bar', ' ', 2) ).to.eql(['', 'foo', 'bar']);
 		});
 
 		it('should deal with Infinity', function () {
@@ -422,7 +420,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return an array of two empty strings if splitting by itself', function () {
-			expect( Stryng.rsplit('foo', 'foo') ).to.eql(['', ''])
+			expect( Stryng.rsplit('foo', 'foo') ).to.eql(['', '']);
 		});
 
 		it('should return an empty array if splitting the empty string by itself', function () {

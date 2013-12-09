@@ -144,7 +144,7 @@
 
         var repr = '[object ' + clazz + ']';
         
-        is[clazz] = function(o){ return o && toString.call(o) === repr }
+        is[clazz] = function(o){ return o && toString.call(o) === repr };
     });
 
     forEach.call(['Boolean', 'Number', 'String'], function(clazz){
@@ -161,7 +161,7 @@
     // override former workaround for webkit returning 'function' if convenient
     if(typeof reFloat === 'object') 
     {
-        is.Function = function(o){ return o && typeof o === 'function' }
+        is.Function = function(o){ return o && typeof o === 'function' };
     }
 
     // duck type arguments as fallback
@@ -838,30 +838,30 @@
             return input; // zero replacements
         },
 
-        exchange2: function(input, replacee, replacement, n)
-        {
-            input = input != null ? String(input) : exit(args);
+        // exchange2: function(input, replacee, replacement, n)
+        // {
+        //     input = input != null ? String(input) : exit(args);
             
 
-            if(n == null || n === 1/0 || n === -1/0) return input.split(replacee).join(replacement);
+        //     if(n == null || n === 1/0 || n === -1/0) return input.split(replacee).join(replacement);
             
-            n = ~~n;
+        //     n = ~~n;
             
-            replacee = new RegExp(replacee.replace(reRegex, '\\$1'), 'g');
+        //     replacee = new RegExp(replacee.replace(reRegex, '\\$1'), 'g');
             
-            if(n > 0)
-            {
-                return input.replace(replacee, function(match){
+        //     if(n > 0)
+        //     {
+        //         return input.replace(replacee, function(match){
 
-                    return --n > -1 ? replacement : match;
-                });
-            }
-            else if(n < 0)
-            {
+        //             return (--n > -1 ? replacement : match);
+        //         });
+        //     }
+        //     else if(n < 0)
+        //     {
 
-            }
-            return input;
-        },
+        //     }
+        //     return input;
+        // },
 
         /**
          * concatenates the given string with the <code>padding</code>
