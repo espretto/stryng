@@ -757,7 +757,7 @@
 
             if(n < 0) return every;
 
-            every.push( every.splice(n, 1/0).join(delimiter) );
+            every.push( every.splice(n, every.length - n).join(delimiter) );
             
             return every;
         },
