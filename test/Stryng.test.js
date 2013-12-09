@@ -129,7 +129,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return true with args ["undefined"]', function (){
-			expect( Stryng.contains('undefined' /*, (undefined).toString() */) ).to.be.ok();
+			expect( Stryng(void 0).contains(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should find the empty string in any string', function (){
@@ -152,11 +152,15 @@ describe('Stryng', function(){
 		});
 
 		it('should return true with args ["undefined"]', function (){
-			expect( Stryng.startsWith('undefined' /*, (undefined).toString() */) ).to.be.ok();
+			expect( Stryng(void 0).startsWith(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should return true searching the empty string', function (){
 			expect( Stryng.startsWith('', '') ).to.be.ok();
+		});
+
+		it('should return true searching the empty string with offset Infinity', function (){
+			expect( Stryng.startsWith('any string', '', 1/0) ).to.be.ok();
 		});
 
 		it('should return true if input starts with substring', function (){
@@ -183,7 +187,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return true with args ["undefined"]', function (){
-			expect( Stryng.endsWith('undefined' /*, (undefined).toString() */) ).to.be.ok();
+			expect( Stryng(void 0).endsWith(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should return true searching the empty string', function (){
@@ -229,8 +233,7 @@ describe('Stryng', function(){
 		});
 
 		it('should search for "undefined" by default', function () {
-			expect( Stryng(/* (undefined).toString() */)
-				    .count(/* (undefined).toString() */) ).to.equal(1);
+			expect( Stryng(void 0).count(/* (undefined).toString() */) ).to.equal(1);
 		});
 
 		it('should return length + 1 when counting the empty string', function () {
@@ -345,7 +348,7 @@ describe('Stryng', function(){
 		});
 
 		it('should split by arbitrary whitespace if no delimiter specified', function () {
-			expect( Stryng.lsplit('the\nquick\tbrown\rfox\f', null, 4) );
+			expect( Stryng.lsplit('the\nquick\tbrown\rfox\f', null, 4) )
 			.to.eql(['the','quick','brown','fox','']);
 		});
 
