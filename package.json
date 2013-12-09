@@ -4,7 +4,6 @@
   "devDependencies": {
     "benchmark": "~1.0.0",
     "jsdoc": "~3.3.0-alpha2",
-    "mocha": "~1.14.0",
     "expect.js": "~0.2.0"
   },
   "testling": {
@@ -26,5 +25,4 @@
     "harness": "mocha",
     "files": "test/*.test.js"
   }
-  
 }
