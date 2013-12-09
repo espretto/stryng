@@ -21,29 +21,6 @@ expect.Assertion.prototype.withArgs = function(){
 	return this;
 };
 
-//////////////////////
-// console polyfill //
-//////////////////////
-
-(function(root){
-	
-	var console = root.console = root.console || {},
-		methods = [
-			"assert", "count", "debug", "dir", "dirxml", "error",
-			"exception", "group", "groupCollapsed", "groupEnd",
-			"info", "log", "markTimeline", "profile", "profileEnd",
-			"time", "timeEnd", "trace", "warn"
-		],
-		noop = function(){};
-
-	while(methods.length)
-	{
-		var methodName = methods.pop();
-		console[methodName] = console[methodName] || noop;
-	}
-
-})(this);
-
 // checkout sinonjs.org
 
 ///////////////
@@ -416,7 +393,7 @@ describe('Stryng', function(){
 		});
 
 		it('should split by arbitrary whitespace if no delimiter specified', function () {
-			expect( Stryng.rsplit('the\nquick\tbrown\rfox\f', null, 4) )
+			expect( Stryng.rsplit('the\nquick\tbrown\rfox\u000C', null, 4) )
 			.to.eql(['the','quick','brown','fox','']);
 		});
 

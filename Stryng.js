@@ -178,19 +178,16 @@
     // shim whitespace recognition //
     /////////////////////////////////
 
-    var
-
-    ws = '\u0009\u000A\u000B\u000C' // '\11\12\13\14'
-       + '\u00A0\u000D\u0020\u1680' // '\xA0\15\40'
-       + '\u180E\u2000\u2001\u2002'
-       + '\u2003\u2004\u2005\u2006'
-       + '\u2007\u2008\u2009\u200A'
-       + '\u2028\u2029\u202F\u205F'
-       + '\u3000\uFEFF',
-
-    strWS = '\\s',
-    reWS  = /\s/, // new RegExp(strWS)
-    reNoWS = /\S/;
+    var ws = '\u0009\u000A\u000B\u000C' // '\11\12\13\14'
+           + '\u00A0\u000D\u0020\u1680' // '\xA0\15\40'
+           + '\u180E\u2000\u2001\u2002'
+           + '\u2003\u2004\u2005\u2006'
+           + '\u2007\u2008\u2009\u200A'
+           + '\u2028\u2029\u202F\u205F'
+           + '\u3000\uFEFF',
+        strWS = '\\s',
+        reWS  = /\s/,
+        reNoWS = /\S/;
 
     for(var i = ws.length; i--;)
     {
@@ -760,12 +757,9 @@
 
             if(n < 0) return every;
 
-            var firsts = every.slice(0, n),
-                last = every.slice(n).join(delimiter);
-
-            firsts.push(last);
-
-            return firsts;
+            every.push( every.splice(n, 1/0).join(delimiter) );
+            
+            return every;
         },
 
 
@@ -796,17 +790,13 @@
 
             if(n === 0) return [input];
             
-            // **TODO** think of a faster implementation
             var every = input.split(delimiter);
 
             if(n < 0) return every;
 
-            var lasts = every.slice(-n),
-                first = every.slice(0, -n).join(delimiter);
+            every.unshift( every.splice(0, every.length - n).join(delimiter) );
 
-            lasts.unshift(first);
-
-            return lasts;
+            return every;
         },
 
         /**
