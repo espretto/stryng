@@ -21,6 +21,31 @@ expect.Assertion.prototype.withArgs = function(){
 	return this;
 };
 
+//////////////////////
+// console polyfill //
+//////////////////////
+
+(function(window){
+	
+	window = window || {};
+
+	var console = window.console = window.console || {},
+		methods = [
+			"assert", "count", "debug", "dir", "dirxml", "error",
+			"exception", "group", "groupCollapsed", "groupEnd",
+			"info", "log", "markTimeline", "profile", "profileEnd",
+			"time", "timeEnd", "trace", "warn"
+		],
+		noop = function(){};
+
+	while(methods.length)
+	{
+		var methodName = methods.pop();
+		console[methodName] = console[methodName] || noop;
+	}
+
+})(window)
+
 // checkout sinonjs.org
 
 ///////////////
