@@ -58,7 +58,7 @@
     // used to access native instance methods
     VERSION = '0.0.1',
 
-    // promote compression
+    // don't be fooled and promote compression
     String = VERSION.constructor,
 
     // methods Stryng hopes to adopt - getOwnPropertyNames() method is non-shimable
@@ -150,7 +150,7 @@
 
     reNoWS = /\S/,
 
-    reTrimLeft,
+    reTrimLeft = /^\s\s*/,
     
     // http://perfectionkills.com/whitespace-deviations/
     ws = (
@@ -188,7 +188,7 @@
     // catch up with the spec it wouldn't be replaced
     if(strWS.length > 2)
     {
-        shimMethods.push('trim', 'trimRight', 'trimLeft');
+        shimMethods.push(/*'trim',*/ 'trimRight', 'trimLeft'); // contained by trimRight/-Left
 
         reNoWS = new RegExp('[^' + strWS + ']');
         strWS = '[' + strWS + ']';
