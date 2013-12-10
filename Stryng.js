@@ -90,15 +90,22 @@
 
     toString = is.toString,
 
+    contains = methods.contains || function(search)
+    {
+        for(var o = Object(this), i = o.length >>> 0; i--;)
+        {
+            if(i in o)
+            {
+                if(o[i] === search) break;
+            }
+        }
+        return i !== -1;
+    },
+
     forEach = methods.forEach || function(iterator, context)
     {
-        // not intended to be spec compliant
-        for(var o = this,
-            length = o.length,
-            i = -1;
-            
-            ++i !== length;
-        ){
+        for(var o = Object(this), length = o.length >>> 0, i = -1; ++i !== length;)
+        {
             if(i in o)
             {
                 iterator.call(context, o[i], i, o);
@@ -144,9 +151,9 @@
     // shim whitespace recognition //
     /////////////////////////////////
 
-    reWS   = /\s/,
+    reWS = /\s/,
 
-    reWSs  = /\s+/g,
+    reWSs = /\s+/g,
 
     reNoWS = /\S/,
 
@@ -188,7 +195,7 @@
     // catch up with the spec it wouldn't be replaced
     if(strWS.length > 2)
     {
-        shimMethods.push(/*'trim',*/ 'trimRight', 'trimLeft'); // contained by trimRight/-Left
+        shimMethods.push('trim', 'trimRight', 'trimLeft');
 
         reNoWS = new RegExp('[^' + strWS + ']');
         strWS = '[' + strWS + ']';
@@ -1689,14 +1696,11 @@
     // native //
     ////////////
     
-    // avoid the need for an Array#indexOf shim
-    shimMethods = shimMethods.join(',');
-
     forEach.call(methods, function(fnName){
 
         var fn = VERSION[fnName];
 
-        if(is.Function(fn) && shimMethods.indexOf(fnName) === -1)
+        if(is.Function(fn) && !contains.call(shimMethods, fnName))
         {
             // static methods
             Stryng[fnName] = function(input /* arguments */)

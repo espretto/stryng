@@ -41,13 +41,6 @@ describe('Stryng', function(){
 		setTimeout(function(){ done() }, 0);
 	});
 
-	describe('form feed', function(){
-
-		it('should recognize form feed by \\s', function () {
-			expect( /\s/.test('\f') ).to.be.ok();
-		});
-	})
-
 	describe('.capitalize', function(){
 
 		it('should fail if input\'s missing', function (){
@@ -135,7 +128,7 @@ describe('Stryng', function(){
 			expect( Stryng.contains ).to.throwError();
 		});
 
-		it('should return true with args ["undefined"]', function (){
+		it('should return true on "undefined" with no arguments passed', function (){
 			expect( Stryng('undefined').contains(/* (undefined).toString() */) ).to.be.ok();
 		});
 
@@ -143,8 +136,12 @@ describe('Stryng', function(){
 			expect( Stryng.contains('any', '') ).to.be.ok();
 		});
 
-		it('should return true if substring found', function (){
+		it('should return true if search equals input', function (){
 			expect( Stryng.contains('foo', 'foo') ).to.be.ok();
+		});
+
+		it('should return true if input contains substring', function (){
+			expect( Stryng.contains('the quick brown fox', 'quick') ).to.be.ok();
 		});
 
 		it('should return false if substring not found', function (){
@@ -158,8 +155,8 @@ describe('Stryng', function(){
 			expect( Stryng.startsWith ).to.throwError();
 		});
 
-		it('should return true with args ["undefined"]', function (){
-			expect( Stryng('undefined').startsWith(/* (undefined).toString() */) ).to.be.ok();
+		it('should return true on "undefined..." with no arguments passed', function (){
+			expect( Stryng('undefined...').startsWith(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should return true searching the empty string', function (){
@@ -193,8 +190,8 @@ describe('Stryng', function(){
 			expect( Stryng.endsWith ).to.throwError();
 		});
 
-		it('should return true with args ["undefined"]', function (){
-			expect( Stryng('undefined').endsWith(/* (undefined).toString() */) ).to.be.ok();
+		it('should return on "...undefined" with no arguments passed', function (){
+			expect( Stryng('...undefined').endsWith(/* (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should return true searching the empty string', function (){
