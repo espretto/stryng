@@ -51,24 +51,31 @@
         root.Stryng = Stryng;
     }
 
-}(this, function(){ var
+}(this, function(){
 
-    String = ''.constructor, // promote compression
+    var // one to var them all
 
-    ////////////////////////////////////////////
-    // String instance methods which's        //
-    // generic versions Stryng hopes to adopt //
-    ////////////////////////////////////////////
+    // used to access native instance methods
+    VERSION = '0.0.1',
 
-    methods = [
+    // promote compression
+    String = VERSION.constructor,
 
-        'charAt', 'charCodeAt', 'codePointAt', 'concat', 'contains',
-        'endsWith', 'fromCodePoint', 'indexOf', 'lastIndexOf',
-        'localeCompare', 'match', 'normalize', 'replace', 'search',
-        'slice', 'split', 'startsWith', 'substr', 'substring',
-        'toLocaleLowerCase', 'toLocaleUpperCase', 'toLowerCase',
-        'toUpperCase'/*, 'trim', 'trimLeft', 'trimRight' TODO*/
-    ],
+    // methods Stryng hopes to adopt - getOwnPropertyNames() method is non-shimable
+    methods = (
+          'charAt,charCodeAt,codePointAt,concat,contains'
+        + ',endsWith,fromCodePoint,indexOf,lastIndexOf'
+        + ',localeCompare,match,normalize,replace,search'
+        + ',slice,split,startsWith,substr,substring'
+        + ',toLocaleLowerCase,toLocaleUpperCase,toLowerCase'
+        + ',toUpperCase,trim,trimLeft,trimRight'
+    ).split(','),
+
+    // methods which's native implementations to override if necessary
+    shimMethods = [],
+
+    // inner module to hold type/class check functions
+    is = {},
 
     ////////////////////////////////
     // quick access variables     //
@@ -81,12 +88,13 @@
 
     unshift = methods.unshift,
 
-    toString = Object.prototype.toString,
+    toString = is.toString,
 
     forEach = methods.forEach || function(iterator, context)
     {
-        for(var o = Object(this),
-            length = o.length >>> 0,
+        // not intended to be spec compliant
+        for(var o = this,
+            length = o.length,
             i = -1;
             
             ++i !== length;
@@ -98,9 +106,9 @@
         }
     },
 
-    // for the w3c-wishlist
     forOwn = function(iterator, context)
     {
+        // for the w3c-wishlist
         var o = Object(this),
             i;
 
@@ -118,8 +126,6 @@
     // to native static methods //
     //////////////////////////////
 
-    abs = Math.abs,
-
     random = Math.random,
 
     fromCharCode = String.fromCharCode,
@@ -134,81 +140,102 @@
 
     reFloat = /^\d+\.?\d*e?[\+-]?\d*$/,
 
-    reRegex = /([\\\^\$\*\+\?\.\(\)\{\}\[\]\-])/g,
+    /////////////////////////////////
+    // shim whitespace recognition //
+    /////////////////////////////////
+
+    reWS   = /\s/,
+
+    reWSs  = /\s+/g,
+
+    reNoWS = /\S/,
+
+    reTrimLeft,
+    
+    // http://perfectionkills.com/whitespace-deviations/
+    ws = (
+          '\11' // '\u0009' // tab
+        + '\12' // '\u000A' // line feed
+        + '\13' // '\u000B' // vertical tab
+        + '\14' // '\u000C' // form feed
+        + '\15' // '\u000D' // carriage return
+        + ' '   // '\u0020' // space
+        
+        // http://www.fileformat.info/info/unicode/category/Zs/list.htm
+        + '\xA0'
+        + '\u1680\u180E\u2000\u2001'
+        + '\u2002\u2003\u2004\u2005'
+        + '\u2006\u2007\u2008\u2009'
+        + '\u200A\u202F\u205F\u3000'
+
+        // http://es5.github.io/#x15.5.4.20
+        + '\u2028' // line separator
+        + '\u2029' // paragraph separator
+        + '\uFEFF' // BOM - byte order mark
+
+    ).split(''),
+
+    strWS  = reWS.source
+
+    ; // ends var block
+
+    forEach.call(ws, function(chr){
+
+        if(!reWS.test(chr)) strWS += chr;
+    });
+
+    // if a native implementation manages to
+    // catch up with the spec it wouldn't be replaced
+    if(strWS.length > 2)
+    {
+        shimMethods.push('trim', 'trimRight', 'trimLeft');
+
+        reNoWS = new RegExp('[^' + strWS + ']');
+        strWS = '[' + strWS + ']';
+        reWS = new RegExp(strWS);
+
+        // http://blog.stevenlevithan.com/archives/faster-trim-javascript
+        reWSs = new RegExp(strWS + strWS + '*', 'g');
+        reTrimLeft = new RegExp('^' + strWS + strWS + '*');
+    }
 
     /////////////////////////
     // class / type checks //
     /////////////////////////
 
-    is = {};
-
-    forEach.call(['Array', 'Date', 'Function', 'Object', 'RegExp'], function(clazz){
+    forEach.call(['Array'/*, 'Date'*/, 'Function'/*, 'Object'*/, 'RegExp'], function(clazz){
 
         var repr = '[object ' + clazz + ']';
         
+        // early exit falsies
         is[clazz] = function(o){ return o && toString.call(o) === repr };
     });
 
-    forEach.call(['Boolean', 'Number', 'String'], function(clazz){
+    forEach.call([/*'Boolean', 'Number',*/ 'String'], function(clazz){
 
         var repr = '[object ' + clazz + ']',
             type = clazz.toLowerCase();
 
+        // early exit null, undefined, primitves
         is[clazz] = function(o){ return o != null && (typeof o === type || toString.call(o) === repr) };
     });
 
     // adopt native if available
     is.Array = Array.isArray || is.Array;
 
-    // override former workaround for webkit returning 'function' if convenient
+    // override if not returning 'function' (webkit)
     if(typeof reFloat === 'object') 
     {
         is.Function = function(o){ return o && typeof o === 'function' };
     }
 
     // duck type arguments as fallback
-    is.Arguments = function(o){ return o && ( toString.call(o) === '[object Arguments]' || o.callee ) };
+    // is.Arguments = function(o){ return o && ( toString.call(o) === '[object Arguments]' || o.callee ) };
     
     // 'undefined' might be overridable
-    is.Undefined = function(o){ return o === void 0 };
+    // is.Undefined = function(o){ return o === void 0 };
 
-    is.Null = function(o){ return o === null };
-
-    /////////////////////////////////
-    // shim whitespace recognition //
-    /////////////////////////////////
-
-    var ws = '\u0009\u000A\u000B\u000C' // '\11\12\13\14'
-           + '\u00A0\u000D\u0020\u1680' // '\xA0\15\40'
-           + '\u180E\u2000\u2001\u2002'
-           + '\u2003\u2004\u2005\u2006'
-           + '\u2007\u2008\u2009\u200A'
-           + '\u2028\u2029\u202F\u205F'
-           + '\u3000\uFEFF',
-        strWS = '\\s',
-        reWS  = /\s/,
-        reNoWS = /\S/;
-
-    for(var i = ws.length; i--;)
-    {
-        var chr = ws.charAt(i);
-
-        if(!reWS.test(chr))
-        {
-            strWS += chr;
-        }
-    }
-
-    // redefine if insecure
-    if(strWS.length > 2)
-    {
-        reNoWS = new RegExp('[^' + strWS + ']');
-        strWS = '[' + strWS + ']';
-        reWS  = new RegExp(strWS);
-    }
-
-    var reWSs      = new RegExp(strWS + '+'),
-        reTrimLeft = new RegExp('^' + strWS + strWS + '*');
+    // is.Null = function(o){ return o === null };
 
     ///////////////////////
     // utility functions //
@@ -235,13 +262,12 @@
         return array;
     }
 
-    /**
-     * composes <code>Math.abs</code> and {@linkcode Stryng.toInt}
-     * @function Stryng.toNat
-     * @param {*} n   - value to be parsed
-     * @param {*} [m] - default value to be parsed
-     * @returns {number} natural <code>n</code>
-     */
+    function exit(args)
+    {
+        // relies on custom property 'Function._name'
+        throw new Error('invalid usage of "' + args.callee._name + '" with args [' + slice.call(args) + ']');
+    }
+
     function toNat(n, m)
     {
         if(n == null || (n = +n) !== n)
@@ -252,30 +278,6 @@
         return n;
     }
 
-    /**
-     * parses <code>n</code> following these rules:
-     * <ul>
-     *     <li><code>null</code>, <code>undefined</code> and <code>NaN</code>
-     *     (after parsing with <code>+</code>) are mapped to <code>0</code></li>
-     *     <li>if <code>m</code> is specified though, <code>toInt(m)</code>
-     *     will be returned</li>
-     * </ul>
-     * note that <code>toInt</code> uses the <code>+</code> operator instead of
-     * <code>parseFloat</code> because the latter omits trailing non-number characters
-     * <em>and succeeds</em>.
-     * see [parseFloat]{@linkcode http://www.w3schools.com/jsref/jsref_parsefloat.asp}
-     * for the details.
-     * @function Stryng.toInt
-     * @param {*} n     - to be parsed
-     * @param {*} [m=0] - default value to be parsed. <strong>not</strong> the radix
-     * @returns {number} parsed and floored <code>n</code>
-     * @example
-     * toInt('1,000')      // returns 0
-     * parseFloat('1,000') // returns 1
-     *
-     * toInt('5.99$', 1)   // returns 1
-     * parseFloat('5.99$') // returns 5.99
-     */
     function toInt(n, m)
     {
         if(n == null || (n = +n) !== n)
@@ -286,18 +288,6 @@
         return n;
     }
 
-    /**
-     * delegates to native <code>parseFloat</code>
-     * but resorts to the given default value
-     * if <code>n</code> is of type string but does not
-     * <em>completely</em> match the number or scientific format.
-     * @param  {*} n     - to be parsed
-     * @param  {*} [m=0] - default value to be parsed.
-     * @returns {number}
-     * @example
-     * Stryng.toFloat('1e3SciFi'); // returns 0
-     * parseFloat('1e3SciFi')      // returns 1000          
-     */
     function toFloat(n, m)
     {
         if(m == null)
@@ -311,26 +301,26 @@
         return parseFloat(n);
     }
 
-    function exit(args)
-    {
-        // relies on custom property 'Function._name'
-        throw new Error('invalid usage of "' + args.callee._name + '" with args [' + slice.call(args) + ']');
-    }
-
     //////////
     // Main //
     //////////
     
     /**
      * generic utility functions to ease working with Strings.
-     * native instance of <code>String</code> get mixed in with inverted signatures.
+     * native instance of <code>String</code> get mixed.
      * @global
-     * @class  Stryng
+     * @constructor Stryng
+     * @param {*} [input=""]
+     *   the value to parse. defaults to the empty string
+     * @returns {Stryng}
      */
-    function Stryng(obj)
+    function Stryng(input)
     {
-        if(!(this instanceof Stryng)) return new Stryng(obj);
-        this._value = obj == null ? '' : String(obj);
+        // allow omitting the new operator
+        if(!(this instanceof Stryng)) return new Stryng(input);
+
+        // default to the empty string
+        this._value = input == null ? '' : String(input);
     }
 
     var StryngGenerics = {
@@ -513,6 +503,22 @@
             for(var result = ''; n--; result += input);
 
             return result;
+        },
+
+        /**
+         * shim for native String#substr
+         * @param  {string} input
+         * @param  {number} start
+         * @param  {number} length
+         * @return {string}
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
+         */
+        substr: function(input, start, length)
+        {
+            input = input != null ? String(input) : exit(arguments);
+            if(start < 0) start += input.length;
+            return input.substr(start, length);
         },
 
         /**
@@ -708,7 +714,7 @@
             while(++a !== aLength)      // skips first argument
             {
                 var j = args[a];        // string index
-                if(j >= iLength) break; // ignore ary following
+                if(j > iLength) break; // ignore any following
                 j = ~~j;                // parse
                 if(j < 0) j += iLength; // ease invalid usage detection and translate from slice to substring
                 if(j < i) exit(args);   // throw if regions overlap
@@ -726,7 +732,7 @@
          * @param  {string} input
          * @param  {string} [delimiter=/\s+/]
          *   defaults to a sequence of whitespace characters of arbitrary length
-         * @param  {number} [n=Infinity]
+         * @param  {number} [n=#occurrences]
          *   maximum number of split operations. negative values are regarded zero.
          *   defaults to the number of occurrences of <code>delimiter</code>
          * @returns {string[]}
@@ -744,24 +750,77 @@
          */
         lsplit: function(input, delimiter, n)
         {
-            input = input != null ? String(input) : exit(args);
+            input = input != null ? String(input) : exit(arguments);
 
+            // handle negative values, null and undefined all the same
+            n = n == null || (n = ~~n) < 0 ? 1/0 : n;
+
+            // conform with native behavior
+            if(n === 0) return [];
+
+            // default to multiple whitespace
             if(delimiter == null) delimiter = reWSs;
-            if(n == null || n === 1/0) return input.split(delimiter);
 
-            n = ~~n;
+            if(is.RegExp(delimiter))
+            {
+                var result = [],
+                    match,
+                    i = 0, j;
 
-            if(n === 0) return [input];
+                if(delimiter.global)
+                {
+                    while(
+                        n-- &&
+                        (match = delimiter.exec(input))
+                    ){
+                        j = match.index;
+                        result.push( input.substring(i, j) );
+                        i = j + match[0].length; // prefer over .lastIndex
+                    }
+                }
+                else
+                {
+                    // slightly slower than recompiling the regex
+                    // in case not global, but smaller in code size
+                    while(n--)
+                    {
+                        input = input.substring(i);
 
-            var every = input.split(delimiter);
+                        if(match = input.match(delimiter))
+                        {
+                            j = match.index;
+                            i = j + match[0].length; // prefer over .lastIndex
+                            result.push( input.substring(0, j) );
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
 
-            if(n < 0) return every;
+                // reset regex for future operations
+                delimiter.lastIndex = 0;
+                
+                result.push( input.substring(i) );
 
-            every.push( every.splice(n, every.length - n).join(delimiter) );
-            
-            return every;
+                return result;
+            }
+            else
+            {
+                // delimiter gets parsed internally
+                var result = input.split(delimiter),
+                    diff = result.length - n;
+
+                if(diff > 0)
+                {
+                    // the removed get rejoined and pushed as one
+                    result.push( result.splice(n, diff).join(delimiter) );    
+                }
+
+                return result;
+            }
         },
-
 
         /**
          * the right-associative version of {@link Stryng.lsplit}
@@ -781,7 +840,7 @@
          */
         rsplit: function(input, delimiter, n)
         {
-            input = input != null ? String(input) : exit(args);
+            input = input != null ? String(input) : exit(arguments);
 
             if(delimiter == null) delimiter = reWSs;
             if(n == null || n === 1/0) return input.split(delimiter);
@@ -907,7 +966,7 @@
             }
             else if(maxLength < 0)
             {
-                maxLength = abs(maxLength);
+                maxLength = Math.abs(maxLength);
 
                 // introduced 'temp' because appending is faster than prepending
                 for(var temp = ''; input.length < maxLength; maxLength -= pLength)
@@ -941,17 +1000,16 @@
          * // which equals the more intuitive (the former is faster)
          * ['!', 'World', ' ', 'Hello'].reverse().join('');
          */
-        prepend: function(/* input, prefixes */)
+        prepend: function(input /*, prefixes */)
         {
-            var args   = arguments,     // promote compression
-                i      = args.length;
+            // used for null check only
+            if(input == null) exit(args);
+            
+            var args = arguments, // promote compression
+                i = args.length;
 
-            if(i === 0) exit(args);
-
-            for(var result = args[--i]; i--;) // append reversely
-            {
-                result += args[i];
-            }
+            // append reversely
+            for(var result = args[--i]; i--; result += args[i]);
 
             return result;
         },
@@ -961,9 +1019,16 @@
          * @deprecated slower - use {@link Stryng.prepend} instead
          * @todo test and benchmark across browsers
          */
-        prepend2: function(/* input, prep1, ..., prepN */)
+        prepend2: function(input /*, prefixes */)
         {
+            if(input == null) exit(args);
             return slice.call(arguments).reverse().join('');
+        },
+
+        prepend3: function(input /*, prefixes */)
+        {
+            if(input == null) exit(args);
+            return VERSION.concat.apply(input, slice.call(arguments, 1).reverse());
         },
 
         /**
@@ -995,7 +1060,7 @@
                 i = input.indexOf(prefix),
                 j = 0; // pending i
 
-            while( // startsWith(prefix, i) where i is the offset
+            while( // startsWith(prefix, i)
                 limit-- &&
                 i === j
             ){
@@ -1545,15 +1610,11 @@
         }
     };
 
-    // correct String#substr
-    if('ab'.substr(-1) !== 'b')
-    {
-        StryngGenerics.substr = function(input, start, length)
-        {
-            if(start < 0) start += input.length;
-            return input.substr(start, length);
-        }
-    }
+    /////////////////
+    // shim substr //
+    /////////////////
+
+    if('ab'.substr(-1) !== 'b') shimMethods.push('substr');
 
     /////////////
     // foreign //
@@ -1589,27 +1650,27 @@
     ////////////
     // native //
     ////////////
+    
+    // avoid the need for an Array#indexOf shim
+    shimMethods = shimMethods.join(',');
 
     forEach.call(methods, function(fnName){
 
-        var fn = ''[fnName];
+        var fn = VERSION[fnName];
 
-        if(is.Function(fn))
+        if(is.Function(fn) && shimMethods.indexOf(fnName) === -1)
         {
-
             // static methods
-            Stryng[fnName] = function()
+            Stryng[fnName] = function(input /* arguments */)
             {
-                // throw an error if no context is provided
-                // which would be cast to the global object
-                // and then again to a string '[object global]' on node
-                if(arguments[0] == null)
-                {
-                    throw new Error('Cannot call "' + fnName + '" of undefined');
-                }
+                if(input == null) exit(arguments);
 
+                // Function#call uses the global object as the default context
                 return Function.call.apply(fn, arguments);
             };
+
+            // make custom exit work
+            Stryng[fnName]._name = fnName;
 
             // instance methods
             Stryng.prototype[fnName] = function()
