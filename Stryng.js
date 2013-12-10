@@ -154,12 +154,12 @@
     
     // http://perfectionkills.com/whitespace-deviations/
     ws = (
-          '\11' // '\u0009' // tab
-        + '\12' // '\u000A' // line feed
+          '\t' // '\11' // '\u0009' // tab
+        + '\n' // '\12' // '\u000A' // line feed
         + '\13' // '\u000B' // vertical tab
-        + '\14' // '\u000C' // form feed
-        + '\15' // '\u000D' // carriage return
-        + ' '   // '\u0020' // space
+        + '\f' // '\14' // '\u000C' // form feed
+        + '\r' // '\15' // '\u000D' // carriage return
+        + ' '   // '\40' // '\u0020' // space
         
         // http://www.fileformat.info/info/unicode/category/Zs/list.htm
         + '\xA0'
@@ -820,6 +820,44 @@
 
                 return result;
             }
+        },
+
+        lsplit_old: function(input, delimiter, n)
+        {
+            if(delimiter == null)
+            {
+                return input.split(reWSs);
+            }
+
+            if(n == null)
+            {
+                return input.split(delimiter);
+            }
+
+            n = toNat(n);
+
+            if(n === 0 || !isFinite(n))
+            {  
+                return []; // conform with native split
+            }
+
+            var // map to native split
+                result = input.split(delimiter, n),
+            
+                // sum up delimiter lengths
+                i = result.length,
+                index = i * delimiter.length;
+
+            while(i--)
+            {
+                // sum up splitted items' lengths
+                index += result[i].length; 
+            }
+
+            // restore the remainder
+            result.push(input.substring(index));
+
+            return result;
         },
 
         /**
