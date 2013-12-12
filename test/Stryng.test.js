@@ -29,16 +29,45 @@ expect.Assertion.prototype.withArgs = function(){
 
 describe('Stryng', function(){
 
+	it('should throw primitve', function () {
+		expect( function(){ throw "message" } ).to.throwError(/message/);
+	});
 
-	// blow away the stack trace here
-	// ```
-	// beforeEach(function(done){
-	// 	setTimeout(done, 0);
-	// });
-	// ```
-	// would break FF 3.0
-	beforeEach(function(done){
-		setTimeout(function(){ done() }, 0);
+	it('should handle array methods on arguments', function(){
+
+		function flatten(iterable) 
+	    {
+	        // length changes by splicing
+	        for(var i = 0; i !== iterable.length;)
+	        {
+	            var item = iterable[i];
+
+	            if(is.Array(item))
+	            {
+	                item.unshift(i, 1);
+	                splice.apply(iterable, item);
+	            }
+	            else
+	            {
+	                i++;
+	            }
+	        }
+	        return iterable;
+	    }
+    
+		expect( function fn(){ return flatten(arguments) } ).withArgs([1,[2,[3]]]).to.not.throwError();
+
+	});
+
+	it('should support loop labeling', function () {
+		outer : for(var i = 10; i--;)
+		{
+			inner : while(i--)
+			{
+				break outer;
+			}
+		}
+		expect(i).to.equal(8);
 	});
 
 	describe('.capitalize', function(){
@@ -98,9 +127,9 @@ describe('Stryng', function(){
 			       + '\u2028\u2029\u202F\u205F'
 			       + '\u3000\uFEFF',
 			    msg = 'Hello World',
-			    padded = ws + msg;
+			    leftPadded = ws + msg;
 
-		    expect( Stryng.trimLeft(padded) ).to.equal(msg);
+		    expect( Stryng.trimLeft(leftPadded) ).to.equal(msg);
 		});
 	});
 
@@ -116,9 +145,9 @@ describe('Stryng', function(){
 			       + '\u2028\u2029\u202F\u205F'
 			       + '\u3000\uFEFF',
 			    msg = 'Hello World',
-			    padded = msg + ws;
+			    rightPadded = msg + ws;
 
-		    expect( Stryng.trimRight(padded) ).to.equal(msg);
+		    expect( Stryng.trimRight(rightPadded) ).to.equal(msg);
 		});
 	});
 
@@ -443,4 +472,74 @@ describe('Stryng', function(){
 			expect( Stryng.rsplit('', '') ).to.eql([]);
 		});
 	});
+
+	//////////////////////
+	// other easy tests //
+	//////////////////////
+
+	describe('.wrap', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.wrap ).to.throwError();			
+		});
+
+		it('should wrap input with "undefined" if no suf-/prefix passed', function () {
+			expect( Stryng.wrap('foo') ).to.equal('undefinedfooundefined');
+		});
+
+		it('should default to wrap once', function () {
+			expect( Stryng.wrap('foo', '"') ).to.equal('"foo"');
+		});
+
+		it('should return the input as is if n is zero', function () {
+			expect( Stryng.wrap('foo', 'any string', 0) ).to.equal('foo');
+		});
+
+		it('should treat Infinity like zero', function () {
+			expect( Stryng.wrap('foo', 'fix', Infinity) ).to.equal('foo');
+		});
+
+		it('should wrap three times', function () {
+			expect( Stryng.wrap('foo', 'x', 3) ).to.equal('xxxfooxxx');
+		});
+	});
+
+	describe('.quote', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.quote ).to.throwError();
+		});
+
+		it('should return two quotes if passed the empty string', function () {
+			expect( Stryng.quote('') ).to.equal('""');
+		});
+
+		it('should wrap the input in double quotes', function () {
+			expect( Stryng.quote('foo') ).to.equal('"foo"');
+		});
+	});
+
+	describe('.unquote', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.unquote ).to.throwError();
+		});
+
+		it('should return the empty string unchanged if passed', function () {
+			expect( Stryng.unquote('') ).to.equal('');
+		});
+
+		it('should strip any leading and trailing single and double quotes', function () {
+			expect( Stryng.unquote('"\'"\'foo\'"\'"') ).to.equal('foo');
+		});
+	});
+
+	describe('.isEqual', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.unquote ).to.throwError();
+		});
+
+		// continue...
+	})
 });

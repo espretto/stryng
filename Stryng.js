@@ -86,7 +86,11 @@
 
     splice = methods.splice,
 
+    shift = methods.shift,
+
     unshift = methods.unshift,
+
+    join = methods.join,
 
     toString = is.toString,
 
@@ -143,30 +147,41 @@
 
     reWord = /\w/,
 
-    reQuote = /^['|"]+|["|']+$/g,
-
     reFloat = /^\d+\.?\d*e?[\+-]?\d*$/,
+
+    ////////////
+    // quotes //
+    ////////////
+
+    strOpenQuotes = '["\'\u00bb\u201d\u2019]',
+
+    strCloseQuotes = '["\'\u00ab\u201c\u2018]',
+
+    reUnquoteLeft = new RegExp('^' + strOpenQuotes + strOpenQuotes + '*'),
+
+    reUnquoteRight = new RegExp(strCloseQuotes + '*' + strCloseQuotes + '$'),
+
 
     /////////////////////////////////
     // shim whitespace recognition //
     /////////////////////////////////
 
-    reWS = /\s/,
-
+    reWS = /\s/, // TODO deprecated
     reWSs = /\s+/g,
-
     reNoWS = /\S/,
 
+    // http://blog.stevenlevithan.com/archives/faster-trim-javascript
     reTrimLeft = /^\s\s*/,
+    reTrimRight = /\s*\s$/,
     
     // http://perfectionkills.com/whitespace-deviations/
     ws = (
           '\t' // '\11' // '\u0009' // tab
         + '\n' // '\12' // '\u000A' // line feed
-        + '\13' // '\u000B' // vertical tab
+        + '\13'         // '\u000B' // vertical tab
         + '\f' // '\14' // '\u000C' // form feed
         + '\r' // '\15' // '\u000D' // carriage return
-        + ' '   // '\40' // '\u0020' // space
+        + ' '  // '\40' // '\u0020' // space
         
         // http://www.fileformat.info/info/unicode/category/Zs/list.htm
         + '\xA0'
@@ -182,7 +197,7 @@
 
     ).split(''),
 
-    strWS  = reWS.source
+    strWS  = '\\s'
 
     ; // ends var block
 
@@ -200,10 +215,9 @@
         reNoWS = new RegExp('[^' + strWS + ']');
         strWS = '[' + strWS + ']';
         reWS = new RegExp(strWS);
-
-        // http://blog.stevenlevithan.com/archives/faster-trim-javascript
         reWSs = new RegExp(strWS + strWS + '*', 'g');
         reTrimLeft = new RegExp('^' + strWS + strWS + '*');
+        reTrimRight = new RegExp(strWS + '*' + strWS + '$');
     }
 
     /////////////////////////
@@ -249,24 +263,24 @@
     ///////////////////////
 
     // does not copy
-    function flatten(array) 
+    function flatten(iterable) 
     {
         // length changes by splicing
-        for(var i = 0; i !== array.length;)
+        for(var i = 0; i !== iterable.length;)
         {
-            var item = array[i];
+            var item = iterable[i];
 
             if(is.Array(item))
             {
                 item.unshift(i, 1);
-                splice.apply(array, item);
+                splice.apply(iterable, item);
             }
             else
             {
                 i++;
             }
         }
-        return array;
+        return iterable;
     }
 
     function exit(args)
@@ -371,10 +385,10 @@
          */
         trimLeft: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
-            return input.replace(reTrimLeft, '');
+            return input != null ? String(input).replace(reTrimLeft, '') : exit(arguments);
         },
 
+        
         /**
          * shim for [native] String#trimRight
          * @function Stryng.trimRight
@@ -385,14 +399,11 @@
          */
         trimRight: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
-
-            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
-
-            return i > 0 ? input.slice(0, ++i) : '';
+            return input != null ? String(input).replace(reTrimRight, '') : exit(arguments);
         },
 
         /**
+         * uses a reverse charAt loop and regex tests then slice
          * @function Stryng.trimRight2
          * @deprecated slower - use {@link Stryng.trimRight} instead
          * @todo test and benchmark across browsers
@@ -401,7 +412,22 @@
         {
             input = input != null ? String(input) : exit(arguments);
 
-            for(var i = input.length; i-- && ws.indexOf(input.charAt(i)) !== -1;);
+            for(var i = input.length; i-- && reWS.test(input.charAt(i));); // TODO side effectively remove "reWS"
+
+            return i > 0 ? input.slice(0, ++i) : '';
+        },
+
+        /**
+         * uses a reverse charAt loop and regex tests
+         * @function Stryng.trimRight3
+         * @deprecated slower - use {@link Stryng.trimRight} instead
+         * @todo test and benchmark across browsers
+         */
+        trimRight3: function(input)
+        {
+            input = input != null ? String(input) : exit(arguments);
+
+            for(var i = input.length; i-- && contains.call(ws, input.charAt(i)););
             
             return i > 0 ? input.slice(0, ++i) : '';
         },
@@ -416,15 +442,7 @@
          */
         trim: function(input)
         {
-            // trimLeft and -Right inlined to keep call stack flat
-            
-            input = input != null ? String(input) : exit(arguments);
-
-            input = input.replace(reTrimLeft, '');
-
-            for(var i = input.length; i-- && reWS.test(input.charAt(i)););
-
-            return i > 0 ? input.slice(0, ++i) : '';
+            return input != null ? String(input).replace(reTrimLeft, '').replace(reTrimRight, '') : exit(arguments);
         },
 
         /**
@@ -524,6 +542,7 @@
         substr: function(input, start, length)
         {
             input = input != null ? String(input) : exit(arguments);
+            start = start >>> 0;
             if(start < 0) start += input.length;
             return input.substr(start, length);
         },
@@ -612,14 +631,17 @@
          * Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['lazy', ['dog']]]]]]]])
          * // returns 'the quick brown fox jumps over the lazy dog'
          */
-        join: function(delimiter /* strings */)
+        join: function(/* delimiter, strings */)
         {
             var args = arguments;
 
             if(args.length < 2) exit(args);
+
+            var delimiter = shift.call(args);
+
             if(delimiter == null) delimiter = ',';
-            
-            return flatten(slice.call(args, 1)).join(delimiter);
+
+            return join.call(flatten(args), delimiter);
         },
 
         /**
@@ -634,13 +656,7 @@
         {
             input = input != null ? String(input) : exit(arguments);
 
-            var result = '',
-                i;
-            
-            for(i = input.length; i--;)
-            {
-                result += input.charAt(i);
-            }
+            for(var result = '', i = input.length; i--; result += input.charAt(i));
 
             return result;
         },
@@ -658,12 +674,14 @@
 
             if(length < 2) return input;
             
-            for(var i = --length; i--;)
-            {
-                input += input.charAt(i);
-            }
+            for(var i = --length; i--; input += input.charAt(i));
 
             return input.substring(length);
+        },
+
+        reverse3: function(input)
+        {
+            return input != null ? String(input).split('').reverse().join('') : exit(arguments);
         },
 
         /**
@@ -721,7 +739,7 @@
             while(++a !== aLength)      // skips first argument
             {
                 var j = args[a];        // string index
-                if(j > iLength) break; // ignore any following
+                if(j > iLength) break;  // ignore any following
                 j = ~~j;                // parse
                 if(j < 0) j += iLength; // ease invalid usage detection and translate from slice to substring
                 if(j < i) exit(args);   // throw if regions overlap
@@ -1126,9 +1144,7 @@
         {
             limit = toNat(limit, 1/0);
 
-            for(var
-                pLength = prefix.length;
-                limit-- &&
+            for(var pLength = prefix.length; limit-- &&
                 input.indexOf(prefix) === 0;
                 input = input.substring(pLength)
             );
@@ -1260,20 +1276,22 @@
          * to do the opppsite use {@link Stryng.strip}.
          * @function Stryng.wrap
          * @param  {string} input
-         * @param  {string} outifx - prefix and suffix
-         * @param  {number} [n=1]  - parsed by {@link Stryng.toNat}
-         *                           number of operations (recursion depth)
+         * @param  {string} [outfix="undefined"]
+         *   prefix and suffix
+         * @param  {number} [n=1]
+         *   number of operations
          * @returns {string}
-         * @throws {(Error|Error)} if any required argument is missing
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         wrap: function(input, outifx, n)
         {
-            if(input == null || outifx == null) exit(arguments);
+            input = input != null ? String(input) : exit(arguments);
+            outifx = String(outifx);
 
-            for(n = toNat(n, 1); n--;)
-            {
-                input = outifx + (input += outifx);
-            }
+            n = n == null ? 1 : n >>> 0;
+
+            for(; n--; input = outifx + (input += outifx));
 
             return input;
         },
@@ -1282,7 +1300,8 @@
          * @function Stryng.quote
          * @param  {string} input
          * @returns {string} <code>input</code> wrapped in double quotes
-         * @throws {(Error|Error)} from within/like {@link Stryng.wrap}
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         quote: function(input)
         {
@@ -1290,16 +1309,33 @@
         },
 
         /**
-         * trims an arbitrary number of single and double quotes from both ends of <code>input</code>.
          * @function Stryng.unquote
          * @param {string} input
          * @returns {string}
-         * @throws {(Error|Error)} if any required argument is missing
+         *   the <code>input</code> with all leading and trailing, single and double quotes removed.
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         unquote: function(input)
         {
+            return input != null ? String(input).replace(reUnquoteLeft, '').replace(reUnquoteRight, '') : exit(arguments);
+        },
+
+        /**
+         * @function Styrng.ord
+         * @param  {string} input
+         * @return {(number|number[])}
+         *   an array of character codes representing the characters.
+         *   returns a single number if <code>input</code> is a single character
+         *   for convenience. returns <code>NaN</code> if passed the empty string.
+         */
+        ord: function(input)
+        {
             input = input != null ? String(input) : exit(arguments);
-            return input.replace(reQuote, '');
+            var i = input.length;
+            if(i === 0) return NaN;
+            for(var result = []; i--; result[i] = input.charCodeAt(0));
+            return result.length === 1 ? result.pop() : result;
         },
 
         /**
@@ -1361,8 +1397,9 @@
         /**
          * strictly type checks the equality of at least two strings.
          * @function Stryng.isEqual
-         * @param  {string}    input
-         * @param  {...string} comp  - strings to compare with
+         * @param  {string} input
+         * @param  {...string} [comp="undefined"]
+         *   strings to compare with
          * @returns {boolean}
          * @throws {Error} if not at least two arguments are passed
          */
@@ -1797,14 +1834,6 @@
     /////////////
     // aliases //
     /////////////
-
-    /**
-     * delegates to native <code>String.prototype.charCodeAt</code>
-     * by inverting the signature.
-     * @function Stryng.ord
-     */
-    Stryng.ord = Stryng.charCodeAt;
-    Stryng.prototype.ord = Stryng.prototype.charCodeAt;
 
     /**
      * delegates to native <code>String.prototype.concat</code>
