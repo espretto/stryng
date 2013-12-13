@@ -94,8 +94,12 @@
 
     toString = is.toString,
 
+    hasProperty = is.hasProperty,
+
     contains = methods.contains || function(search)
     {
+        if(this == null) throw new TypeError('can\'t convert '+this+' to object');
+        
         for(var o = Object(this), i = o.length >>> 0; i--;)
         {
             if(i in o)
@@ -103,11 +107,14 @@
                 if(o[i] === search) break;
             }
         }
+
         return i !== -1;
     },
 
     forEach = methods.forEach || function(iterator, context)
     {
+        if(this == null) throw new TypeError('can\'t convert '+this+' to object');
+        
         for(var o = Object(this), length = o.length >>> 0, i = -1; ++i !== length;)
         {
             if(i in o)
@@ -119,9 +126,9 @@
 
     forOwn = function(iterator, context)
     {
-        // for the w3c-wishlist
-        var o = Object(this),
-            i;
+        if(this == null) throw new TypeError('can\'t convert '+this+' to object');
+        
+        var o = Object(this), i;
 
         for(i in o)
         {
@@ -173,6 +180,9 @@
     // http://blog.stevenlevithan.com/archives/faster-trim-javascript
     reTrimLeft = /^\s\s*/,
     reTrimRight = /\s*\s$/,
+
+    // http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
+    reLines = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g, // LineTerminatorSequence
     
     // http://perfectionkills.com/whitespace-deviations/
     ws = (
@@ -212,11 +222,11 @@
     {
         shimMethods.push('trim', 'trimRight', 'trimLeft');
 
-        reNoWS = new RegExp('[^' + strWS + ']');
-        strWS = '[' + strWS + ']';
-        reWS = new RegExp(strWS);
-        reWSs = new RegExp(strWS + strWS + '*', 'g');
-        reTrimLeft = new RegExp('^' + strWS + strWS + '*');
+        reNoWS      = new RegExp('[^' + strWS + ']');
+        strWS       = '[' + strWS + ']';
+        reWS        = new RegExp(strWS);
+        reWSs       = new RegExp(strWS + strWS + '*', 'g');
+        reTrimLeft  = new RegExp('^' + strWS + strWS + '*');
         reTrimRight = new RegExp(strWS + '*' + strWS + '$');
     }
 
@@ -262,6 +272,16 @@
     // utility functions //
     ///////////////////////
 
+    // http://www.ecma-international.org/ecma-262/5.1/#sec-9.4
+    function toInteger(n)
+    {
+        return (
+            (n = +n) !== n ? 0 :
+            n && isFinite(n) ? n|0 :
+            n
+        );
+    }
+
     // does not copy
     function flatten(iterable) 
     {
@@ -287,26 +307,6 @@
     {
         // relies on custom property 'Function._name'
         throw new Error('invalid usage of "' + args.callee._name + '" with args [' + slice.call(args) + ']');
-    }
-
-    function toNat(n, m)
-    {
-        if(n == null || (n = +n) !== n)
-        {
-            return m === void 0 ? 0 : m;
-        }
-        if(isFinite(n)) n |= 0; // Math.round
-        return n;
-    }
-
-    function toInt(n, m)
-    {
-        if(n == null || (n = +n) !== n)
-        {
-            return m === void 0 ? 0 : m;
-        }
-        if(isFinite(n)) n |= 0; // Math.round
-        return n;
     }
 
     function toFloat(n, m)
@@ -345,11 +345,6 @@
     }
 
     var StryngGenerics = {
-
-        // have been kept private for faster access and less typing
-        toNat: toNat,
-        toInt: toInt,
-        toFloat: toFloat,
 
         /**
          * upper-cases the first letter. ignores the empty string.
@@ -458,48 +453,81 @@
          */
         contains: function(input, search)
         {
-            input = input != null ? String(input) : exit(arguments);
-            return input.indexOf(search) !== -1;
+            return input != null ? String(input).indexOf(search) !== -1 : exit(arguments);
         },
 
         /**
-         * shim for native String#startsWith
-         * @function String.startsWith
+         * shim for native [String#startsWith]{@link https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.startswith}
+         * @function Stryng.startsWith
          * @param  {string} input
-         * @param  {string} [search="undefined"]
-         * @param  {number} [offset=0]
-         *   default applies for values parsed to <code>NaN</code>
-         *   and negative ones
+         * @param  {string} [searchString="undefined"]
+         * @param  {number} [position=0]
          * @returns {boolean}
-         *   whether or not <code>input</code> at index <code>offset</code>
-         *   begins with substring <code>search</code>
+         *   whether or not <code>input</code> at index <code>position</code>
+         *   begins with substring <code>searchString</code>
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
-        startsWith: function(input, search, offset)
+        startsWith: function(input, searchString, position)
         {
             input = input != null ? String(input) : exit(arguments);
-            offset = offset === 1/0 ? input.length : ~~offset;
-            if(offset < 0) offset = 0; // ignore negatives
-            return input.indexOf(search, offset) === offset;
+
+            // omit regex check
+
+            // implies most steps to be taken
+            // also covers "out of bounds"
+            var i = input.indexOf(searchString, position);
+
+            // early exit
+            if(i !== -1)
+            {
+                // parsing
+                position = toInteger(position);
+                
+                var len = input.length;
+
+                // boundaries: 0 <= position <= len
+                if(position < 0) position = 0;
+                else if(position > len) position = len;
+                
+                return position === i;
+            }
+            return false;
         },
 
         /**
-         * shim for native String#endsWith
+         * shim for native [String#endsWith]{@link https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.endswith}
          * @function Stryng.endsWith
-         * @param  {string} input
-         * @param  {string} [search="undefined"]
+         * @param {string} input
+         * @param {string} [searchString="undefined"]
+         * @param {number} [endPosition=input.length]
          * @returns {boolean}
-         *   whether or not <code>input</code>
-         *   ends with substring <code>search</code>
+         *   whether or not <code>input</code> truncated by <code>endPosition</code>
+         *   ends with substring <code>searchString</code>
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
-        endsWith: function(input, search)
+        endsWith: function(input, searchString, endPosition)
         {
             input = input != null ? String(input) : exit(arguments);
-            var i = input.lastIndexOf(search);
-            return i !== -1 && i + String(search).length === input.length;
+            
+            searchString = String(searchString);
+
+            var len = input.length;
+            
+            // default
+            if(endPosition === void 0) endPosition = len;
+            else
+            {
+                // parse
+                endPosition = toInteger(endPosition);
+
+                // boundaries: 0 <= position <= len
+                if(endPosition < 0) endPosition = 0;
+                else if(endPosition > len) endPosition = len;
+            }
+
+            return input.substring(endPosition - searchString.length, endPosition) === searchString;
         },
 
         /**
@@ -542,8 +570,9 @@
         substr: function(input, start, length)
         {
             input = input != null ? String(input) : exit(arguments);
-            start = start >>> 0;
+            start = toInteger(start);
             if(start < 0) start += input.length;
+            if(start < 0) start = 0;
             return input.substr(start, length);
         },
 
@@ -755,11 +784,12 @@
         /**
          * @function Stryng.lsplit
          * @param  {string} input
-         * @param  {string} [delimiter=/\s+/]
-         *   defaults to a sequence of whitespace characters of arbitrary length
-         * @param  {number} [n=#occurrences]
-         *   maximum number of split operations. negative values are regarded zero.
-         *   defaults to the number of occurrences of <code>delimiter</code>
+         * @param  {(string|RegExp)} [delimiter=/\s+/]
+         *   defaults to a sequence of whitespace
+         *   (and zs and line-terminators) characters of arbitrary length
+         * @param  {number} [n=4294967295]
+         *   maximum number of split operations. defaults to <code>Math.pow(2, 32) - 1</code>
+         *   as per the spec {@link http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14}
          * @returns {string[]}
          *   the <code>input</code> split by the given <code>delimiter</code>
          *   with anything past the <code>n</code>th occurrence of
@@ -777,110 +807,24 @@
         {
             input = input != null ? String(input) : exit(arguments);
 
-            // handle negative values, null and undefined all the same
-            n = n == null || (n = ~~n) < 0 ? 1/0 : n;
+            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
+            n = n == void 0 ? -1 >>> 0 : n >>> 0;
 
-            // conform with native behavior
+            // early exit
             if(n === 0) return [];
 
             // default to multiple whitespace
-            if(delimiter == null) delimiter = reWSs;
+            if(delimiter === void 0) delimiter = reWSs;
 
-            if(is.RegExp(delimiter))
+            // delimiter gets parsed internally
+            var result = input.split(delimiter),
+                diff = result.length - n;
+
+            if(diff > 0)
             {
-                var result = [],
-                    match,
-                    i = 0, j;
-
-                if(delimiter.global)
-                {
-                    while(
-                        n-- &&
-                        (match = delimiter.exec(input))
-                    ){
-                        j = match.index;
-                        result.push( input.substring(i, j) );
-                        i = j + match[0].length; // prefer over .lastIndex
-                    }
-                }
-                else
-                {
-                    // slightly slower than recompiling the regex
-                    // in case not global, but smaller in code size
-                    while(n--)
-                    {
-                        input = input.substring(i);
-
-                        if(match = input.match(delimiter))
-                        {
-                            j = match.index;
-                            i = j + match[0].length; // prefer over .lastIndex
-                            result.push( input.substring(0, j) );
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                // reset regex for future operations
-                delimiter.lastIndex = 0;
-                
-                result.push( input.substring(i) );
-
-                return result;
+                // the removed get rejoined and pushed as one
+                result.push( result.splice(n, diff).join(delimiter) );    
             }
-            else
-            {
-                // delimiter gets parsed internally
-                var result = input.split(delimiter),
-                    diff = result.length - n;
-
-                if(diff > 0)
-                {
-                    // the removed get rejoined and pushed as one
-                    result.push( result.splice(n, diff).join(delimiter) );    
-                }
-
-                return result;
-            }
-        },
-
-        lsplit_old: function(input, delimiter, n)
-        {
-            if(delimiter == null)
-            {
-                return input.split(reWSs);
-            }
-
-            if(n == null)
-            {
-                return input.split(delimiter);
-            }
-
-            n = toNat(n);
-
-            if(n === 0 || !isFinite(n))
-            {  
-                return []; // conform with native split
-            }
-
-            var // map to native split
-                result = input.split(delimiter, n),
-            
-                // sum up delimiter lengths
-                i = result.length,
-                index = i * delimiter.length;
-
-            while(i--)
-            {
-                // sum up splitted items' lengths
-                index += result[i].length; 
-            }
-
-            // restore the remainder
-            result.push(input.substring(index));
 
             return result;
         },
@@ -905,20 +849,26 @@
         {
             input = input != null ? String(input) : exit(arguments);
 
+            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
+            n = n == void 0 ? -1 >>> 0 : n >>> 0;
+
+            // early exit
+            if(n === 0) return [];
+
+            // default to multiple whitespace
             if(delimiter == null) delimiter = reWSs;
-            if(n == null || n === 1/0) return input.split(delimiter);
 
-            n = ~~n;
+            // delimiter gets parsed internally
+            var result = input.split(delimiter),
+                diff = result.length - n;
 
-            if(n === 0) return [input];
-            
-            var every = input.split(delimiter);
+            if(diff > 0)
+            {
+                // the removed get rejoined and unshifted as one
+                result.unshift( result.splice(0, diff).join(delimiter) );    
+            }
 
-            if(n < 0) return every;
-
-            every.unshift( every.splice(0, every.length - n).join(delimiter) );
-
-            return every;
+            return result;
         },
 
         /**
@@ -1328,6 +1278,8 @@
          *   an array of character codes representing the characters.
          *   returns a single number if <code>input</code> is a single character
          *   for convenience. returns <code>NaN</code> if passed the empty string.
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         ord: function(input)
         {
@@ -1405,17 +1357,24 @@
          */
         isEqual: function(input /* comparables */)
         {
-            input = input != null ? String(input) : exit(arguments);
+            var args = arguments; // promote compression
+            input = input != null ? String(input) : exit(args);
 
-            var args = arguments, // promote compression
-                length = args.length,
-                i = 0;
+            var length = args.length;
 
-            if(length < 2) exit(args);
+            if(length < 2) return input === "undefined";
             
-            while(++i !== length && args[i] === input); // skips first argument
+            // skips first argument
+            for(var i = 0; ++i !== length && input === String(args[i]););
             
             return i === length;
+        },
+
+        isEqual2: function(input /* comparables */)
+        {
+            var args = arguments; // promote compression
+            input = input != null ? String(input) : exit(args);
+            return Stryng.repeat(input, args.length) === join.call(args, '');
         },
 
         /**
@@ -1430,17 +1389,26 @@
          */
         isEquali: function(input /*comparables */)
         {
-            input = input != null ? String(input).toLowerCase() : exit(arguments);
+            var args = arguments; // promote compression
+            input = input != null ? String(input).toLowerCase() : exit(args);
 
-            var args = arguments, // promote compression
-                length = args.length,
-                i = 0;
+            var length = args.length;
 
-            if(length < 2) exit(args);
+            if(length < 2) return input === "undefined";
             
-            while(++i !== length && args[i].toLowerCase() === input); // skips first argument
+            // skips first argument
+            for(var i = 0; ++i !== length && input === String(args[i]).toLowerCase(););
             
             return i === length;
+        },
+
+        isEquali2: function(/* input, comparables */)
+        {
+            // workaround an Array#map polyfill
+            forEach.call(arguments, function(arg, i, args){
+                args[i] = String(arg).toLowerCase();
+            });
+            return Stryng.isEqual.apply(null, args)
         },
 
         /**
@@ -1468,7 +1436,7 @@
          */
         isEmpty: function(input)
         {
-            return input != null ? String(input).length === 0 : exit(arguments);
+            return input != null ? !String(input) : exit(arguments);
         },
 
         /**
@@ -1483,25 +1451,21 @@
         isBlank: function(input)
         {
             input = input != null ? String(input) : exit(arguments);
-            return input.length === 0 || reNoWS.test(input);
+            return !input || reNoWS.test(input);
         },
 
         /**
          * @function Stryng.isNumeric
          * @param  {string}  input
          * @returns {boolean} whether the string is numeric
-         * @throws {Error} if any required argument is missing
-         * @example
-         * Stryng.isNumeric('123,00')
-         * // returns false
-         *
-         * Stryng.isNumeric('123.00')
-         * // returns true
+         * @throws {Error} if any required argument is missingsssss
          */
         isNumeric: function(input)
         {
             input = input != null ? String(input) : exit(arguments);
-            return input.length && (input = +input) === input;
+
+            // exclude the empty string
+            return input && (input = +input) === input;
         },
         
         /**
@@ -1510,32 +1474,21 @@
          * @param  {string} input
          * @param  {number} maxLength
          *   parsed by {@link Stryng.toNat}
-         * @param  {string} [ellipsis='...']
-         * @param  {boolean} [exact=false]
-         *   whether to search for the nearest word boundary
-         *   or cut off at the exact index
+         * @param  {string} [ellipsis="..."]
          * @returns {string}
          * @todo how to handle situations where ellipsis is longer than input?
          * @todo <code>exact</code> not yet implemented
          */
-        truncate: function(input, maxLength, ellipsis, exact)
+        truncate: function(input, maxLength, ellipsis)
         {
             input = input != null ? String(input) : exit(arguments);
-
-            ellipsis = ellipsis == null ? '...' : ellipsis;
-            maxLength = toNat(maxLength) - ellipsis.length;
-
-            if(exact)
-            {
-                return input.substring(0, maxLength) + ellipsis;
-            }
-
-            while(
-                maxLength >= 0 &&
-                reWord.test(input.charAt(maxLength))
-            ){
-                maxLength--;
-            }
+            ellipsis = ellipsis != null ? String(ellipsis) : '...';
+            
+            for(
+                maxLength = (maxLength >>> 0) - ellipsis.length;
+                maxLength >= 0 && reWS.test(input.charAt(maxLength));
+                maxLength--
+            );
 
             return input.substring(0, maxLength) + ellipsis;
         },
