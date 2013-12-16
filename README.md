@@ -62,3 +62,13 @@ Documentation
 
 The docs are generated using [jsdoc3](https://github.com/jsdoc3/jsdoc) and included in this repo.
 An ugly yet working version is available at the [project root](http://espretto.github.io/Stryng/) URL.
+
+Compat
+------
+Cross-browser: works on IE6+, Firefox, Safari, Chrome, Opera.
+Standalone. Single global with no prototype extensions or shims.
+
+Usage
+-----
+
+wherever a string is expected, "undefined" will be the default as the result of `String(undefined)`

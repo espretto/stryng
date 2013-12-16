@@ -29,34 +29,60 @@ expect.Assertion.prototype.withArgs = function(){
 
 describe('Stryng', function(){
 
+	it('should allow reasonable numeric comparisons without parsing', function () {
+		
+		function toInteger(n)
+	    {
+	        return (
+	            (n = +n) !== n ? 0 : // toNumber and isNaN
+	            n && isFinite(n) ? n|0 : // ceiles negatives, floors positives - Math.floor(Math.abs(n))
+	            n // sign, zero and Infinity yet untouched
+	        );
+	    }
+
+	    expect( toInteger(NaN) > 0       ).to.equal( NaN > 0 );
+	    expect( toInteger(NaN) < 0       ).to.equal( NaN < 0 );
+	    expect( toInteger(1/0) > 0       ).to.equal( 1/0 > 0 );
+	    expect( toInteger(1/0) < 0       ).to.equal( 1/0 < 0 );
+	    expect( toInteger('Infinity') > 0      ).to.equal( 'Infinity' > 0 );
+	    expect( toInteger('Infinity') < 0      ).to.equal( 'Infinity' < 0 );
+	    expect( toInteger(-1/0) > 0      ).to.equal( -1/0 > 0 );
+	    expect( toInteger(-1/0) < 0      ).to.equal( -1/0 < 0 );
+	    expect( toInteger(-'Infinity') > 0      ).to.equal( -'Infinity' > 0 );
+	    expect( toInteger(-'Infinity') < 0      ).to.equal( -'Infinity' < 0 );
+	    expect( toInteger(undefined) > 0 ).to.equal( undefined > 0 );
+	    expect( toInteger(undefined) < 0 ).to.equal( undefined < 0 );
+	    expect( toInteger(null) > 0      ).to.equal( null > 0 );
+	    expect( toInteger(null) < 0      ).to.equal( null < 0 );
+	    expect( toInteger(false) > 0     ).to.equal( false > 0 );
+	    expect( toInteger(false) < 0     ).to.equal( false < 0 );
+	    expect( toInteger(true) > 0      ).to.equal( true > 0 );
+	    expect( toInteger(true) < 0      ).to.equal( true < 0 );
+	    expect( toInteger(1) > 0         ).to.equal( 1 > 0 );
+	    expect( toInteger(1) < 0         ).to.equal( 1 < 0 );
+	    expect( toInteger(-1) > 0        ).to.equal( -1 > 0 );
+	    expect( toInteger(-1) < 0        ).to.equal( -1 < 0 );
+	    expect( toInteger([]) > 0        ).to.equal( [] > 0 );
+	    expect( toInteger([]) < 0        ).to.equal( [] < 0 );
+	    expect( toInteger({}) > 0        ).to.equal( {} > 0 );
+	    expect( toInteger({}) < 0        ).to.equal( {} < 0 );
+	    expect( toInteger(/./) > 0       ).to.equal( /./ > 0 );
+	    expect( toInteger(/./) < 0       ).to.equal( /./ < 0 );
+	    expect( toInteger('123') > 0     ).to.equal( '123' > 0 );
+	    expect( toInteger('123') < 0     ).to.equal( '123' < 0 );
+	    expect( toInteger('-123') > 0    ).to.equal( '-123' > 0 );
+	    expect( toInteger('-123') < 0    ).to.equal( '-123' < 0 );
+	    expect( toInteger('1e1') > 0     ).to.equal( '1e1' > 0 );
+	    expect( toInteger('1e1') < 0     ).to.equal( '1e1' < 0 );
+	});
+
 	it('should throw primitve', function () {
 		expect( function(){ throw "message" } ).to.throwError(/message/);
 	});
 
 	it('should handle array methods on arguments', function(){
-
-		function flatten(iterable) 
-	    {
-	        // length changes by splicing
-	        for(var i = 0; i !== iterable.length;)
-	        {
-	            var item = iterable[i];
-
-	            if(is.Array(item))
-	            {
-	                item.unshift(i, 1);
-	                splice.apply(iterable, item);
-	            }
-	            else
-	            {
-	                i++;
-	            }
-	        }
-	        return iterable;
-	    }
-    
-		expect( function fn(){ return flatten(arguments) } ).withArgs([1,[2,[3]]]).to.not.throwError();
-
+		expect( function fn(){ return [].slice.call(arguments) } ).withArgs(1,2,3).to.not.throwError();
+		expect( function fn(){ return Array.apply(null, arguments) } ).withArgs(1,2,3).to.not.throwError();
 	});
 
 	it('should support loop labeling', function () {
@@ -158,7 +184,7 @@ describe('Stryng', function(){
 		});
 
 		it('should return true on "undefined" with no arguments passed', function (){
-			expect( Stryng('undefined').contains(/* (undefined).toString() */) ).to.be.ok();
+			expect( Stryng.contains('undefined'/*, (undefined).toString() */) ).to.be.ok();
 		});
 
 		it('should find the empty string in any string', function (){
@@ -252,12 +278,13 @@ describe('Stryng', function(){
 			expect( Stryng.repeat ).to.throwError();			
 		});
 
-		it('should fail if n is positive Infinity', function (){
-			expect( Stryng.repeat ).withArgs('', Infinity).to.throwError();
+		it('should fail if n is negative or not finite', function () {
+			expect( Stryng.repeat ).withArgs('', -1).to.throwError();
 		});
 
-		it('should fail if n is negative', function (){
-			expect( Stryng.repeat ).withArgs('', -1).to.throwError();
+		it('should fail if n is not finite', function () {
+			expect( Stryng.repeat ).withArgs('', Infinity).to.throwError();
+			expect( Stryng.repeat ).withArgs('', '-Infinity').to.throwError();
 		});
 
 		it('should return the empty string if n is zero', function (){
@@ -266,6 +293,49 @@ describe('Stryng', function(){
 
 		it('should repeat the input n times', function (){
 			expect( Stryng.repeat('foo', 3) ).to.equal('foofoofoo');
+		});
+	});
+
+	describe('.substr', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.substr ).to.throwError();			
+		});
+
+		it('should accept negative indices', function () {
+			expect( Stryng.substr('foo', -1) ).to.equal('o');
+		});
+
+		it('should apply zero if abs(index) exceeds the input\'s length', function () {
+			expect( Stryng.substr('foo', -4) ).to.equal('foo');
+		});
+
+		it('should ceil negative floating point indices', function () {
+			expect( Stryng.substr('foo', '-0.5', 2) ).to.equal('fo');
+		});
+
+		it('should return the empty string if length is zero', function () {
+			expect( Stryng.substr('foo', 'NaN', 0) ).to.equal('');
+		});
+	});
+
+	describe('.wrap', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.wrap ).to.throwError();			
+		});
+
+		it('should fail if n is negative or not finite', function () {
+			expect( Stryng.wrap ).withArgs('foo', 'outfix', Infinity).to.throwError();
+			expect( Stryng.wrap ).withArgs('foo', 'outfix', -1).to.throwError();
+		});
+
+		it('should apply zero as the deault thus return the input', function () {
+			expect( Stryng.wrap('foo', 'outfix') ).to.equal('foo');
+		});
+
+		it('should wrap three times', function () {
+			expect( Stryng.wrap('foo', 'x', 3) ).to.equal('xxxfooxxx');
 		});
 	});
 
@@ -286,10 +356,6 @@ describe('Stryng', function(){
 		it('should return the number of non-overlapping occurences', function (){
 			expect( Stryng.count('foo foo bar', 'foo') ).to.equal(2);
 		});
-
-		it('should parse the substring to search for', function (){
-			expect( Stryng.count('123', 2) ).to.equal(1);
-		});
 	});
 
 	describe('.join', function(){
@@ -298,12 +364,8 @@ describe('Stryng', function(){
 			expect( Stryng.join ).to.throwError();
 		});
 
-		it('should fail if strings to join are missing', function (){
-			expect( Stryng.join ).withArgs(',').to.throwError()
-		});
-
-		it('should join with commata by default', function (){
-			expect( Stryng.join(null, 1, 2, 3) ).to.equal('1,2,3');
+		it('should return the empty string if no arguments passed to join', function (){
+			expect( Stryng.join(',') ).to.equal('');
 		});
 
 		it('should allow an empty delimiter string', function (){
@@ -312,6 +374,10 @@ describe('Stryng', function(){
 
 		it('should flatten the args to join', function (){
 			expect( Stryng.join(' ', [[[1],2],3]) ).to.equal('1 2 3');
+		});
+
+		it('should allow an Arguments object', function () {
+			expect( (function(){ return Stryng.join(',', arguments) })(1,2,3) ).to.equal('1,2,3');
 		});
 	})
 
@@ -364,7 +430,7 @@ describe('Stryng', function(){
 	describe('.splitAt', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.splitAt ).to.throwError();
+			expect( Stryng.splitAt ).to.throwError(/splitAt/);
 		});
 
 		it('should fail if indices overlap / are badly sorted', function (){
@@ -392,123 +458,240 @@ describe('Stryng', function(){
 		});
 	});
 
-	describe('.lsplit', function(){
+	describe('.splitLeft', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.lsplit ).to.throwError();
+			expect( Stryng.splitLeft ).to.throwError(/splitLeft/);
 		});
 
-		// it('should ignore negative values for limit and apply the default', function (){
-		// 	expect( Stryng.lsplit('foo', '', -1) ).to.eql(['f', 'o', 'o']);
-		// });
+		it('should toUint32 negative values', function (){
+			expect( Stryng.splitLeft('foo', '', -1) ).to.eql(['f', 'o', 'o']);
+		});
 
-		// it('should return an empty array if limit is zero', function(){
-		// 	expect( Stryng.lsplit('foo', '', 0) ).to.eql([]);
-		// });
+		it('should return an empty array if limit is zero', function(){
+			expect( Stryng.splitLeft('foo', '', 0) ).to.eql([]);
+		});
 
-		// it('should treat Infinity equal to zero as limit', function(){
-		// 	expect( Stryng.lsplit('foo', '', Infinity) ).to.eql([]);
-		// });
+		it('should treat Infinity equal to zero as limit', function(){
+			expect( Stryng.splitLeft('foo', '', Infinity) ).to.eql([]);
+		});
 
-		// it('should return an empty array if splitting the empty string by itself', function (){
-		// 	expect( Stryng.lsplit('', '') ).to.eql([]);
-		// });
+		it('should return an empty array if splitting the empty string by itself', function (){
+			expect( Stryng.splitLeft('', '') ).to.eql([]);
+		});
 
-		// it('should return an array of two empty strings if splitting by itself', function (){
-		// 	expect( Stryng.lsplit('foo', 'foo') ).to.eql(['', '']);
-		// });
+		it('should return an array of two empty strings if splitting by the input', function (){
+			expect( Stryng.splitLeft('foo', 'foo') ).to.eql(['', '']);
+		});
 
-		// //////////////
-		// // advanced //
-		// //////////////
+		it('should split by all occurences of the delimiter if no limit passed', function (){
+			expect( Stryng.splitLeft('sequence', '') ).to.eql(['s','e','q','u','e','n','c','e']);
+		});
 
-		// it('should split by arbitrary whitespace if no delimiter passed', function (){
+		it('should split limit times but yet include the rest', function (){
+			expect( Stryng.splitLeft('sequence', '', 4) ).to.eql(['s','e','q','u','ence']);
+		});
 
-		// 	var actual = Stryng.lsplit('\nthe\nquick\tbrown\rfox\r', null, 4),
-		// 		expected = ['', 'the', 'quick', 'brown', 'fox\r'];
-
-		// 	expect( actual ).to.eql(expected);
-		// });
-
-		// it('should split if input ends with delimiter and limit matches #occurences of delimiter', function (){
-		// 	expect( Stryng.lsplit('foo bar ', null, 2) ).to.eql(['foo', 'bar', '']);
-		// });
-
-		// it('should split if input starts with delimiter and limit matches #occurences of delimiter', function (){
-		// 	expect( Stryng.lsplit(' foo bar', null, 2) ).to.eql(['', 'foo', 'bar']);
-		// });
-
-		// it('should split by all occurences of the delimiter if no limit passed', function (){
-		// 	expect( Stryng.lsplit('sequence', '') ).to.eql(['s','e','q','u','e','n','c','e']);
-		// });
-
-		// it('should split limit times but yet include the rest', function (){
-		// 	expect( Stryng.lsplit('sequence', '', 4) ).to.eql(['s','e','q','u','ence']);
-		// });
+		it('should work for [grouping] regular expressions, too');
 	});
 
-	describe('.rsplit', function(){
+	describe('.splitRight', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.rsplit ).to.throwError();
+			expect( Stryng.splitRight ).to.throwError(/splitRight/);
 		});
 
-		// it('should deal with Infinity', function (){
-		// 	expect( Stryng.rsplit('charactersequence', '', Infinity) )
-		// 	.to.eql(['c','h','a','r','a','c','t','e','r','s','e','q','u','e','n','c','e']);
-		// });
+		it('should split limit times but yet include the rest', function (){
+			expect( Stryng.splitRight('charactersequence', '', 4) ).to.eql(['charactersequ','e','n','c','e']);
+		});
 
-		// it('should split limit times but yet include the rest', function (){
-		// 	expect( Stryng.rsplit('charactersequence', '', 4) ).to.eql(['charactersequ','e','n','c','e']);
-		// });
+		it('should work for [grouping] regular expressions, too');
 
-		// it('should ignore negative values for limit and apply the default', function (){
-		// 	expect( Stryng.rsplit('foo', '', -1) ).to.eql(['f', 'o', 'o']);
-		// });
+		// refer to Stryng.splitLeft for further tests
 
-		// it('should return the input with the input as its only element if limit is zero', function(){
-		// 	expect( Stryng.rsplit('foo', '', 0) ).to.eql(['foo']);
-		// });
+	});
 
-		// it('should return an array of two empty strings if splitting by itself', function (){
-		// 	expect( Stryng.rsplit('foo', 'foo') ).to.eql(['', '']);
-		// });
+	describe('.exchange', function(){
 
-		// it('should return an empty array if splitting the empty string by itself', function (){
-		// 	expect( Stryng.rsplit('', '') ).to.eql([]);
-		// });
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.exchange ).to.throwError(/exchange/);
+		});
+
+		it('should leave the input as is if replacee and replacement equal', function () {
+			expect( Stryng.exchange('foo', 'o', 'o') ).to.equal('foo');
+		});
+
+		it('should replace all occurences of replacee by replacement', function () {
+			expect( Stryng.exchange('foo', 'o', 'a') ).to.equal('faa');
+		});
+
+		it('should comma separate the input if passed the empty string as replacee and comma as replacement', function () {
+			expect( Stryng.exchange('sequence', '', ',') ).to.equal('s,e,q,u,e,n,c,e');
+		});
+	});
+
+	describe('.exchangeLeft', function(){
+
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.exchangeLeft ).to.throwError(/exchangeLeft/);
+		});
+
+		it('should replace n left-hand occurences of replacee', function () {
+			expect( Stryng.exchangeLeft('sequence', '', ',', 3) ).to.equal('s,e,q,uence');
+		});
+
+		// refer to Stryng.splitLeft for further tests
+	});
+
+	describe('.exchangeRight', function(){
+
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.exchangeRight ).to.throwError(/exchangeRight/);
+		});
+
+		it('should replace n right-hand occurences of replacee', function () {
+			expect( Stryng.exchangeRight('sequence', '', ',', 3) ).to.equal('seque,n,c,e');
+		});
+
+		// refer to Stryng.splitRight for further tests
+	});
+
+	describe('.padLeft', function(){
+
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.padLeft ).to.throwError(/padLeft/);
+		});
+
+		it('should fail if maxLength is negative', function () {
+			expect( Stryng.padLeft ).withArgs('foo', -1, 'o').to.throwError(/padLeft/);
+		});
+
+		it('should fail if maxLength is not finite', function () {
+			expect( Stryng.padLeft ).withArgs('foo', Infinity, 'o').to.throwError(/padLeft/);
+			expect( Stryng.padLeft ).withArgs('foo', '-Infinity', 'o').to.throwError(/padLeft/);
+		});
+
+		it('should return the input if its length is greater than or equals maxLength', function () {
+			expect( Stryng.padLeft('foo', 2, 'o') ).to.equal('foo');
+			expect( Stryng.padLeft('foo', 3, 'o') ).to.equal('foo');
+		});
+
+		it('should prepend the padding to the input until its length equals maxLength', function () {
+			expect( Stryng.padLeft('foo', 5, 'o') ).to.equal('oofoo');
+		});
+
+		it('should prepend the padding to the input until the next iteration would exceed maxLength', function () {
+			expect( Stryng.padLeft('dong', 20, 'ding ') ).to.equal('ding ding ding dong'); // length 19
+		});
+	});
+
+	describe('.padRight', function(){
+
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.padRight ).to.throwError(/padRight/);
+		});
+
+		it('should append the padding to the input until its length equals maxLength', function () {
+			expect( Stryng.padRight('foo', 5, 'o') ).to.equal('foooo');
+		});
+
+		it('should append the padding to the input until the next iteration would exceed maxLength', function () {
+			expect( Stryng.padRight('ding', 20, ' dong') ).to.equal('ding dong dong dong'); // length 19
+		});
+
+		// refer to Stryng.padLeft for further tests
+	});
+
+	describe('.pad', function(){
+
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.pad ).to.throwError(/pad/);
+		});
+
+		it('should append and prepend to the input until its length equals maxLength', function () {
+			expect( Stryng.pad('private', 'private'.length + 4, '_') ).to.equal('__private__')
+		});
+	});
+
+	describe('.prepend', function(){
+
+		it('should fail if input\'s missing', function (){
+			expect( Stryng.prepend ).to.throwError(/prepend/);
+		});
+
+		it('should prepend the given argument', function () {
+			expect( Stryng.prepend(' World!', 'Hello') ).to.equal('Hello World!');
+		});
+
+		it('should prepend the given arguments\'s string representations in order', function () {
+			expect( Stryng.prepend('!', 'World', 2, 'lo', 'Hel') ).to.equal('Hello2World!');
+		});
+	});
+
+	describe('.stripLeft', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.stripLeft ).to.throwError(/stripLeft/);			
+		});
+
+		it('should strip from the beginning', function () {
+			expect( Stryng.stripLeft('Hello World!', 'Hello') ).to.equal(' World!')
+		});
+
+		it('should strip the prefix as long as it remains one', function () {
+			expect( Stryng.stripLeft('ding ding ding dong', 'ding ') ).to.equal('dong')
+		});
+
+		it('should strip the prefix n times', function () {
+			expect( Stryng.stripLeft('ding ding ding dong', 'ding ', 2) ).to.equal('ding dong')
+		});
+	});
+
+	describe('.stripRight', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.stripRight ).to.throwError(/stripRight/);			
+		});
+
+		it('should strip from the beginning', function () {
+			expect( Stryng.stripRight('Hello, hello World!', 'World!') ).to.equal('Hello, hello ')
+		});
+
+		it('should strip the prefix as long as it remains one', function () {
+			expect( Stryng.stripRight('ding dong dong dong', ' dong') ).to.equal('ding')
+		});
+
+		it('should strip the prefix n times', function () {
+			expect( Stryng.stripRight('ding dong dong dong', ' dong', 2) ).to.equal('ding dong')
+		});
+	});
+
+	describe('.strip', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.strip ).to.throwError(/strip/);			
+		});
+
+		it('should strip from the beginning and the end', function () {
+			expect( Stryng.strip('maoam', 'm') ).to.equal('aoa');
+		});
+
+		it('should strip multiple times', function () {
+			expect( Stryng.strip('"""docstring"""', '"') ).to.equal('docstring');
+		});
+
+		it('should strip n times', function () {
+			expect( Stryng.strip('"""docstring"""', '"', 2) ).to.equal('"docstring"');
+		});
+	});
+
+	describe('.stripTags', function(){
+		it('yet is missing')
 	});
 
 	//////////////////////
 	// other easy tests //
 	//////////////////////
-
-	describe('.wrap', function(){
-
-		it('should fail if input\'s missing', function () {
-			expect( Stryng.wrap ).to.throwError();			
-		});
-
-		it('should wrap input with "undefined" if no suf-/prefix passed', function () {
-			expect( Stryng.wrap('foo') ).to.equal('undefinedfooundefined');
-		});
-
-		it('should default to wrap once', function () {
-			expect( Stryng.wrap('foo', '"') ).to.equal('"foo"');
-		});
-
-		it('should return the input as is if n is zero', function () {
-			expect( Stryng.wrap('foo', 'any string', 0) ).to.equal('foo');
-		});
-
-		it('should treat Infinity like zero', function () {
-			expect( Stryng.wrap('foo', 'fix', Infinity) ).to.equal('foo');
-		});
-
-		it('should wrap three times', function () {
-			expect( Stryng.wrap('foo', 'x', 3) ).to.equal('xxxfooxxx');
-		});
-	});
 
 	describe('.quote', function(){
 
@@ -516,13 +699,7 @@ describe('Stryng', function(){
 			expect( Stryng.quote ).to.throwError();
 		});
 
-		it('should return two quotes if passed the empty string', function () {
-			expect( Stryng.quote('') ).to.equal('""');
-		});
-
-		it('should wrap the input in double quotes', function () {
-			expect( Stryng.quote('foo') ).to.equal('"foo"');
-		});
+		it('unfinished escape issues yet');
 	});
 
 	describe('.unquote', function(){
@@ -531,21 +708,8 @@ describe('Stryng', function(){
 			expect( Stryng.unquote ).to.throwError();
 		});
 
-		it('should return the empty string unchanged if passed', function () {
-			expect( Stryng.unquote('') ).to.equal('');
-		});
-
-		it('should strip any leading and trailing single and double quotes', function () {
-			expect( Stryng.unquote('"\'"\'foo\'"\'"') ).to.equal('foo');
-		});
+		it('unfinished escape issues yet');
 	});
 
-	describe('.isEqual', function(){
-
-		it('should fail if input\'s missing', function () {
-			expect( Stryng.unquote ).to.throwError();
-		});
-
-		// continue...
-	})
+	// continue..
 });
