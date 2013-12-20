@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Stryng - Tests</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+			html, body
+			{
+				display:block;
+				height:100%;
+				width:100%;
+				margin:0;
+				padding:0;
+			}
+        </style>
+
+    </head>
+    <body>
+		<script src="/node_modules/mocha/mocha.js" charset="UTF-8"></script>
+		<script>
+
+			mocha.setup({ ui : "bdd", reporter : 'tap' });
+
+		</script>
+		<script src="http://getfirebug.com/firebug-lite.js" charset="UTF-8">
+		{
+		    saveCookies : false,
+		    startOpened : true, //false,
+		    startInNewWindow : false,
+		    showIconWhenHidden : true,
+		    overrideConsole : true,
+		    ignoreFirebugElements : false,//true,
+		    disableXHRListener : false,
+		    disableWhenFirebugActive : false, //true,
+		    enableTrace : false,
+    		enablePersistent : false
+		}
+		</script>
+		<script src="/test/Stryng.web.js" charset="UTF-8"></script>
+		<script>
+		alert(window.process);
+			(function poll(){
+
+				var fb_iframe = document.getElementById('FirebugUI');
+
+				if(!fb_iframe)
+				{
+					return setTimeout(poll, 500);
+				}
+
+				var fb_window = fb_iframe.contentWindow;
+
+				var fb_document = fb_iframe.contentDocument || fb_window && fb_window.document;
+
+				var fb_bodies = fb_document.getElementsByTagName('body');
+
+				(function poll(){
+
+					if(!fb_bodies.length)
+					{
+						return setTimeout(poll, 500);
+					}
+
+					var fb_body = fb_bodies[0],
+						cssText = 'display:block;'
+							+ 'width:'  + (window.innerWidth  || document.documentElement.clientWidth  || fb_body.clientWidth ) + 'px;'
+							+ 'height:' + (window.innerHeight || document.documentElement.clientHeight || fb_body.clientHeight) + 'px;'
+						;
+							
+					fb_iframe.style.cssText = fb_body.style.cssText = cssText;
+
+					mocha.run();
+				})();
+			})();
+		</script>
+    </body>
+</html>
