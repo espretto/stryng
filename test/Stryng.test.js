@@ -29,6 +29,14 @@ expect.Assertion.prototype.withArgs = function(){
 
 describe('Stryng', function(){
 
+	if("undefined" != typeof window){
+
+		beforeEach(function(done){
+
+			setTimeout(function(){ done() }, 15);
+		});
+	}
+
 	it('should allow reasonable numeric comparisons without parsing', function () {
 		
 		function toInteger(n)
@@ -40,40 +48,40 @@ describe('Stryng', function(){
 	        );
 	    }
 
-	    expect( toInteger(NaN) > 0       ).to.equal( NaN > 0 );
-	    expect( toInteger(NaN) < 0       ).to.equal( NaN < 0 );
-	    expect( toInteger(1/0) > 0       ).to.equal( 1/0 > 0 );
-	    expect( toInteger(1/0) < 0       ).to.equal( 1/0 < 0 );
-	    expect( toInteger('Infinity') > 0      ).to.equal( 'Infinity' > 0 );
-	    expect( toInteger('Infinity') < 0      ).to.equal( 'Infinity' < 0 );
-	    expect( toInteger(-1/0) > 0      ).to.equal( -1/0 > 0 );
-	    expect( toInteger(-1/0) < 0      ).to.equal( -1/0 < 0 );
-	    expect( toInteger(-'Infinity') > 0      ).to.equal( -'Infinity' > 0 );
-	    expect( toInteger(-'Infinity') < 0      ).to.equal( -'Infinity' < 0 );
-	    expect( toInteger(undefined) > 0 ).to.equal( undefined > 0 );
-	    expect( toInteger(undefined) < 0 ).to.equal( undefined < 0 );
-	    expect( toInteger(null) > 0      ).to.equal( null > 0 );
-	    expect( toInteger(null) < 0      ).to.equal( null < 0 );
-	    expect( toInteger(false) > 0     ).to.equal( false > 0 );
-	    expect( toInteger(false) < 0     ).to.equal( false < 0 );
-	    expect( toInteger(true) > 0      ).to.equal( true > 0 );
-	    expect( toInteger(true) < 0      ).to.equal( true < 0 );
-	    expect( toInteger(1) > 0         ).to.equal( 1 > 0 );
-	    expect( toInteger(1) < 0         ).to.equal( 1 < 0 );
-	    expect( toInteger(-1) > 0        ).to.equal( -1 > 0 );
-	    expect( toInteger(-1) < 0        ).to.equal( -1 < 0 );
-	    expect( toInteger([]) > 0        ).to.equal( [] > 0 );
-	    expect( toInteger([]) < 0        ).to.equal( [] < 0 );
-	    expect( toInteger({}) > 0        ).to.equal( {} > 0 );
-	    expect( toInteger({}) < 0        ).to.equal( {} < 0 );
-	    expect( toInteger(/./) > 0       ).to.equal( /./ > 0 );
-	    expect( toInteger(/./) < 0       ).to.equal( /./ < 0 );
-	    expect( toInteger('123') > 0     ).to.equal( '123' > 0 );
-	    expect( toInteger('123') < 0     ).to.equal( '123' < 0 );
-	    expect( toInteger('-123') > 0    ).to.equal( '-123' > 0 );
-	    expect( toInteger('-123') < 0    ).to.equal( '-123' < 0 );
-	    expect( toInteger('1e1') > 0     ).to.equal( '1e1' > 0 );
-	    expect( toInteger('1e1') < 0     ).to.equal( '1e1' < 0 );
+	    expect( toInteger(NaN) > 0        ).to.equal( NaN > 0 );
+	    expect( toInteger(NaN) < 0        ).to.equal( NaN < 0 );
+	    expect( toInteger(1/0) > 0        ).to.equal( 1/0 > 0 );
+	    expect( toInteger(1/0) < 0        ).to.equal( 1/0 < 0 );
+	    expect( toInteger('Infinity') > 0 ).to.equal( 'Infinity' > 0 );
+	    expect( toInteger('Infinity') < 0 ).to.equal( 'Infinity' < 0 );
+	    expect( toInteger(-1/0) > 0       ).to.equal( -1/0 > 0 );
+	    expect( toInteger(-1/0) < 0       ).to.equal( -1/0 < 0 );
+	    expect( toInteger(-'Infinity') > 0).to.equal( -'Infinity' > 0 );
+	    expect( toInteger(-'Infinity') < 0).to.equal( -'Infinity' < 0 );
+	    expect( toInteger(undefined) > 0  ).to.equal( undefined > 0 );
+	    expect( toInteger(undefined) < 0  ).to.equal( undefined < 0 );
+	    expect( toInteger(null) > 0       ).to.equal( null > 0 );
+	    expect( toInteger(null) < 0       ).to.equal( null < 0 );
+	    expect( toInteger(false) > 0      ).to.equal( false > 0 );
+	    expect( toInteger(false) < 0      ).to.equal( false < 0 );
+	    expect( toInteger(true) > 0       ).to.equal( true > 0 );
+	    expect( toInteger(true) < 0       ).to.equal( true < 0 );
+	    expect( toInteger(1) > 0          ).to.equal( 1 > 0 );
+	    expect( toInteger(1) < 0          ).to.equal( 1 < 0 );
+	    expect( toInteger(-1) > 0         ).to.equal( -1 > 0 );
+	    expect( toInteger(-1) < 0         ).to.equal( -1 < 0 );
+	    expect( toInteger([]) > 0         ).to.equal( [] > 0 );
+	    expect( toInteger([]) < 0         ).to.equal( [] < 0 );
+	    expect( toInteger({}) > 0         ).to.equal( {} > 0 );
+	    expect( toInteger({}) < 0         ).to.equal( {} < 0 );
+	    expect( toInteger(/./) > 0        ).to.equal( /./ > 0 );
+	    expect( toInteger(/./) < 0        ).to.equal( /./ < 0 );
+	    expect( toInteger('123') > 0      ).to.equal( '123' > 0 );
+	    expect( toInteger('123') < 0      ).to.equal( '123' < 0 );
+	    expect( toInteger('-123') > 0     ).to.equal( '-123' > 0 );
+	    expect( toInteger('-123') < 0     ).to.equal( '-123' < 0 );
+	    expect( toInteger('1e1') > 0      ).to.equal( '1e1' > 0 );
+	    expect( toInteger(-0.5) < 0       ).to.not.equal( -0.5 < 0 );
 	});
 
 	it('should throw primitve', function () {
@@ -99,7 +107,7 @@ describe('Stryng', function(){
 	describe('.capitalize', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.capitalize ).to.throwError();
+			expect( Stryng.capitalize ).to.throwError(/capitalize/);
 		});
 
 		it('should return the empty string', function(){
@@ -114,7 +122,7 @@ describe('Stryng', function(){
 	describe('.trim', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.trim ).to.throwError();
+			expect( Stryng.trim ).to.throwError(/trim/);
 		});
 
 		it('should return the empty string', function(){
@@ -180,7 +188,7 @@ describe('Stryng', function(){
 	describe('.contains', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.contains ).to.throwError();
+			expect( Stryng.contains ).to.throwError(/contains/);
 		});
 
 		it('should return true on "undefined" with no arguments passed', function (){
@@ -207,7 +215,7 @@ describe('Stryng', function(){
 	describe('.startsWith', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.startsWith ).to.throwError();
+			expect( Stryng.startsWith ).to.throwError(/startsWith/);
 		});
 
 		it('should apply "undefined" as default searchString and zero as default position', function (){
@@ -239,7 +247,7 @@ describe('Stryng', function(){
 	describe('.endsWith', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.endsWith ).to.throwError();
+			expect( Stryng.endsWith ).to.throwError(/endsWith/);
 		});
 
 		it('should apply "undefined" as default searchString and the input\'s length as default endPosition', function (){
@@ -275,7 +283,7 @@ describe('Stryng', function(){
 	describe('.repeat', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.repeat ).to.throwError();			
+			expect( Stryng.repeat ).to.throwError(/repeat/);			
 		});
 
 		it('should fail if n is negative or not finite', function () {
@@ -299,7 +307,7 @@ describe('Stryng', function(){
 	describe('.substr', function(){
 
 		it('should fail if input\'s missing', function () {
-			expect( Stryng.substr ).to.throwError();			
+			expect( Stryng.substr ).to.throwError(/substr/);			
 		});
 
 		it('should accept negative indices', function () {
@@ -322,7 +330,7 @@ describe('Stryng', function(){
 	describe('.wrap', function(){
 
 		it('should fail if input\'s missing', function () {
-			expect( Stryng.wrap ).to.throwError();			
+			expect( Stryng.wrap ).to.throwError(/wrap/);			
 		});
 
 		it('should fail if n is negative or not finite', function () {
@@ -342,7 +350,7 @@ describe('Stryng', function(){
 	describe('.count', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.count ).to.throwError();			
+			expect( Stryng.count ).to.throwError(/count/);			
 		});
 
 		it('should search for "undefined" by default', function (){
@@ -361,7 +369,7 @@ describe('Stryng', function(){
 	describe('.join', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.join ).to.throwError();
+			expect( Stryng.join ).to.throwError(/join/);
 		});
 
 		it('should return the empty string if no arguments passed to join', function (){
@@ -384,7 +392,7 @@ describe('Stryng', function(){
 	describe('.reverse', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.reverse ).to.throwError();
+			expect( Stryng.reverse ).to.throwError(/reverse/);
 		});
 
 		it('should return the empty string unchanged', function (){
@@ -403,7 +411,7 @@ describe('Stryng', function(){
 	describe('.insert', function(){
 
 		it('should fail if input\'s missing', function (){
-			expect( Stryng.insert ).to.throwError();
+			expect( Stryng.insert ).to.throwError(/insert/);
 		});
 
 		it('should prepend "undefined" if neither index nor insertion provided', function (){
@@ -685,10 +693,6 @@ describe('Stryng', function(){
 		});
 	});
 
-	describe('.stripTags', function(){
-		it('yet is missing')
-	});
-
 	//////////////////////
 	// other easy tests //
 	//////////////////////
@@ -696,20 +700,107 @@ describe('Stryng', function(){
 	describe('.quote', function(){
 
 		it('should fail if input\'s missing', function () {
-			expect( Stryng.quote ).to.throwError();
+			expect( Stryng.quote ).to.throwError(/quote/);
 		});
 
-		it('unfinished escape issues yet');
+		it('should return the input wrapped in double quotes', function () {
+			expect( Stryng.quote('foo') ).to.equal('"foo"');
+		});
+
+		it('should backslash-escape double quotes', function () {
+			expect( Stryng.quote('"') ).to.equal('"\\""');
+		});
+
+		it('should backslash-escape special characters', function () {
+			expect( Stryng.quote('\n\t\r\b\f\\') ).to.equal('"\\n\\t\\r\\b\\f\\\\"');
+		});
+
+		it('should hex/unicode escape non-printable characters', function () {
+			// native JSON.stringify forces full unicode notation (at least on node it seems)
+			expect( Stryng.quote('\0\x01\u0002') ).to.match(/^"\\(x00|u0000)\\(x01|u0001)\\(x02|u0002)"$/);
+		});
 	});
 
 	describe('.unquote', function(){
 
 		it('should fail if input\'s missing', function () {
-			expect( Stryng.unquote ).to.throwError();
+			expect( Stryng.unquote ).to.throwError(/unquote/);
 		});
 
 		it('unfinished escape issues yet');
 	});
+
+	describe('.isEqual', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.isEqual ).to.throwError(/isEqual/);
+		});
+
+		it('should apply "undefined" as the default second parameter', function () {
+			expect( Stryng.isEqual("undefined") ).to.be.ok();
+		});
+
+		it('should ask arguments their primitive string representations and then strictly type check', function () {
+			expect( Stryng.isEqual('123', new String('123'), 123) ).to.be.ok();
+			expect( Stryng.isEqual('null', null) ).to.be.ok();
+			expect( Stryng.isEqual('undefined', void 0) ).to.be.ok();
+			expect( Stryng.isEqual({}, '[object Object]') ).to.be.ok();
+		});
+
+		it('should return true for equal input', function () {
+			expect( Stryng.isEqual('ding', 'ding', 'ding', 'ding', 'ding') ).to.be.ok();
+		});
+	});
+
+	describe('.isEquali', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.isEquali ).to.throwError(/isEquali/);
+		});
+
+		it('should apply "undefined"i as the default second parameter', function () {
+			expect( Stryng.isEquali("UnDeFiNeD") ).to.be.ok();
+		});
+
+		it('should return true for equal input ignoring case', function () {
+			expect( Stryng.isEquali('foo', new String('Foo'), 'FOO', 'fOO') ).to.be.ok();
+		});
+	});
+
+	describe('.ord', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.ord ).to.throwError(/ord/);
+		});
+
+		it('should return each character\'s character code', function(){
+			expect( Stryng.ord('Hello World') ).to.eql([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]);
+		});
+	});
+
+	describe('.isEmpty', function(){
+
+		it('should fail if input\'s missing', function () {
+			expect( Stryng.isEmpty ).to.throwError(/isEmpty/);
+		});
+
+		it('should return true for the empty string', function () {
+			expect( Stryng().isEmpty() ).to.be.ok();
+			expect( Stryng.isEmpty('') ).to.be.ok();
+			expect( Stryng.isEmpty(new String('')) ).to.be.ok();
+		});
+
+		it('should return true on instances initialized with null or undefined or the empty array', function () {
+			expect( Stryng(null).isEmpty() ).to.be.ok();
+			expect( Stryng(void 0).isEmpty() ).to.be.ok();
+			expect( Stryng([]).isEmpty() ).to.be.ok();
+
+		});
+
+		it('should not be generic but coerce to string prior to check the length property', function () {
+			expect( Stryng.isEmpty({}) ).to.not.be.ok();
+		});
+	})
 
 	// continue..
 });

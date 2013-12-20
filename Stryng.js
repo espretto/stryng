@@ -51,7 +51,7 @@
         root.Stryng = Stryng;
     }
 
-})(this, function(){
+}(this, function(){
 
     var // one to var them all
 
@@ -63,12 +63,18 @@
 
     // methods Stryng hopes to adopt - getOwnPropertyNames() method is non-shimable
     methods = (
-          'charAt,charCodeAt,codePointAt,concat,contains'
-        + ',endsWith,fromCodePoint,indexOf,lastIndexOf'
-        + ',localeCompare,match,normalize,replace,search'
-        + ',slice,split,startsWith,substr,substring'
-        + ',toLocaleLowerCase,toLocaleUpperCase,toLowerCase'
-        + ',toUpperCase,trim,trimLeft,trimRight'
+        // required
+          'charAt,charCodeAt,indexOf,lastIndexOf,'
+        + 'match,replace,search,'
+        + 'concat,slice,substring,split,'
+        + 'codePointAt,normalize,'
+
+        // todo support ligatures and diacritics
+        + 'toLocaleLowerCase,toLocaleUpperCase,localeCompare,'
+        + 'toLowerCase,toUpperCase,'
+    
+        // shimmed
+        + 'substr,trim,trimLeft,trimRight,contains,startsWith,endsWith,'
     ).split(','),
 
     // methods which's native implementations to override if necessary
@@ -86,7 +92,7 @@
 
     array_splice = methods.splice,
 
-    array_pop = methods.pop,
+    array_push = methods.push,
 
     array_shift = methods.shift,
 
@@ -96,19 +102,19 @@
 
     array_contains = methods.contains || function(search)
     {
-        /*
-        if(this == null) throw new TypeError('can\'t convert '+this+' to object');
         
-        for(var o = Object(this), i = o.length >>> 0; i--;)
-        {
-            if(i in o)
-            {
-                if(o[i] === search) return true;
-            }
-        }
+        // if(this == null) throw new TypeError('can\'t convert '+this+' to object');
+        
+        // for(var o = Object(this), i = o.length >>> 0; i--;)
+        // {
+        //     if(i in o)
+        //     {
+        //         if(o[i] === search) return true;
+        //     }
+        // }
 
-        return false;
-        */
+        // return false;
+        
        
         // no spec compliance intended - for internal use only
         var arr = this,
@@ -121,17 +127,16 @@
 
     array_forEach = methods.forEach || function(iterator, context)
     {
-        /*
-        if(this == null) throw new TypeError('can\'t convert '+this+' to object');
         
-        for(var o = Object(this), length = o.length >>> 0, i = 0; length !== i++;)
-        {
-            if(i in o)
-            {
-                iterator.call(context, o[i], i, o);
-            }
-        }
-        */
+        // if(this == null) throw new TypeError('can\'t convert '+this+' to object');
+        
+        // for(var o = Object(this), length = o.length >>> 0, i = 0; length !== i++;)
+        // {
+        //     if(i in o)
+        //     {
+        //         iterator.call(context, o[i], i, o);
+        //     }
+        // }
 
         // no spec compliance intended - for internal use only
         var arr = this,
@@ -141,6 +146,8 @@
     },
 
     object_toString = is.toString,
+
+    object_hasOwnProperty = is.hasOwnProperty,
 
     string_concat = VERSION.concat,
 
@@ -164,9 +171,27 @@
         return keys;
     },
 
+    object_defineProperty = (function(defineProperty){
+
+        try
+        {
+            // throws if either is undefined or does not allow native objects
+            defineProperty({}, 'v', { value: 1 });
+
+            return defineProperty;
+        }
+        catch(e)
+        {
+            // return undefined
+        }
+        
+    })(Object.defineProperty),
+
     math_random = Math.random,
 
     string_fromCharCode = String.fromCharCode,
+
+    json_stringify = "undefined" != typeof JSON && JSON.stringify, 
 
     ///////////////////////////////////////
     // regular expressions (precompiled) //
@@ -212,7 +237,7 @@
         + '\u2029' // paragraph separator
         + '\uFEFF' // BOM - byte order mark
 
-    ).split(''),
+    ), // no need to split since forEach is generic
 
     strWS  = '\\s'
 
@@ -237,6 +262,8 @@
         reTrimRight = new RegExp(strWS + '*' + strWS + '$');
     }
 
+    if('ab'.substr(-1) !== 'b') shimMethods.push('substr');
+
     /////////////////////////
     // class / type checks //
     /////////////////////////
@@ -249,7 +276,7 @@
         is[clazz] = function(o){ return o && object_toString.call(o) === repr };
     });
 
-    array_forEach.call([/*'Boolean', 'Number',*/ 'String'], function(clazz){
+    array_forEach.call([/*'Boolean',*/ 'Number' /*, 'String'*/], function(clazz){
 
         var repr = '[object ' + clazz + ']',
             type = clazz.toLowerCase();
@@ -267,8 +294,16 @@
         is.Function = function(o){ return o && typeof o === 'function' };
     }
 
-    // duck type arguments as fallback
-    is.Arguments = function(o){ return o && ( object_toString.call(o) === '[object Arguments]' || o.callee ) };
+    // is.Arguments = (function(){
+
+    //     var repr = '[object Arguments]';
+
+    //     function isArguments(o){ return o && object_toString.call(o) === repr; }
+    //     function isArgumentsDuck(o){ return o && typeof o.callee === 'function'; }
+
+    //     return isArguments(arguments) ? isArguments : isArgumentsDuck;
+        
+    // })();
     
     // is.Undefined = function(o){ return o === void 0 }; // 'undefined' might be overridable
 
@@ -305,7 +340,7 @@
         {
             var item = iterable[i];
 
-            if(is.Array(item) || is.Arguments(item))
+            if(item && is.Number(item.length))
             {
                 array_unshift.call(item, i, 1);
                 array_splice.apply(iterable, item);
@@ -318,19 +353,17 @@
         return iterable;
     }
 
-    function exit(args)
+    function exit()
     {
-        // relies on custom property 'Function._name'
-        throw new Error('invalid usage of "' + args.callee._name + '" with args [' + array_slice.call(args) + ']');
-    }
+        var caller = arguments.callee.caller;
+            message = 'invalid usage of Stryng.' + /* custom */ caller._name + '() with args [',
+            args = '';
 
-    function toFloat(n)
-    {
-        if(n == null || is.String(n) && !reFloat.test(n))
-        {
-            return 0.0;
-        }
-        return parseFloat(n);
+        // workaround null and undefined being displayed as the empty string
+        // by at least node's Array#toString / Array#join
+        array_forEach.call(caller.arguments, function(arg){ args += arg + ', ' });
+
+        throw new Error(message + (args ? args.slice(0, -2) : '') + ']');
     }
 
     //////////
@@ -345,6 +378,8 @@
      * @param {*} [input=""]
      *   the value to parse. defaults to the empty string
      * @returns {Stryng}
+     *   the empty string if passed <code>null</code>
+     *   or <code>undefined</code> unlike the native constructor
      */
     function Stryng(input)
     {
@@ -356,8 +391,27 @@
          * @name Stryng~_value
          * @type {string}
          */
-        this._value = input == null ? '' : String(input);
+        this._value = input != null ? String(input) : '';
+
+        if(object_defineProperty)
+        {
+            object_defineProperty(this, 'length', {
+                // ensure correct defaults
+                enumerable  : false,
+                configurable: false,
+                get: function(){ return this._value.length } 
+            });
+        }
+        else
+        {
+            // fallback - is writable/enumerable
+            this.length = this._value.length;
+        }
     }
+
+    // for Object.prototype.toString to return '[object String]'
+    Stryng.prototype = new String();
+    Stryng.prototype.constructor = Stryng;
 
     var StryngGenerics = {
 
@@ -372,7 +426,7 @@
          */
         capitalize: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
             
             var length = input.length;
 
@@ -393,7 +447,7 @@
          */
         trimLeft: function(input)
         {
-            return input != null ? String(input).replace(reTrimLeft, '') : exit(arguments);
+            return input != null ? String(input).replace(reTrimLeft, '') : exit();
         },
 
         
@@ -407,7 +461,7 @@
          */
         trimRight: function(input)
         {
-            return input != null ? String(input).replace(reTrimRight, '') : exit(arguments);
+            return input != null ? String(input).replace(reTrimRight, '') : exit();
         },
 
         /**
@@ -418,7 +472,7 @@
          */
         trimRight2: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             for(var i = input.length; i-- && reWS.test(input.charAt(i));); // TODO side effectively remove "reWS"
 
@@ -433,7 +487,7 @@
          */
         trimRight3: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             for(var i = input.length; i-- && array_contains.call(ws, input.charAt(i)););
             
@@ -454,7 +508,7 @@
                 String(input)
                     .replace(reTrimLeft, '')
                     .replace(reTrimRight, '')
-                : exit(arguments);
+                : exit();
         },
 
         /**
@@ -470,7 +524,7 @@
          */
         contains: function(input, searchString)
         {
-            return input != null ? String(input).indexOf(searchString) !== -1 : exit(arguments);
+            return input != null ? String(input).indexOf(searchString) !== -1 : exit();
         },
 
         /**
@@ -487,11 +541,11 @@
          */
         startsWith: function(input, searchString, position)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // omit regex check
 
-            // implies most steps to be taken
+            // implies correct parsing
             // also covers "out of bounds"
             var i = input.indexOf(searchString, position);
 
@@ -526,7 +580,7 @@
          */
         endsWith: function(input, searchString, endPosition)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
             
             searchString = String(searchString);
 
@@ -560,7 +614,7 @@
          */
         repeat: function(input, count)
         {
-            if(input == null || count <= -1 || count == 1/0) exit(arguments);
+            if(input == null || count <= -1 || count == 1/0) exit();
             
             count = toInteger(count);
 
@@ -581,7 +635,7 @@
          */
         substr: function(input, start, length)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
             
             // add length if negative, set zero if still negative
             start = start <= -1 ? (start = toInteger(start) + input.length) < 0 ? 0 : start : start;
@@ -606,7 +660,7 @@
          */
         wrap: function(input, outfix, n)
         {
-            if(input == null) exit(arguments);
+            if(input == null) exit();
             // implies parsing
             outfix = Stryng.repeat(outfix, n);
             return outfix + input + outfix;
@@ -627,7 +681,7 @@
          */
         count: function(input, searchString)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             searchString = String(searchString);
 
@@ -651,7 +705,7 @@
          */
         count2: function(input, searchString)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             searchString = String(searchString);
 
@@ -696,15 +750,12 @@
          * Stryng.join(' ', the', ['quick', ['brown', ['fox', ['jumps', ['over', ['the', ['lazy', ['dog']]]]]]]])
          * // returns 'the quick brown fox jumps over the lazy dog'
          */
-        join: function(/* delimiter, strings... */)
+        join: function(delimiter /*, strings... */)
         {
-            var args = arguments, // promote compression
-                delimiter = array_shift.call(args);
+            if(delimiter == null) exit();
+            if(arguments.length === 1) return '';
 
-            if(delimiter == null) exit(args);
-            if(!args.length) return '';
-
-            return array_join.call( flatten(args), delimiter );
+            return array_join.call( flatten(array_slice.call(arguments, 1)), delimiter );
         },
 
         /**
@@ -717,12 +768,12 @@
          */
         reverse: function(input)
         {
-            return input != null ?
-                String(input)
+            return input != null
+                ? String(input)
                     .split('')
                     .reverse()
                     .join('')
-                : exit(arguments);
+                : exit();
         },
 
         /**
@@ -732,7 +783,7 @@
          */
         reverse2: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             for(var result = '', i = input.length; i--; result += input.charAt(i));
 
@@ -748,7 +799,7 @@
          */
         reverse3: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             var length = input.length;
 
@@ -772,7 +823,7 @@
          */
         insert: function(input, index, insertion)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // slice's native parsing will apply different defaults to the first and second argument
             if(index === void 0) index = toInteger(index);
@@ -798,7 +849,7 @@
         {
             var args = arguments; // promote compression
 
-            input = input != null ? String(input) : exit(args);
+            input = input != null ? String(input) : exit();
 
             var len = args.length,
                 i = 1, // skip first argument
@@ -843,7 +894,7 @@
          */
         splitLeft: function(input, delimiter, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
             n = (n === void 0 ? -1 : n) >>> 0;
@@ -859,6 +910,81 @@
             {
                 // the removed get rejoined and pushed as one
                 result.push( result.splice(n, diff).join(delimiter) );    
+            }
+
+            return result;
+        },
+
+        /**
+         * @function Stryng.splitLeft2
+         * @deprecated regex compliant - use {@link Stryng.splitLeft} instead
+         * @todo test and benchmark across browsers
+         */
+        splitLeft2: function(input, delimiter, n)
+        {
+            input = input != null ? String(input) : exit();
+
+            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
+            n = (n === void 0 ? -1 : n) >>> 0;
+
+            // early exit for zero
+            if(!n) return [];
+
+            var result = [],
+                match,
+                index,
+                diff,
+                lastIndex = 0;
+
+            if(is.RegExp(delimiter))
+            {
+                if(delimiter.global)
+                {
+                    while(n-- && (match = delimiter.exec(input)))
+                    {
+                        index = match.index;
+                        result.push( input.substring(lastIndex, index) );
+
+                        // reliable lastIndex, mutates match
+                        lastIndex = index + match.shift().length;
+
+                        // append captured groups if any exist
+                        if(match.length) array_push.apply(result, match);
+                    }
+                }
+                else
+                {
+                    // insignificantly slower/faster than recompiling the regex to a global one
+                    while(n-- && (match = input.match(delimiter)))
+                    {
+                        index = match.index;
+                        result.push( input.substring(0, index) );
+
+                        // reliable lastIndex, mutates match
+                        lastIndex = index + match.shift().length;
+
+                        // append captured groups if any exist
+                        if(match.length) array_push.apply(result, match);
+
+                        // slice input to workaround delimiter not being global
+                        input = input.substring(lastIndex);
+                    }
+                }
+
+                result.push( input.substring(lastIndex) );
+            }
+            else
+            {
+                // implies parsing delimiter
+                result = input.split(delimiter);
+                diff = result.length - n;
+
+                if(diff > 0)
+                {
+                    // implies parsing delimiter
+                    // the removed get rejoined and pushed as one
+                    result.push( result.splice(n, diff).join(delimiter) );    
+                }
             }
 
             return result;
@@ -881,7 +1007,7 @@
          */
         splitRight: function(input, delimiter, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
             n = (n === void 0 ? -1 : n) >>> 0;
@@ -916,7 +1042,7 @@
          */
         exchange: function(input, replacee, replacement)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // omit regex check
             
@@ -947,7 +1073,7 @@
          */
         exchangeLeft: function(input, replacee, replacement, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
             replacee = String(replacee);
             replacement = String(replacement);
 
@@ -975,7 +1101,7 @@
          */
         exchangeRight: function(input, replacee, replacement, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
             replacee = String(replacee);
             replacement = String(replacement);
 
@@ -1001,7 +1127,7 @@
          */
         padLeft: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit(arguments);
+            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1022,9 +1148,14 @@
             return input;
         },
 
+        /**
+         * @function Stryng.padLeft2
+         * @deprecated slower - use {@link Stryng.padLeft} instead
+         * @todo test and benchmark across browsers
+         */
         padLeft2: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit(arguments);
+            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1035,8 +1166,7 @@
             // early exit for the empty padding
             if(maxLength <= iLength || !padding) return input;
 
-            var pLength = padding.length,
-                n = (maxLength - iLength) / pLength | 0;
+            var n = 0 | (maxLength - iLength) / padding.length;
 
             return Stryng.repeat(padding, n) + input;
         },
@@ -1056,7 +1186,7 @@
          */
         padRight: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit(arguments);
+            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1092,7 +1222,7 @@
          */
         pad: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit(arguments);
+            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1133,7 +1263,7 @@
         {
             var args = arguments; // promote compression
 
-            if(args[0] == null) exit(args);
+            if(args[0] == null) exit();
 
             // append to reversely
             var i = args.length - 1,
@@ -1152,7 +1282,7 @@
          */
         prepend2: function(input /*, prefixes... */)
         {
-            if(input == null) exit(arguments);
+            if(input == null) exit();
             return array_slice.call(arguments).reverse().join('');
         },
 
@@ -1163,7 +1293,7 @@
          */
         prepend3: function(input /*, prefixes... */)
         {
-            if(input == null) exit(arguments);
+            if(input == null) exit();
             return function_call.apply(string_concat, array_slice.call(arguments).reverse());
         },
 
@@ -1189,7 +1319,7 @@
          */
         stripLeft2: function(input, prefix, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
             n = (n === void 0 ? -1 : n ) >>> 0;
@@ -1216,7 +1346,7 @@
          */
         stripLeft3: function(input, prefix, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
             n = n === void 0 ? -1 >>> 0 : n >>> 0;
@@ -1239,7 +1369,7 @@
          */
         stripLeft: function(input, prefix, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
             n = n === void 0 ? -1 >>> 0 : n >>> 0;
@@ -1296,7 +1426,7 @@
          */
         stripRight: function(input, suffix, n)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
             n = n === void 0 ? -1 >>> 0 : n >>> 0;
@@ -1335,36 +1465,6 @@
         },
 
         /**
-         * securely removes all HTML tags by preserving any quoted contents 
-         * @function Stryng.stripHTMLTags
-         * @param  {string} input - HTML
-         * @returns {string}       - <code>input</code> with HTML-tags removed
-         * @throws {Error}
-         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
-         * @todo fasten
-         */
-        stripHTMLTags: function(input)
-        {
-            var mem = [],
-                i = 0;
-
-            return input
-
-                .replace(/("|')(?:\\\1|[^(?:\1)])*\1/g, function(match){
-
-                    mem[i] = match;
-                    return '_' + (i++) + '_';
-                })
-
-                .replace(/<(\w+) [^>]*>([\s\S]*)<\/\1>/g, '')
-
-                .replace(/_(\d+)_/g, function(match, i){
-
-                    return mem[i];
-                });
-        },
-
-        /**
          * @function Stryng.quote
          * @param {string} input
          * @returns {string}
@@ -1372,52 +1472,39 @@
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
-        quote: /*JSON && JSON.stringify &&
-        function(input){ return input != null ? '"' + JSON.stringify(input) + '"' : exit(arguments) } ||
-        */function(input){
-
-            input = input != null ? String(input) : exit(arguments);
-
-            var specialEscapeMap =
-            {
-                "\'" : "\\'",  // single quote
-                "\"" : "\\\"", // double quote
-                "\\" : "\\\\", // backslash
-                "\n" : "\\n",  // new line
-                "\r" : "\\r",  // carriage return
-                "\t" : "\\t",  // tab
-                "\b" : "\\b",  // backspace
-                "\f" : "\\f"   // form feed
-            };
+        quote: json_stringify ? function(input){ return input != null ? json_stringify(String(input)) : exit() } :
+        
+        function(input)
+        {
+            input = input != null ? String(input) : exit();
 
             var result = '',
                 length = input.length,
-                i = -1;
+                i = -1,
+                code;
 
             while(++i !== length)
             {
-                var chr = input.charAt(i);
+                code = input.charCodeAt(i);
 
-                if(specialEscapeMap.hasOwnProperty(chr))
-                {
-                    result += specialEscapeMap[chr];
-                }
-                else
-                {
-                    var code = chr.charCodeAt(0);
+                result +=
+                    // ASCII printables (#95)
+                    31 > code && code < 127 ? string_fromCharCode(code) :
 
-                    if(32 > code || code > 126)
-                    {
-                        result += (code < 256
-                            ? '\\x' + (code < 16 ? '0' : '')
-                            : '\\u' + (code < 4096 ? '0' : '')
-                        ) + code.toString(16);
-                    }
-                    else
-                    {
-                        result += chr;
-                    }
-                }
+                    // short escape characters
+                    code === 34 ? "\\\"" : // double quote
+                    code === 92 ? "\\\\" : // backslash
+                    code === 10 ? "\\n"  : // new line
+                    code === 13 ? "\\r"  : // carriage return
+                    code === 9  ? "\\t"  : // tab
+                    code === 8  ? "\\b"  : // backspace
+                    code === 12 ? "\\f"  : // form feed
+
+                    (   // hexadecimal/unicode notation
+                        code < 256
+                        ? '\\x' + (code < 16   ? '0' : '')
+                        : '\\u' + (code < 4096 ? '0' : '')
+                    ) + code.toString(16);
             }
 
             return '"' + result + '"';
@@ -1437,10 +1524,10 @@
                 Stryng(input)
                     .strip('"', 1)
                     .toString()
-                    .replace(/\\([\"\'\\nrtbf]|[xu]([0-9a-f]{2,4}))/g, function(match, postSlash, hex){
+                    .replace(/\\([\\"nrtbf]|x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4}))/g, function(match, postSlash, hex){
                         return hex ? string_fromCharCode(parseInt(hex, 16)) : match // TODO mirror specialEscapeMap
                     })
-                : exit(arguments);
+                : exit();
         },
 
         /**
@@ -1456,35 +1543,32 @@
          */
         isEqual: function(input /* comparables */)
         {
-            var args = arguments; // promote compression
-            input = input != null ? String(input) : exit(args);
-
-            var i = args.length;
+            input = input != null ? String(input) : exit();
+            
+            var args = arguments, // promote compression
+                i = args.length;
 
             // early exit if no comparables passed
             if(i === 1) return input === "undefined";
             
-            // skips first argument
-            while( 1 !== i-- && input === String(args[i]));
+            // break on zero by pre-decrementing
+            while(--i && input === String(args[i]));
             
             return !i;
         },
 
-        isEqual2: function(input /* comparables */)
-        {
-            var args = arguments; // promote compression
-            input = input != null ? String(input) : exit(args);
-            return Stryng.repeat(input, args.length) === array_join.call(args, '');
-        },
-
-        isEqual3: function(/* comparables */)
+        /**
+         * @function Stryng.isEqual2
+         * @deprecated slower - use {@link Stryng.isEqual} instead
+         * @todo test and benchmark across browsers
+         */
+        isEqual2: function(/* comparables */)
         {
             var args = arguments, // promote compression
-                input = array_shift.call(args);
+                input = array_shift.call(args), // mutates arguments - slow
+                i = args.length;
 
-            input = input != null ? String(input) : exit(args);
-
-            var i = args.length;
+            input = input != null ? String(input) : exit();
 
             // early exit if no comparables passed
             if(!i) return input === "undefined";
@@ -1492,15 +1576,7 @@
             // skips first argument
             while( i-- && input === String(args[i]));
             
-            return !i;
-        },
-
-        isEqual4: function(input)
-        {
-            var args = arguments;
-            if(input == null) exit(args);
-            var i = (args.length + 1) / 2 | 0;
-            return array_slice.call(args, 0, i).join('') === array_slice.call(args, i).join('');
+            return i === -1;
         },
 
         /**
@@ -1515,16 +1591,16 @@
          */
         isEquali: function(input /*comparables */)
         {
-            var args = arguments; // promote compression
-            input = input != null ? String(input).toLowerCase() : exit(args);
-
-            var i = args.length;
+            input = input != null ? String(input).toLowerCase() : exit();
+            
+            var args = arguments, // promote compression
+                i = args.length;
 
             // early exit if no comparables passed
             if(i === 1) return input === "undefined";
             
-            // skips first argument
-            while( 1 !== i-- && input === String(args[i]).toLowerCase());
+            // break on zero by pre-decrementing
+            while(--i && input === String(args[i]).toLowerCase());
             
             return !i;
         },
@@ -1532,27 +1608,21 @@
         isEquali2: function(/* input, comparables */)
         {
             // workaround an Array#map polyfill
-            array_forEach.call(arguments, function(arg, i, args){
-                args[i] = String(arg).toLowerCase();
-            });
-            return Stryng.isEqual.apply(null, arguments)
+            for(var args = arguments, i = args.length; i--; args[i] = String(args[i]).toLowerCase());
+            return Stryng.isEqual.apply(null, args);
         },
 
-        /**
-         * wraps access to <code>input.length</code>.
-         * @function Stryng.len
-         * @param {string} input
-         * @returns {number} <code>input.length</code>
-         * @throws {Error} if any required argument is missing
-         * @example usage:
-         * var pangram = ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'];
-         *  
-         * pangram.map(Stryng.len) == pluck(pangram, 'length')
-         * // returns true - given the pluck is implemented somewhere
-         */
-        len: function(input) // "length" is a reserved Function property
+        ord: function(input)
         {
-            return input != null ? String(input).length : exit(arguments);
+            input = input != null ? String(input) : exit();
+            
+            var result = [],
+                length = input.length,
+                i = -1;
+
+            while(++i !== length) result[i] = input.charCodeAt(i);
+
+            return result;
         },
 
         /**
@@ -1563,7 +1633,7 @@
          */
         isEmpty: function(input)
         {
-            return input != null ? !String(input) : exit(arguments);
+            return input != null ? !String(input) : exit();
         },
 
         /**
@@ -1577,7 +1647,7 @@
          */
         isBlank: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
             return !input || !reNoWS.test(input);
         },
 
@@ -1589,7 +1659,7 @@
          */
         isNumeric: function(input)
         {
-            input = input != null ? String(input) : exit(arguments);
+            input = input != null ? String(input) : exit();
 
             // exclude the empty string
             return input && (input = +input) === input;
@@ -1608,7 +1678,7 @@
          */
         truncate: function(input, maxLength, ellipsis)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit(arguments);
+            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
 
             input = String(input);
             maxLength = toInteger(maxLength);
@@ -1641,7 +1711,7 @@
          */
         random: function(n, from, to)
         {
-            if(n <= -1 || n == 1/0) exit(arguments);
+            if(n <= -1 || n == 1/0) exit();
 
             n = toInteger(n);
 
@@ -1665,7 +1735,7 @@
 
         /**
          * @function Stryng.randomOf
-         * @param  {number} n
+         * @param  {number} [n=0]
          * @param  {string} [charset="undefined"]
          * @return {string}
          *   string of length <code>n</code>
@@ -1673,85 +1743,19 @@
          */
         randomOf: function(n, charset)
         {
-            if(n <= -1 || n == 1/0) exit(arguments);
+            if(n <= -1 || n == 1/0) exit();
 
             n = toInteger(n);
             charset = String(charset).split('');
 
-            var length = charset.length;
+            var result = '',
+                length = charset.length;
 
-            while(n--)
-            {
-                result += charset[random() * length | 0];
-            }
+            while(n--) result += charset[random() * length | 0];
 
             return result;
-        },
-
-        
-
-        /**
-         * formats the given number to a human readable form.
-         * uses <code>Number.prototype.toFixed</code> internally
-         * which however does not work correctly in every browser.
-         * if yours is such an edge case, please refer to Kris Kowal's
-         * [ECMA5]{@link https://github.com/kriskowal/es5-shim/blob/master/es5-shim.js}
-         * monkey patch.
-         * @param  {(number|*)} n            
-         *   to be formatted. parsed by {@link Stryng.toFloat}
-         * @param  {number} [f=2]
-         *   number of fraction digits to preserve.
-         *   parsed by {@link Stryng.toNat}.
-         * @param  {string} [digitSeparator=',']
-         *   character used to separate
-         *   groups of three digits (thousands)
-         * @param  {string} [fractionSeparator='.']
-         *   character used to separate the
-         *   fraction part.
-         * @returns {string}
-         *   number in legible form
-         */
-        formatNumber: function(n, f, digitSeparator, fractionSeparator)
-        {
-            n = toFloat(n);
-
-            if(!isFinite(n))
-            {
-                return '&#8734;'; // unicode for Infinity
-            }
-
-            f = toNat(f, 2);
-            digitSeparator = digitSeparator || ',';
-            fractionSeparator = fractionSeparator || '.';
-
-            var parts  = n.toFixed(f).split('.'),
-                result = parts[0].split(''),
-                sign   = n < 0 ? result.shift() : '',
-                frac   = parts[1],
-                i      = result.length - 3;
-
-            // insert delimiters in steps of three
-            for(; i > 0; i -= 3)
-            {
-                result.splice(i, 0, digitSeparator);
-            }
-
-            if(f !== 0)
-            {
-                result.push(fractionSeparator, frac);
-            }
-
-            result.unshift(sign);
-
-            return result.join('');
         }
     };
-
-    /////////////////
-    // shim substr //
-    /////////////////
-
-    if('ab'.substr(-1) !== 'b') shimMethods.push('substr');
 
     /////////////
     // foreign //
@@ -1774,16 +1778,8 @@
 
             var result = fn.apply(null, arguments);
 
-            // enhance method chaining by returning
-            // the wrapped object if the result is a string
-            // typeof check is sufficient
-            if(typeof result === 'string') // is.String(result))
-            {
-                this._value = result;
-                return this;
-            }
-
-            return result;
+            // typeof check is sufficient, mimics immutability of Stryngs
+            return 'string' === typeof result ? new Stryng(result) : result;
         };
     });
 
@@ -1800,9 +1796,9 @@
             // static methods
             Stryng[fnName] = function(input /* arguments */)
             {
-                if(input == null) exit(arguments);
-
-                // Function#call uses the global object as the default context
+                // Function#call may use the global object as the default context
+                if(input == null) exit();
+                
                 return function_call.apply(fn, arguments);
             };
 
@@ -1810,25 +1806,21 @@
             Stryng[fnName]._name = fnName;
 
             // instance methods
-            Stryng.prototype[fnName] = function()
+            Stryng.prototype[fnName] = function(/* arguments */)
             {
                 var result = fn.apply(this._value, arguments);
 
-                // enhance method chaining by returning
-                // the wrapped object if the result is a string
-                // typeof check is sufficient
-                if(typeof result === 'string') // is.String(result))
-                {
-                    this._value = result;
-                    return this;
-                }
-                return result;
+                // typeof check is sufficient, mimics immutability of Stryngs
+                return 'string' === typeof result ? new Stryng(result) : result;
             };
         }
     });
 
-    // override Object#toString
-    Stryng.prototype.value =
+    ////////////////////////////
+    // shadow Object#toString //
+    ////////////////////////////
+    
+    Stryng.prototype.valueOf = 
     Stryng.prototype.toString = function(){ return this._value }
 
     /////////////////////////////
@@ -1836,16 +1828,37 @@
     /////////////////////////////
 
     /**
-     * alias to native [String.fromCharCode]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode}
-     * will, as a static method, not be available for OOP.
-     * <em>alias:</em> <code>Stryng.fromCharCode</code>
-     * @function Stying.chr
+     * delegates to native [String.fromCharCode]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode}.
+     * will <strong>not</strong> be available on Stryng instances.
+     * @function Stryng.chr
+     * @param {...number} charCode
+     * @returns {string}
+     *   the concatenated <code>Stryng</code> representations of the given
+     *   <code>charCode</code>s from the UTF-16 table
      * @example
-     * Stryng.chr.apply(null, 72, 101, 108, 2, 111, 32, 87, 111, 114, 108, 100);
+     * var stryng = Stryng.chr(72, 101, 108, 2, 111, 32, 87, 111, 114, 108, 100);
      * // returns "Hello World"
+     * stryng instanceof Stryng;
+     * // returns true
+     * var string = Stryng.fromCharCode.apply(null, [
+     *     72, 101, 108, 108, 2, 111, 32, 87, 111, 114, 108, 100
+     * ]);
+     * // to not wrap use native
+     * string instanceof Stryng;
+     * // returns false
+     * typeof string;
+     * // returns "string"
      */
-    Stryng.fromCharCode = Stryng.chr = string_fromCharCode;
-    
+    Stryng.chr = function(/* charCodes,... */)
+    {
+        return Stryng( string_fromCharCode.apply(null, arguments) );
+    };
+
+    Stryng.fromCharCode = string_fromCharCode;
+
+    // no shim yet
+    if(String.fromCodePoint) Stryng.fromCodePoint = String.fromCodePoint;
+
     /////////////
     // aliases //
     /////////////
@@ -1870,27 +1883,17 @@
         }
     });
 
-    Stryng.echo = Stryng.repeat;
-    Stryng.prototype.echo = Stryng.prototype.repeat;
+    Stryng.prototype.length = Stryng.prototype.len;
 
-    /**
-     * delegates to native <code>String.prototype.charCodeAt</code>
-     * @function Stying.ord
-     * @param {string} input
-     * @param {number} index
-     * @returns {number}
-     *   the numeric representation of <code>input</code> at <code>index</code>
-     *   according to the Unicode table
-     */
-    Stryng.ord = Stryng.charCodeAt;
-    Stryng.prototype.ord = Stryng.prototype.charCodeAt;
+    Stryng.stringifyShallow = Stryng.quote;
+    Stryng.prototype.stringifyShallow = Stryng.prototype.quote;
 
     /**
      * delegates to native <code>String.prototype.concat</code>
-     * @function Stying.append
+     * in analogy to [Stryng.prepend]{@link Stryng.prepend}
+     * @function Stryng.append
      * @param {...string} input
      * @returns {string}
-     *   the given argumentsstrings to be concatenated
      */
     Stryng.append = Stryng.concat;
     Stryng.prototype.append = Stryng.prototype.concat;
@@ -1901,4 +1904,4 @@
 
     return Stryng;
 
-});
+}));
