@@ -58,7 +58,10 @@
     // used to access native instance methods
     VERSION = '0.0.1',
 
-    // promote compression
+    // used for input validation
+    INFINITY = 1/0,
+
+    // used to cast to string
     String = VERSION.constructor,
 
     // methods Stryng hopes to adopt - getOwnPropertyNames() method is non-shimable
@@ -96,15 +99,16 @@
 
     array_shift = methods.shift,
 
-    array_unshift = methods.unshift, // no need for fixing IE lte 8 returning undefined
+    array_unshift = methods.unshift, // no need to fix IE lte 8 returning undefined
 
     array_join = methods.join,
 
     array_contains = methods.contains || function(search)
-    {
-        
-        // if(this == null) throw new TypeError('can\'t convert '+this+' to object');
-        
+    { 
+        // if(this == null)
+        // {
+        //     throw new TypeError('can\'t convert '+this+' to object');
+        // }
         // for(var o = Object(this), i = o.length >>> 0; i--;)
         // {
         //     if(i in o)
@@ -112,10 +116,8 @@
         //         if(o[i] === search) return true;
         //     }
         // }
-
         // return false;
         
-       
         // no spec compliance intended - for internal use only
         var arr = this,
             i = arr.length;
@@ -127,9 +129,10 @@
 
     array_forEach = methods.forEach || function(iterator, context)
     {
-        
-        // if(this == null) throw new TypeError('can\'t convert '+this+' to object');
-        
+        // if(this == null)
+        // {
+        //     throw new TypeError('can\'t convert '+this+' to object');
+        // }
         // for(var o = Object(this), length = o.length >>> 0, i = 0; length !== i++;)
         // {
         //     if(i in o)
@@ -158,7 +161,7 @@
     // to native static methods //
     //////////////////////////////
 
-    object_keys = Object.keys || function(object)
+    Object_keys = Object.keys || function(object)
     {
         // no spec compliance intended - for internal use only
         var keys = [], key;
@@ -171,7 +174,7 @@
         return keys;
     },
 
-    object_defineProperty = (function(defineProperty){
+    Object_defineProperty = (function(defineProperty){
 
         try
         {
@@ -187,11 +190,11 @@
         
     })(Object.defineProperty),
 
-    math_random = Math.random,
+    Math_random = Math.random,
 
-    string_fromCharCode = String.fromCharCode,
+    String_fromCharCode = String.fromCharCode,
 
-    json_stringify = "undefined" != typeof JSON && JSON.stringify, 
+    JSON_stringify = "undefined" != typeof JSON && JSON.stringify, 
 
     ///////////////////////////////////////
     // regular expressions (precompiled) //
@@ -218,12 +221,12 @@
     
     // http://perfectionkills.com/whitespace-deviations/
     ws = (
-          '\t' // '\11' // '\u0009' // tab
-        + '\n' // '\12' // '\u000A' // line feed
-        + '\13'         // '\u000B' // vertical tab
-        + '\f' // '\14' // '\u000C' // form feed
-        + '\r' // '\15' // '\u000D' // carriage return
-        + ' '  // '\40' // '\u0020' // space
+          '\t' // '\u0009' tab
+        + '\n' // '\u000A' line feed
+        + '\13'// '\u000B' vertical tab
+        + '\f' // '\u000C' form feed
+        + '\r' // '\u000D' carriage return
+        + ' '  // '\u0020' space
         
         // http://www.fileformat.info/info/unicode/category/Zs/list.htm
         + '\xA0'
@@ -288,7 +291,7 @@
     // adopt native if available
     is.Array = Array.isArray || is.Array;
 
-    // override if not returning 'function' (webkit)
+    // returns 'function' in old webkit
     if(typeof reFloat === 'object') 
     {
         is.Function = function(o){ return o && typeof o === 'function' };
@@ -319,13 +322,17 @@
     function toInteger(n)
     {
         // note:
-        // the isNegative check can be performed without parsing through x <= -1 since all results of toNumber(x) in range ]-1,0[ get ceiled to zero
-        // the isPositiveInfinity check can be performed without parsing through x == 1/0 since only 'Infinity' == Infinity ( == 1/0 )
+        // 
+        // the isNegative check can be performed without parsing through
+        // x <= -1 since all results of toNumber(x) in range ]-1,0[ get ceiled to zero
+        // 
+        // the isPositiveInfinity check can be performed without parsing through
+        // x == INFINITY since only 'Infinity' == Infinity ( == INFINITY )
+        
         return (
             // toNumber and isNaN
             (n = +n) !== n ? 0 :
-            // ceiles negatives, floors positives just like
-            // sign(n) * Math.floor(Math.abs(n))
+            // ceiles negatives, floors positives just like `sign(n) * Math.floor(Math.abs(n))`
             n && isFinite(n) ? n|0 :
             // sign, zero and Infinity untouched
             n 
@@ -360,7 +367,7 @@
             args = '';
 
         // workaround null and undefined being displayed as the empty string
-        // by at least node's Array#toString / Array#join
+        // by at least NodeJS's Array#toString / Array#join
         array_forEach.call(caller.arguments, function(arg){ args += arg + ', ' });
 
         throw new Error(message + (args ? args.slice(0, -2) : '') + ']');
@@ -372,14 +379,15 @@
     
     /**
      * generic utility functions to ease working with Strings.
-     * native instance of <code>String</code> get mixed.
+     * the <code>new</code> operator can be omitted.
      * @global
      * @constructor Stryng
      * @param {*} [input=""]
      *   the value to parse. defaults to the empty string
      * @returns {Stryng}
      *   the empty string if passed <code>null</code>
-     *   or <code>undefined</code> unlike the native constructor
+     *   or <code>undefined</code> (unlike the native constructor),
+     *   the <code>input</code>'s string representation otherwise.
      */
     function Stryng(input)
     {
@@ -393,9 +401,9 @@
          */
         this._value = input != null ? String(input) : '';
 
-        if(object_defineProperty)
+        if(Object_defineProperty)
         {
-            object_defineProperty(this, 'length', {
+            Object_defineProperty(this, 'length', {
                 // ensure correct defaults
                 enumerable  : false,
                 configurable: false,
@@ -555,7 +563,7 @@
                 var len = input.length;
                 
                 return i === (
-                    // default for negatives (get ceiled)
+                    // default for negatives
                     position <= -1 ? 0 :
                     // maximum
                     position > len ? len :
@@ -611,10 +619,11 @@
          *   concatenated to the empty string 
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
+         * @tutorial repeat
          */
         repeat: function(input, count)
         {
-            if(input == null || count <= -1 || count == 1/0) exit();
+            if(input == null || count <= -1 || count == INFINITY) exit();
             
             count = toInteger(count);
 
@@ -638,7 +647,11 @@
             input = input != null ? String(input) : exit();
             
             // add length if negative, set zero if still negative
-            start = start <= -1 ? (start = toInteger(start) + input.length) < 0 ? 0 : start : start;
+            start = start <= -1
+                ? (start = toInteger(start) + input.length) < 0
+                    ? 0
+                    : start
+                : start;
 
             // implies parsing length
             return input.substr(start, length);
@@ -690,10 +703,10 @@
 
             var length = searchString.length,
                 count = 0,
-                i = -length; // fix first run
+                i = -length; // prepare first run
 
             do i = input.indexOf(searchString, i + length);
-            while(i !== -1 && /* step */ ++count)
+            while(i !== -1 && /* always true */ ++count)
 
             return count;
         },
@@ -1009,7 +1022,7 @@
         {
             input = input != null ? String(input) : exit();
 
-            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
             n = (n === void 0 ? -1 : n) >>> 0;
 
             // early exit for zero
@@ -1127,7 +1140,7 @@
          */
         padLeft: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
+            if(input == null || maxLength <= -1 || maxLength == INFINITY) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1155,7 +1168,7 @@
          */
         padLeft2: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
+            if(input == null || maxLength <= -1 || maxLength == INFINITY) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1186,7 +1199,7 @@
          */
         padRight: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
+            if(input == null || maxLength <= -1 || maxLength == INFINITY) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1222,7 +1235,7 @@
          */
         pad: function(input, maxLength, padding)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
+            if(input == null || maxLength <= -1 || maxLength == INFINITY) exit();
 
             input = String(input);
             padding = String(padding);
@@ -1300,7 +1313,7 @@
         /**
          * strips <code>prefix</code> from the left of <code>input</code>
          * <code>n</code> times. to strip <code>prefix</code> as long
-         * as it remains a prefix to the result, pass <code>Infinity</code> or <code>1/0</code>.
+         * as it remains a prefix to the result, pass <code>Infinity</code> or <code>INFINITY</code>.
          * @function Stryng.stripLeft
          * @param  {string} input
          * @param  {string} [prefix="undefined"]
@@ -1472,11 +1485,15 @@
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
-        quote: json_stringify ? function(input){ return input != null ? json_stringify(String(input)) : exit() } :
-        
-        function(input)
+        quote: function(input)
         {
             input = input != null ? String(input) : exit();
+
+            // delegate to native JSON.stringify if available
+            if(JSON_stringify)
+            {
+                return JSON_stringify(input);
+            }
 
             var result = '',
                 length = input.length,
@@ -1489,7 +1506,7 @@
 
                 result +=
                     // ASCII printables (#95)
-                    31 > code && code < 127 ? string_fromCharCode(code) :
+                    31 > code && code < 127 ? String_fromCharCode(code) :
 
                     // short escape characters
                     code === 34 ? "\\\"" : // double quote
@@ -1500,7 +1517,7 @@
                     code === 8  ? "\\b"  : // backspace
                     code === 12 ? "\\f"  : // form feed
 
-                    (   // hexadecimal/unicode notation
+                    (   // hexadecimal/unicode notation - whichever is shortest
                         code < 256
                         ? '\\x' + (code < 16   ? '0' : '')
                         : '\\u' + (code < 4096 ? '0' : '')
@@ -1520,12 +1537,12 @@
          */
         unquote: function(input)
         {
-            return input != null ?
-                Stryng(input)
+            return input != null
+                ? Stryng(input)
                     .strip('"', 1)
                     .toString()
                     .replace(/\\([\\"nrtbf]|x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4}))/g, function(match, postSlash, hex){
-                        return hex ? string_fromCharCode(parseInt(hex, 16)) : match // TODO mirror specialEscapeMap
+                        return hex ? String_fromCharCode(parseInt(hex, 16)) : match // TODO mirror specialEscapeMap
                     })
                 : exit();
         },
@@ -1608,21 +1625,12 @@
         isEquali2: function(/* input, comparables */)
         {
             // workaround an Array#map polyfill
-            for(var args = arguments, i = args.length; i--; args[i] = String(args[i]).toLowerCase());
+            var args = arguments,
+                i = args.length;
+
+            while(i--) args[i] = String(args[i]).toLowerCase();
+
             return Stryng.isEqual.apply(null, args);
-        },
-
-        ord: function(input)
-        {
-            input = input != null ? String(input) : exit();
-            
-            var result = [],
-                length = input.length,
-                i = -1;
-
-            while(++i !== length) result[i] = input.charCodeAt(i);
-
-            return result;
         },
 
         /**
@@ -1678,7 +1686,7 @@
          */
         truncate: function(input, maxLength, ellipsis)
         {
-            if(input == null || maxLength <= -1 || maxLength == 1/0) exit();
+            if(input == null || maxLength <= -1 || maxLength == INFINITY) exit();
 
             input = String(input);
             maxLength = toInteger(maxLength);
@@ -1694,6 +1702,19 @@
             if(eLength > maxLength) return ellipsis.slice(-maxLength);
 
             return input.substring(0, maxLength - eLength) + ellipsis;
+        },
+
+        ord: function(input)
+        {
+            input = input != null ? String(input) : exit();
+            
+            var result = [],
+                length = input.length,
+                i = -1;
+
+            while(++i !== length) result[i] = input.charCodeAt(i);
+
+            return result;
         },
         
         /**
@@ -1711,7 +1732,7 @@
          */
         random: function(n, from, to)
         {
-            if(n <= -1 || n == 1/0) exit();
+            if(n <= -1 || n == INFINITY) exit();
 
             n = toInteger(n);
 
@@ -1726,7 +1747,7 @@
             {
                 while(n--)
                 {
-                    result += string_fromCharCode(from + math_random() * diff | 0);
+                    result += String_fromCharCode(from + Math_random() * diff | 0);
                 }
             }
 
@@ -1743,7 +1764,7 @@
          */
         randomOf: function(n, charset)
         {
-            if(n <= -1 || n == 1/0) exit();
+            if(n <= -1 || n == INFINITY) exit();
 
             n = toInteger(n);
             charset = String(charset).split('');
@@ -1761,7 +1782,7 @@
     // foreign //
     /////////////
 
-    array_forEach.call( object_keys(StryngGenerics), function(fnName){
+    array_forEach.call( Object_keys(StryngGenerics), function(fnName){
         
         var fn = StryngGenerics[fnName];
 
@@ -1778,7 +1799,8 @@
 
             var result = fn.apply(null, arguments);
 
-            // typeof check is sufficient, mimics immutability of Stryngs
+            // typeof check is sufficient
+            // Stryngs are hereby immutable
             return 'string' === typeof result ? new Stryng(result) : result;
         };
     });
@@ -1810,7 +1832,8 @@
             {
                 var result = fn.apply(this._value, arguments);
 
-                // typeof check is sufficient, mimics immutability of Stryngs
+                // typeof check is sufficient
+                // Stryngs are hereby immutable
                 return 'string' === typeof result ? new Stryng(result) : result;
             };
         }
@@ -1851,10 +1874,10 @@
      */
     Stryng.chr = function(/* charCodes,... */)
     {
-        return Stryng( string_fromCharCode.apply(null, arguments) );
+        return Stryng( String_fromCharCode.apply(null, arguments) );
     };
 
-    Stryng.fromCharCode = string_fromCharCode;
+    Stryng.fromCharCode = String_fromCharCode;
 
     // no shim yet
     if(String.fromCodePoint) Stryng.fromCodePoint = String.fromCodePoint;
@@ -1863,9 +1886,9 @@
     // aliases //
     /////////////
 
-    array_forEach.call( object_keys(StryngGenerics), function(fnName){
+    array_forEach.call( Object_keys(StryngGenerics), function(fnName){
   
-        var alias = Stryng(fnName);
+        var alias = new Stryng(fnName);
 
         if(alias.endsWith('Left'))
         {
@@ -1885,8 +1908,8 @@
 
     Stryng.prototype.length = Stryng.prototype.len;
 
-    Stryng.stringifyShallow = Stryng.quote;
-    Stryng.prototype.stringifyShallow = Stryng.prototype.quote;
+    Stryng.shallowStringify = Stryng.quote;
+    Stryng.prototype.shallowStringify = Stryng.prototype.quote;
 
     /**
      * delegates to native <code>String.prototype.concat</code>

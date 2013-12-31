@@ -286,7 +286,7 @@ describe('Stryng', function(){
 			expect( Stryng.repeat ).to.throwError(/repeat/);			
 		});
 
-		it('should fail if n is negative or not finite', function () {
+		it('should fail if n is negative', function () {
 			expect( Stryng.repeat ).withArgs('', -1).to.throwError();
 		});
 
@@ -338,7 +338,7 @@ describe('Stryng', function(){
 			expect( Stryng.wrap ).withArgs('foo', 'outfix', -1).to.throwError();
 		});
 
-		it('should apply zero as the deault thus return the input', function () {
+		it('should apply zero as the default thus return the input', function () {
 			expect( Stryng.wrap('foo', 'outfix') ).to.equal('foo');
 		});
 
@@ -771,6 +771,10 @@ describe('Stryng', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.ord ).to.throwError(/ord/);
+		});
+
+		it('should return the empty array given the empty string', function () {
+			expect( Stryng.ord('') ).to.eql([]);
 		});
 
 		it('should return each character\'s character code', function(){
