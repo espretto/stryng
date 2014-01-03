@@ -63,11 +63,11 @@ Benchmark.options.setup = function()
 {
 	var
 
-	// static strings
 	empty = '',
 	chr = 'a',
 	word = 'foo',
 	sentence = 'the quick brown fox jumps over the lazy dog',
+	splitSentence = sentence.split(' '),
 
 	rightPadded = 'text'
 		+ '\u0009\u000A\u000B\u000C'
@@ -182,6 +182,21 @@ suites.push(
 		})
 );
 
+suites.push(
+
+	Benchmark.Suite({name:'join'})
+
+		.add('slice args', function(){
+
+			Stryng['join'](' ', splitSentence);
+		})
+
+		.add('shift args', function(){
+
+			Stryng['join2'](' ', splitSentence);
+		})
+);
+
 suites.push( // http://jsperf.com/mention-arguments/3
 
 	Benchmark.Suite({name:'arguments'})
@@ -237,7 +252,7 @@ suites.push(
 
 suites = suites.filter(function(suite){
 
-	return !suite.name.indexOf('isEqual')
+	return !suite.name.indexOf('join')
 
 });
 

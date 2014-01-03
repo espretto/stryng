@@ -13,12 +13,11 @@
  * defensive programming
  */
 
-// https://github.com/umdjs/umd/blob/master/returnExports.js
 (function (root, factory){
 
     if (typeof define === 'function' && define.amd)
     {
-        // AMD. Register as an anonymous module.
+        // register as an anonymous AMD module.
         define(factory);
     }
     else if(typeof module === 'object' && module.exports)
@@ -28,7 +27,7 @@
     }
     else if(typeof exports === 'object')
     {
-        // NodeJS
+        // old NodeJS
         exports = factory();
     }
     else
@@ -61,7 +60,10 @@
     // used for input validation
     INFINITY = 1/0,
 
-    // used to cast to string
+    // used to limit String.fromCharCode
+    MAX_CHARCODE = 65535, // Math.pow(2, 16) - 1
+
+    // used to convert to string
     String = VERSION.constructor,
 
     // methods Stryng hopes to adopt - getOwnPropertyNames() method is non-shimable
@@ -77,7 +79,7 @@
         + 'toLowerCase,toUpperCase,'
     
         // shimmed
-        + 'substr,trim,trimLeft,trimRight,contains,startsWith,endsWith,'
+        + 'substr,trim,trimLeft,trimRight,contains,startsWith,endsWith'
     ).split(','),
 
     // methods which's native implementations to override if necessary
@@ -164,11 +166,13 @@
     Object_keys = Object.keys || function(object)
     {
         // no spec compliance intended - for internal use only
-        var keys = [], key;
+        var keys = [],
+            key,
+            k = 0;
 
         for(key in object)
         {
-            if(object.hasOwnProperty(key)) keys.push(key);
+            if(object.hasOwnProperty(key)) keys[k++] = key;
         }
 
         return keys;
@@ -179,7 +183,7 @@
         try
         {
             // throws if either is undefined or does not allow native objects
-            defineProperty({}, 'v', { value: 1 });
+            defineProperty({}, VERSION, { value: 1 });
 
             return defineProperty;
         }
@@ -239,20 +243,20 @@
         + '\u2028' // line separator
         + '\u2029' // paragraph separator
         + '\uFEFF' // BOM - byte order mark
-
-    ), // no need to split since forEach is generic
+    ),
 
     strWS  = '\\s'
 
     ; // ends var block
 
+    // forEach is generic - works on strings
     array_forEach.call(ws, function(chr){
 
         if(!reWS.test(chr)) strWS += chr;
     });
 
     // if a native implementation manages to
-    // catch up with the spec it wouldn't be replaced
+    // catch up with the spec it wouldn't be shimmed
     if(strWS.length > 2)
     {
         shimMethods.push('trim', 'trimRight', 'trimLeft');
@@ -265,27 +269,28 @@
         reTrimRight = new RegExp(strWS + '*' + strWS + '$');
     }
 
-    if('ab'.substr(-1) !== 'b') shimMethods.push('substr');
+    // force shim if necessary
+    if('xy'.substr(-1) !== 'y') shimMethods.push('substr');
 
     /////////////////////////
     // class / type checks //
     /////////////////////////
 
-    array_forEach.call(['Array'/*, 'Date'*/, 'Function'/*, 'Object'*/, 'RegExp'], function(clazz){
+    array_forEach.call(['Array'/*, 'Date'*/, 'Function'/*, 'Object'*/, 'RegExp'], function(klass){
 
-        var repr = '[object ' + clazz + ']';
+        var repr = '[object ' + klass + ']';
         
         // early exit falsies
-        is[clazz] = function(o){ return o && object_toString.call(o) === repr };
+        is[klass] = function(o){ return o && object_toString.call(o) === repr };
     });
 
-    array_forEach.call([/*'Boolean',*/ 'Number' /*, 'String'*/], function(clazz){
+    array_forEach.call([/*'Boolean',*/ 'Number' /*, 'String'*/], function(klass){
 
-        var repr = '[object ' + clazz + ']',
-            type = clazz.toLowerCase();
+        var repr = '[object ' + klass + ']',
+            type = klass.toLowerCase();
 
-        // early exit null, undefined, primitves
-        is[clazz] = function(o){ return o != null && (typeof o === type || object_toString.call(o) === repr) };
+        // early exit null, undefined, primitves (typeof)
+        is[klass] = function(o){ return o != null && (typeof o === type || object_toString.call(o) === repr) };
     });
 
     // adopt native if available
@@ -294,19 +299,20 @@
     // returns 'function' in old webkit
     if(typeof reFloat === 'object') 
     {
+        // early exit falsies
         is.Function = function(o){ return o && typeof o === 'function' };
     }
 
-    // is.Arguments = (function(){
+    is.Arguments = (function(){
 
-    //     var repr = '[object Arguments]';
+        var repr = '[object Arguments]';
 
-    //     function isArguments(o){ return o && object_toString.call(o) === repr; }
-    //     function isArgumentsDuck(o){ return o && typeof o.callee === 'function'; }
+        function isArguments(o){ return o && object_toString.call(o) === repr; }
+        function isArgumentsDuck(o){ return o && typeof o.callee === 'function'; }
 
-    //     return isArguments(arguments) ? isArguments : isArgumentsDuck;
+        return isArguments(arguments) ? isArguments : isArgumentsDuck;
         
-    // })();
+    })();
     
     // is.Undefined = function(o){ return o === void 0 }; // 'undefined' might be overridable
 
@@ -327,7 +333,7 @@
         // x <= -1 since all results of toNumber(x) in range ]-1,0[ get ceiled to zero
         // 
         // the isPositiveInfinity check can be performed without parsing through
-        // x == INFINITY since only 'Infinity' == Infinity ( == INFINITY )
+        // x == 1/0 since only 'Infinity' == Infinity ( == 1/0 )
         
         return (
             // toNumber and isNaN
@@ -347,7 +353,7 @@
         {
             var item = iterable[i];
 
-            if(item && is.Number(item.length))
+            if(is.Array(item) || is.Arguments(item))
             {
                 array_unshift.call(item, i, 1);
                 array_splice.apply(iterable, item);
@@ -362,14 +368,18 @@
 
     function exit()
     {
-        var caller = arguments.callee.caller;
-            message = 'invalid usage of Stryng.' + /* custom */ caller._name + '() with args [',
-            args = '';
+        var args = '',
+            caller = arguments.callee.caller;
+            message =
+                  'invalid usage of Stryng.'
+                + caller._name /* custom property of Stryng functions */ 
+                + '() with args [';
 
         // workaround null and undefined being displayed as the empty string
         // by at least NodeJS's Array#toString / Array#join
         array_forEach.call(caller.arguments, function(arg){ args += arg + ', ' });
 
+        // strip trailing
         throw new Error(message + (args ? args.slice(0, -2) : '') + ']');
     }
 
@@ -385,9 +395,10 @@
      * @param {*} [input=""]
      *   the value to parse. defaults to the empty string
      * @returns {Stryng}
-     *   the empty string if passed <code>null</code>
+     *   either ther empty string if passed <code>null</code>
      *   or <code>undefined</code> (unlike the native constructor),
-     *   the <code>input</code>'s string representation otherwise.
+     *   or the <code>input</code>'s string representation wrapped
+     *   in a Stryng object.
      */
     function Stryng(input)
     {
@@ -430,7 +441,7 @@
          *   <code>input</code> with first letter upper-cased.
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
-         * @todo in order to support diacritics and ligatures import the Stryng.esc plugin
+         * @todo support diacritics and ligatures
          */
         capitalize: function(input)
         {
@@ -563,7 +574,7 @@
                 var len = input.length;
                 
                 return i === (
-                    // default for negatives
+                    // default for negatives (get ceiled)
                     position <= -1 ? 0 :
                     // maximum
                     position > len ? len :
@@ -646,9 +657,10 @@
         {
             input = input != null ? String(input) : exit();
             
-            // add length if negative, set zero if still negative
             start = start <= -1
+                // add length if is negative
                 ? (start = toInteger(start) + input.length) < 0
+                    // set zero if still is negative
                     ? 0
                     : start
                 : start;
@@ -755,7 +767,7 @@
          * @param {(...*|Array.<*>|Arguments.<*>)} [joinees=[]]
          *   <em>nestable</em>
          * @returns {string}
-         *   <code>joinees</code> join by native <code>Array.prototype.join</code>.
+         *   <code>joinees</code> joined by native <code>Array.prototype.join</code>.
          *   returns the empty string if no second, third .. argument is passed
          * @throws {Error}
          *   if <code>delimiter</code> is either <code>null</code> or <code>undefined</code>
@@ -769,6 +781,22 @@
             if(arguments.length === 1) return '';
 
             return array_join.call( flatten(array_slice.call(arguments, 1)), delimiter );
+        },
+
+        /**
+         * @function Stryng.join2
+         * @deprecated slower - use {@link Stryng.join} instead
+         * @todo test and benchmark across browsers
+         */
+        join2: function(/* delimiter, strings... */)
+        {
+            var args = arguments,
+                delimiter = array_shift.call(args);
+
+            if(delimiter == null) exit();
+            if(!args.length) return '';
+
+            return array_join.call( flatten(args), delimiter );
         },
 
         /**
@@ -909,7 +937,7 @@
         {
             input = input != null ? String(input) : exit();
 
-            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
             n = (n === void 0 ? -1 : n) >>> 0;
 
             // early exit for zero
@@ -937,7 +965,7 @@
         {
             input = input != null ? String(input) : exit();
 
-            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
             n = (n === void 0 ? -1 : n) >>> 0;
 
             // early exit for zero
@@ -1334,8 +1362,8 @@
         {
             input = input != null ? String(input) : exit();
 
-            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
-            n = (n === void 0 ? -1 : n ) >>> 0;
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
+            n = (n === void 0 ? -1 : n) >>> 0;
             prefix = String(prefix);
 
             // early exit for zero and the empty prefix
@@ -1361,8 +1389,8 @@
         {
             input = input != null ? String(input) : exit();
 
-            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
-            n = n === void 0 ? -1 >>> 0 : n >>> 0;
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
+            n = (n === void 0 ? -1 : n) >>> 0;
             prefix = String(prefix);
 
             // early exit for zero and the empty prefix
@@ -1384,8 +1412,8 @@
         {
             input = input != null ? String(input) : exit();
 
-            // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
-            n = n === void 0 ? -1 >>> 0 : n >>> 0;
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
+            n = (n === void 0 ? -1 : n) >>> 0;
             prefix = String(prefix);
 
             // early exit
@@ -1442,7 +1470,7 @@
             input = input != null ? String(input) : exit();
 
             // Math.pow(2, 32) - 1 if undefined, toUint32(n) otherwise
-            n = n === void 0 ? -1 >>> 0 : n >>> 0;
+            n = (n === void 0 ? -1 : n) >>> 0;
             suffix = String(suffix);
 
             // early exit for zero and the empty suffix
@@ -1475,6 +1503,39 @@
         strip: function(input, outfix, n)
         {
             return Stryng.stripRight( Stryng.stripLeft( input, outfix, n ), outfix, n );
+        },
+
+        /**
+         * @function Stryng.truncate
+         * @param  {string} input
+         * @param  {number} maxLength
+         * @param  {string} [ellipsis="..."]
+         * @returns {string}
+         *   the <code>input</code> sliced to fit the given
+         *   <code>maxLength</code> including the <code>ellipsis</code>
+         * @tutorial truncate
+         */
+        truncate: function(input, maxLength, ellipsis)
+        {
+            input = input != null ? String(input) : exit();
+
+            // toUint32(-1) == Math.pow(2, 32) - 1 (default)
+            maxLength = (maxLength === void 0 ? -1 : maxLength) >>> 0;
+
+            // no space - no output
+            if(!maxLength) return '';
+            
+            // enough space - no need to truncate
+            if(maxLength >= input.length) return input;
+            
+            ellipsis = ellipsis != null ? String(ellipsis) : '...';
+
+            var eLength = ellipsis.length;
+
+            // not even enough space for the ellipsis
+            if(eLength > maxLength) return ellipsis.slice(-maxLength);
+
+            return input.substring(0, maxLength - eLength) + ellipsis;
         },
 
         /**
@@ -1558,7 +1619,7 @@
          * @throws {Error}
          *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
-        isEqual: function(input /* comparables */)
+        isEqual: function(input /*, comparables */)
         {
             input = input != null ? String(input) : exit();
             
@@ -1634,10 +1695,52 @@
         },
 
         /**
+         * @function Stryng.consistsOf
+         * @param  {string} input
+         * @param  {string} [charset="undefined"]
+         * @return {boolean}
+         *   whether <code>input</code> consists of
+         *   characters within <code>charset</code> exclusively
+         */
+        consistsOf: function(input, charset)
+        {
+            input = input != null ? String(input) : exit();
+
+            charset = String(charset);
+
+            for(var i = input.length; i--; charset.indexOf( input.charAt(i) ) !== -1);
+
+            return i === -1;
+        },
+
+        /**
+         * @function Stryng.randomize
+         * @param  {string} input
+         * @param  {number} [length=input.length]
+         * @return {string}
+         *   string of length <code>length</code>
+         *   with characters randomly choosen from <code>input</code>
+         */
+        randomize: function(input, length)
+        {
+            if(input == null || length <= -1 || length == INFINITY) exit();
+
+            input = String(input);
+
+            // default to the input's length
+            length = length === void 0 ? input.length : toInteger(length);
+
+            for(var result = ''; length--; result += input.charAt(Math_random() * length | 0) );
+
+            return result;
+        },
+        
+        /**
          * @function Stryng.isEmpty
          * @param  {string}  input
          * @returns {boolean} whether the string has length <code>0</code>
-         * @throws {Error} if any required argument is missing
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         isEmpty: function(input)
         {
@@ -1648,10 +1751,9 @@
          * @function Stryng.isBlank
          * @param  {string}  input
          * @returns {boolean}
-         *   whether the string is empty
-         *   or consists only of whitespace characters
+         *   whether the string is empty or consists of whitespace only
          * @throws {Error}
-         *   if any required argument is missing
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         isBlank: function(input)
         {
@@ -1660,48 +1762,82 @@
         },
 
         /**
+         * @function Stryng.isDigit
+         * @param  {string} input
+         * @return {boolean}
+         *   whether or not <code>input</code> consists of numbers only
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
+         */
+        isDigit: function(input)
+        {
+            // implies parsing
+            return input != null ? /^\d\d*$/.test(input) : exit();
+        },
+
+        /**
          * @function Stryng.isNumeric
          * @param  {string}  input
-         * @returns {boolean} whether the string is numeric
-         * @throws {Error} if any required argument is missingsssss
+         * @returns {boolean}
+         *   whether the string is numeric. unlike native <code>isNaN</code>,
+         *   false is returned for the empty string
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
          */
         isNumeric: function(input)
         {
             input = input != null ? String(input) : exit();
 
             // exclude the empty string
-            return input && (input = +input) === input;
+            return !!input && (input = +input) === input;
         },
-        
+
         /**
-         * @function Stryng.truncate
+         * @function Stryng.isLetter
          * @param  {string} input
-         * @param  {number} maxLength
-         * @param  {string} [ellipsis="..."]
-         * @returns {string}
-         *   the <code>input</code> sliced to fit the given
-         *   <code>maxLength</code> including the <code>ellipsis</code>
-         * @todo how to handle situations where ellipsis is longer than input?
-         * @todo <code>exact</code> not yet implemented
+         * @return {boolean}
+         *   whether or not <code>input</code> consistsOf
+         *   letters (lower- and uppercased) only
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
+         * @todo support diacritics and ligatures
          */
-        truncate: function(input, maxLength, ellipsis)
+        isLetter: function(input)
         {
-            if(input == null || maxLength <= -1 || maxLength == INFINITY) exit();
+            // implies parsing
+            return input != null ? /^[a-zA-Z][a-zA-Z]*$/.test(input) : exit();
+        },
 
-            input = String(input);
-            maxLength = toInteger(maxLength);
-            
-            var iLength = input.length;
+        /**
+         * @function Stryng.isAlphaNumeric
+         * @param  {string} input
+         * @return {boolean}
+         *   whether or not <code>input</code> consistsOf
+         *   letters (lower- and uppercased) and digits only
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
+         * @todo support diacritics and ligatures
+         */
+        isAlphaNumeric: function(input)
+        {
+            // implies parsing
+            return input != null ? /^[0-9a-zA-Z][0-9a-zA-Z]*$/.test(input) : exit();
+        },
 
-            if(maxLength >= iLength) return input;
-            
-            ellipsis = ellipsis != null ? String(ellipsis) : '...';
-
-            var eLength = ellipsis.length;
-
-            if(eLength > maxLength) return ellipsis.slice(-maxLength);
-
-            return input.substring(0, maxLength - eLength) + ellipsis;
+        /**
+         * @function Stryng.isPunctuation
+         * @param  {string}  input
+         * @return {boolean}
+         *   whether or not <code>input</code> consistsOf
+         *   punctuation characters only:
+         *   !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+         * @throws {Error}
+         *   if <code>input</code> is either <code>null</code> or <code>undefined</code>
+         */
+        isPunctuation: function(input)
+        {
+            // implies parsing
+            return input != null ? /^[!"#\$%&'\(\)\*\+,-\.\/\:;<\=>\?@\[\\\]\^_`\{|\}~]+$/.test(input) : exit(); // "
         },
 
         ord: function(input)
@@ -1713,66 +1849,6 @@
                 i = -1;
 
             while(++i !== length) result[i] = input.charCodeAt(i);
-
-            return result;
-        },
-        
-        /**
-         * generates a string of random characters
-         * which default to the ASCII printables. to choose randomly
-         * from the whole Unicode table call <code>Stryng.random(n, 0, -1)</code>
-         * @function Stryng.random
-         * @param {number} n
-         * @param {number} [from=32]
-         * @param {number} [to=126]
-         * @returns {string}
-         *   string of length <code>n</code> with characters
-         *   randomly choosen from the Unicode table with
-         *   code-range [<code>from</code>, <code>to</code>]
-         */
-        random: function(n, from, to)
-        {
-            if(n <= -1 || n == INFINITY) exit();
-
-            n = toInteger(n);
-
-            // printable ASCII characters by default
-            from = from === void 0 ? 32  : from >>> 0;
-            to   = to   === void 0 ? 126 : to   >>> 0;
-
-            var result = '',
-                diff = to - from;
-
-            if(diff > 0)
-            {
-                while(n--)
-                {
-                    result += String_fromCharCode(from + Math_random() * diff | 0);
-                }
-            }
-
-            return result;
-        },
-
-        /**
-         * @function Stryng.randomOf
-         * @param  {number} [n=0]
-         * @param  {string} [charset="undefined"]
-         * @return {string}
-         *   string of length <code>n</code>
-         *   with characters randomly choosen from <code>charset</code>
-         */
-        randomOf: function(n, charset)
-        {
-            if(n <= -1 || n == INFINITY) exit();
-
-            n = toInteger(n);
-            charset = String(charset).split('');
-
-            var result = '',
-                length = charset.length;
-
-            while(n--) result += charset[random() * length | 0];
 
             return result;
         }
@@ -1800,7 +1876,7 @@
             var result = fn.apply(null, arguments);
 
             // typeof check is sufficient
-            // Stryngs are hereby immutable
+            // ensure immutability and enable chaining of Stryngs
             return 'string' === typeof result ? new Stryng(result) : result;
         };
     });
@@ -1833,7 +1909,7 @@
                 var result = fn.apply(this._value, arguments);
 
                 // typeof check is sufficient
-                // Stryngs are hereby immutable
+                // ensure immutability and enable chaining of Stryngs
                 return 'string' === typeof result ? new Stryng(result) : result;
             };
         }
@@ -1851,31 +1927,72 @@
     /////////////////////////////
 
     /**
+     * generates a string of random characters which default to the ASCII printables.
+     * to choose randomly from the whole Unicode table call <code>Stryng.random(n, 0, -1)</code>.
+     * will <strong>not</strong> be available on Stryng instances.
+     * @function Stryng.random
+     * @param {number} [length=0]
+     * @param {number} [from=32]
+     * @param {number} [to=126]
+     * @returns {string}
+     *   string of length <code>n</code> with characters
+     *   randomly choosen from the Unicode table with
+     *   code-range [<code>from</code>, <code>to</code>]
+     */
+    Stryng.random = function(length, from, to)
+    {
+        if(length <= -1 || length == INFINITY) exit();
+
+        length = toInteger(length);
+
+        // printable ASCII characters by default
+        from = from === void 0 ? 32  : (from >>> 0);
+        to   = to   === void 0 ? 126 : (to   >>> 0);
+
+        var result = '',
+            diff = to - from;
+
+        if(diff > 0)
+        {
+            while(length--)
+            {
+                result += String_fromCharCode(from + Math_random() * diff | 0);
+            }
+        }
+
+        return Stryng(result);
+    };
+
+    Stryng.random._name = 'random';
+
+    /**
      * delegates to native [String.fromCharCode]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode}.
      * will <strong>not</strong> be available on Stryng instances.
      * @function Stryng.chr
      * @param {...number} charCode
      * @returns {string}
      *   the concatenated <code>Stryng</code> representations of the given
-     *   <code>charCode</code>s from the UTF-16 table
-     * @example
-     * var stryng = Stryng.chr(72, 101, 108, 2, 111, 32, 87, 111, 114, 108, 100);
-     * // returns "Hello World"
-     * stryng instanceof Stryng;
-     * // returns true
-     * var string = Stryng.fromCharCode.apply(null, [
-     *     72, 101, 108, 108, 2, 111, 32, 87, 111, 114, 108, 100
-     * ]);
-     * // to not wrap use native
-     * string instanceof Stryng;
-     * // returns false
-     * typeof string;
-     * // returns "string"
+     *   <code>charCode</code>s from the UTF-16 table. empty if no arguments passed
+     * @throws {Error}
+     *   if <code>charCode</code> is out of range [<code>0</code>, <code>Math.pow(2, 16)</code>[
+     * @tutorial chr
      */
     Stryng.chr = function(/* charCodes,... */)
     {
-        return Stryng( String_fromCharCode.apply(null, arguments) );
+        var args = flatten(arguments),
+            i = args.length,
+            charCode;
+
+        while(i--)
+        {
+            charCode = +args[i];
+            if(0 > charCode || charCode > MAX_CHARCODE) exit();
+        }
+
+        return Stryng( String_fromCharCode.apply(null, args) );
     };
+
+    Stryng.chr._name = 'chr';
 
     Stryng.fromCharCode = String_fromCharCode;
 
@@ -1905,8 +2022,6 @@
             Stryng.prototype[alias] = Stryng.prototype[fnName];
         }
     });
-
-    Stryng.prototype.length = Stryng.prototype.len;
 
     Stryng.shallowStringify = Stryng.quote;
     Stryng.prototype.shallowStringify = Stryng.prototype.quote;
