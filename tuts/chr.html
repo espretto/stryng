@@ -1,0 +1,14 @@
+<pre><code class="prettyprint lang-javascript linenums">
+var stryng = Stryng.chr(72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100); // returns "Hello World"
+
+stryng instanceof Stryng; // returns true
+
+// to not wrap use native
+var string = Stryng.fromCharCode.apply(null, [
+    72, 101, 108, 108, 2, 111, 32, 87, 111, 114, 108, 100
+]);
+
+string instanceof Stryng; // returns false
+typeof string; // returns "string"
+
+</code></pre>
