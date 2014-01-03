@@ -1,13 +1,7 @@
 
 
-
-
-
 Benchmark = require('benchmark');
-Stringen = require('./Stringen.js');
-
-
-
+Stryng = require('./../Stryng.js');
 
 // baseline setup
 // ==============
@@ -53,10 +47,12 @@ Benchmark.forOwn(
 				suites.shift().run();
 			}
 		}
-	}.
+	},
 	function(fn, fnName){ this[fnName] = fn },
 	Benchmark.Suite.options
 );
+
+// Benchmark.options.minSamples = 200;
 
 
 
@@ -67,225 +63,196 @@ Benchmark.options.setup = function()
 {
 	var
 
-	// static strings
 	empty = '',
 	chr = 'a',
 	word = 'foo',
-	sentence = 'the quick brown fox jumps over the lazy dog';
+	sentence = 'the quick brown fox jumps over the lazy dog',
+	splitSentence = sentence.split(' '),
+
+	rightPadded = 'text'
+		+ '\u0009\u000A\u000B\u000C'
+		+ '\u00A0\u000D\u0020\u1680'
+		+ '\u180E\u2000\u2001\u2002'
+		+ '\u2003\u2004\u2005\u2006'
+		+ '\u2007\u2008\u2009\u200A'
+		+ '\u2028\u2029\u202F\u205F'
+		+ '\u3000\uFEFF',
+
+	html ='<!doctype html>'
+		+ '<html>'
+		+ '<head>'
+		+ '    <title>Example Domain</title>'
+		+ ''
+		+ '    <meta charset="utf-8" />'
+		+ '    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />'
+		+ '    <meta name="viewport" content="width=device-width, initial-scale=1" />'
+		+ '    <style type="text/css">'
+		+ '    </style>    '
+		+ '</head>'
+		+ ''
+		+ '<body>'
+		+ '<div>'
+		+ '    <h1>Example Domain</h1>'
+		+ '    <p>This domain is established to be used for illustrative examples in documents. You may use this'
+		+ '    domain in examples without prior coordination or asking for permission.</p>'
+		+ '    <p><a href="http://www.iana.org/domains/example">More information...</a></p>'
+		+ '</div>'
+		+ '</body>'
+		+ '</html>';
 
 };
-
 
 // globals
 // -------
 
+
+
 // suite queue
 suites = [];
 
-// printable randomized strings
-gRandomStrings = (function(lengths){
-
-	var cache = {};
-
-	lengths.forEach(function(length){
-
-		cache[length] = Stringen.random(length);
-
-	});
-
-	return cache;
-
-})( [10, 50, 100, 200, 500, 1000, 2000, 5000] );
-
-// naive polyfill `String.prototype.repeat` as generic
-function repeat(value, n)
-{
-	var result = '';
-
-	while(n--)
-	{
-		result += value;
-	}
-
-	return result;
-}
-
-// repeated string
-gRandomString = Stringen.random(10);
-gRepeatedRadnomString = repeat(gRandomString, 500);
-
-// Stringen.capitalize()
-// ---------------------
-
 suites.push(
 
-	Benchmark.Suite({name:'capitalize empty string'})
+	Benchmark.Suite({name: 'splitLeft'})
 
-		.add('Stringen.capitalize()', function() {
-
-			Stringen.capitalize(empty);
+		.add('match substrings', function(){
+			
+			Stryng.splitLeft(html, /<[^>]*>/);
 
 		})
-		.add('Stringen.capitalize2()', function() {
 
-			Stringen.capitalize2(empty);
+		.add('exec with globalized', function(){
+			
+			Stryng.splitLeft2(html, /<[^>]*>/);
 
 		})
 );
 
 suites.push(
 
-	Benchmark.Suite({name:'capitalize single character'})
+	Benchmark.Suite({name: 'count'})
 
-		.add('Stringen.capitalize()', function(){
+		.add('charAt loop', function(){
 
-			Stringen.capitalize(chr);
-
-		})
-		.add('Stringen.capitalize2()', function(){
-
-			Stringen.capitalize2(chr);
-
+			Stryng.count2(sentence, ' ');
 		})
 
+		.add('repetitive indexOf', function(){
+
+			Stryng.count(sentence, ' ');
+		})
 );
 
 suites.push(
 
-	Benchmark.Suite({name:'capitalize word'})
+	Benchmark.Suite({name:'trimRight'})
 
-		.add('Stringen.capitalize()', function(){
+		.add('reverse charAt loop with regex test', function(){
 
-			Stringen.capitalize(word);
-
-		})
-		.add('Stringen.capitalize2()', function(){
-
-			Stringen.capitalize2(word);
-
+		    Stryng.trimRight(rightPadded);
 		})
 
-);
+		.add('reverse charAt loop with contains check', function(){
 
-// Stringen.count()
-// ----------------
-
-suites.push(
-
-	Benchmark.Suite({name:'count single character'})
-
-		.add('Stringen.count()', function(){
-
-			Stringen.count(sentence, 'o');
-
+		    Stryng.trimRight2(rightPadded);
 		})
-		.add('Stringen.count2()', function(){
+		
+		.add('strip by regex', function(){
 
-			Stringen.count2(sentence, 'o');
-
+		    Stryng.trimRight3(rightPadded);
 		})
-
 );
 
 suites.push(
 
-	Benchmark.Suite({name:'count regex'})
+	Benchmark.Suite({name:'reverse'})
 
-		.add('Stringen.count()', function(){
+		.add('reverse charAt loop appending to new string', function(){
 
-			Stringen.count(sentence, /o/g);
-
-		})
-		.add('Stringen.count2()', function(){
-
-			Stringen.count2(sentence, /o/g);
-
+			Stryng.reverse3('0123456789ABCDEF');
 		})
 
+		.add('reverse charAt loop appending to input then slicing', function(){
+
+			Stryng.reverse2('0123456789ABCDEF');
+		})
+
+		.add('composed split reverse join', function(){
+
+			Stryng.reverse('0123456789ABCDEF');
+		})
 );
 
 suites.push(
 
-	Benchmark.Suite({name:'count word'})
+	Benchmark.Suite({name:'join'})
 
-		.add('Stringen.count()', function(){
+		.add('slice args', function(){
 
-			Stringen.count(sentence, 'the ');
-
-		})
-		.add('Stringen.count2()', function(){
-
-			Stringen.count2(sentence, 'the ');
-
+			Stryng['join'](' ', splitSentence);
 		})
 
+		.add('shift args', function(){
+
+			Stryng['join2'](' ', splitSentence);
+		})
 );
 
-// Stringen.isPrintable()
-// ----------------------
+suites.push( // http://jsperf.com/mention-arguments/3
 
-Benchmark.forOwn(gRandomStrings, function(randomString, length){
+	Benchmark.Suite({name:'arguments'})
 
-	suites.push(
+		.add('1', function(x){
+			var y = 1;
+			return Math.random() === x + y;
+		})
 
-		Benchmark.Suite({name: 'isPrintable check of length ' + length })
+		.add('2', function(x, arguments){
+			var y = 1;
+			return Math.random() === x + y;
+		})
 
-			.add('Stringen.isPrintable()', function(){
+		.add('3', function(x){
+			var y = 1, arguments;
+			return Math.random() === x + y;
+		})
 
-				Stringen.isPrintable(randomString);
+		.add('4', function(x){
+			var y = 1;
+			return Math.random() === x + y;
+			var arguments;
+		})
 
-			})
+		.add('5', function(x){
+			var y = 1;
+			return Math.random() === x + y;
+			arguments : while(false);
+		})
 
-			.add('Stringen.isPrintable2()', function(){
+		.add('6', function(x){
+			arguments : while(false);
+			var y = 1;
+			return Math.random() === x + y;
+		})
+);
 
-				Stringen.isPrintable2(randomString);
+suites.push(
 
-			})
+	Benchmark.Suite({name:'isEqual'})
 
-			.add('Stringen.isPrintable3()', function(){
+		.add('isEqual', function(){
 
-				Stringen.isPrintable3(randomString);
+			Stryng.isEqual('hello', 'hello', 'hello', 'hello', 'hello');
+		})
 
-			})
+		.add('isEqual2', function(){
 
-	);
-
-});
-
-// Stringen.lstrip()
-// -----------------
-
-[3,4,5,6,7,8].forEach(function(n){
-
-	suites.push(
-
-		Benchmark.Suite({name: 'lstrip operation with `n = ' + n + '`'})
-
-			.add('Stringen.lstrip()', function(){
-
-				Stringen.lstrip(gRepeatedRadnomString, gRandomString, n);
-
-			})
-
-			.add('Stringen.lstrip2()', function(){
-
-				Stringen.lstrip2(gRepeatedRadnomString, gRandomString, n);
-
-			})
-
-			.add('Stringen.lstrip3()', function(){
-
-				Stringen.lstrip3(gRepeatedRadnomString, gRandomString, n);
-
-			})
-
-	);
-
-});
+			Stryng.isEqual2('hello', 'hello', 'hello', 'hello', 'hello');
+		})
+)
 
 suites = suites.filter(function(suite){
 
-	return !suite.name.indexOf('count')
+	return !suite.name.indexOf('join')
 
 });
 

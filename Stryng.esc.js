@@ -32,6 +32,8 @@
 
 	reHTMLDelimiters = /[&<>"'\/]/g,
 
+	reRegex = /([\^\$\*\+\?\.\(\)\{\}\[\]\-])/g, // TODO
+
     HTMLDelimiterMap =
     {
         '&': '&amp;',
