@@ -1,12 +1,9 @@
 
-This is a work in process
--------------------------
-it's yet on github to leverage browserling for cross browser testing.
-
-[![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/Stryng)
-
+Stryng
+------
 The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the build-in javascript `String` object, and extends that existing set of functions with its own utilities.
 
+[![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/Stryng)
 
 How it works
 ------------
