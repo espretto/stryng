@@ -30,7 +30,7 @@ module.exports = function( grunt ) {
           hostname: '*',
           keepalive: true,
           port: 8000,
-          base: '/home/rasu/Development/nodejs/Stryng/docs/dist'
+          base: 'docs/dist'
         }
       }
     },

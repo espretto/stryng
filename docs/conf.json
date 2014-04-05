@@ -1,0 +1,33 @@
+{
+  "tags": {
+    "allowUnknownTags" : true
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true,
+    "default": {
+      "outputSourceFiles" : true
+    },
+    "applicationName": "stryngjs",
+    "disqus": "",
+    "googleAnalytics": "",
+    "openGraph": {
+      "title": "Stryng",
+      "type": "website",
+      "image": "",
+      "site_name": "",
+      "url": ""
+    },
+    "meta": {
+      "title": "",
+      "description": "",
+      "keyword": "javascript, string, library"
+    }
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": true,
+    "tags": ["examples"]
+  }
+}

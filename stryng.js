@@ -1220,9 +1220,8 @@ var StryngMembers = {
   },
 
   /**
-   * [ord description]
-   * @param  {[type]} input [description]
-   * @return {[type]}       [description]
+   * @return {number[]} -
+   *   an array of char code numbers representing the given string.
    */
   ord: function( input ) {
     input = input != null ? String( input ) : exit();
@@ -1464,15 +1463,15 @@ Stryng.chr = function( /* charCodes,... */ ) {
 
 Stryng.chr._name = 'chr';
 
+Stryng.fromCharCode = String_fromCharCode;
 /**
  * delegate directly to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
- * @memberOf Stryng
+ * @fucntion Stryng.fromCharCode
  * @param {number} [charCode]
  * @returns {string} -
  *   string representation of the given `charCode`s from the UTF-16 table or
  *   the empty string if no arguments passed.
  */
-Stryng.fromCharCode = String_fromCharCode;
 
 // no shim yet
 if ( String.fromCodePoint ) Stryng.fromCodePoint = String.fromCodePoint;

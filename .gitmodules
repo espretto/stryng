@@ -1,0 +1,3 @@
+[submodule "docs/templates/jaguar"]
+	path = docs/templates/jaguar
+	url = https://github.com/davidshimjs/jaguarjs-jsdoc.git
