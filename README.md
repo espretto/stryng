@@ -1,7 +1,7 @@
 
 Stryng
 ------
-The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the build-in `String` object, fixes non-spec compliant implemenations, provides polyfills fulfilling ECMA 6 Standard and lastly mixes in its own set of utility functions.
+The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the build-in `String` object, detects and fixes native non-spec compliant implemenations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.
 
 [![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/Stryng)
 
@@ -25,3 +25,15 @@ String.prototype.toStryng = function() {
 .count('.')
 // 3 dots 
 ```
+
+Documentation
+-------------
+please refer to either the [api documentation](http://espretto.github.io/Stryng/index.html) or the [annotated source](http://espretto.github.io/Stryng/grock). Many thanks to [david](https://github.com/davidshimjs)'s [jsdoc template](https://github.com/davidshimjs/jaguarjs-jsdoc) and [killercups](https://github.com/killercup) [docco > groc fork](https://github.com/killercup/grock).
+
+Roadmap
+-------
+
+- refactor tests
+- integrate them into docs
+- renew testling setup
+- extend with plugin `Stryng.esc` for encoding conversions related to url parsing and slugifying
