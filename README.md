@@ -44,6 +44,13 @@ Standalone. Single global with no prototype extensions or shims.
 Usage
 -----
 
+you may want to include
+```
+String.prototype.toStryng = function() {
+  return new Stryng( this )
+};
+```
+
 wherever a string is expected, "undefined" will be the default as the result of `String(undefined)`
 
 As the astute reader may have noticed:
