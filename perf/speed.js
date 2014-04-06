@@ -1,7 +1,7 @@
 
 
 Benchmark = require('benchmark');
-Stryng = require('./../Stryng.js');
+Stryng = require('./../stryng.js');
 
 // baseline setup
 // ==============

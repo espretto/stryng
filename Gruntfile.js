@@ -1,21 +1,39 @@
 module.exports = function( grunt ) {
+  
+  var 
+
+  DOCS_OUT = 'docs/dist',
+  DOCS_IN = [
+    'README.md',
+    'src/stryng.js'
+  ];
+  LIVERELOAD = true;
+
   grunt.initConfig( {
 
     clean: {
       docs: {
-        src: 'docs/dist'
+        src: DOCS_OUT,
       }
+    },
+
+    grock: {
+      options: {
+        github: false,
+        index: 'README.md',
+        out: DOCS_OUT + '/annotated-source',
+        style: 'thin',
+        verbose: true
+      },
+      files: DOCS_IN
     },
 
     jsdoc: {
       all: {
-        src: [
-          'README.md',
-          'stryng.js'
-        ],
+        src: DOCS_IN,
         options: {
           verbose: true,
-          destination: 'docs/dist',
+          destination: DOCS_OUT,
           configure: 'docs/conf.json',
           template: 'docs/templates/jaguar',
           'private': false
@@ -26,39 +44,43 @@ module.exports = function( grunt ) {
     connect: {
       docs: {
         options: {
-          livereload: true,
+          livereload: LIVERELOAD,
           hostname: '*',
           keepalive: true,
           port: 8000,
-          base: 'docs/dist'
+          base: DOCS_OUT
         }
       }
     },
 
     watch: {
       options: {
-        livereload: true
+        livereload: LIVERELOAD
       },
       jsdoc: {
-        files: '<%= jsdoc.all.src %>',
-        tasks: ['jsdoc:all']
+        files: DOCS_IN.concat([
+          'docs/conf.json'
+        ]),
+        tasks: ['jsdoc', 'grock']
       }
     }
 
   } );
 
-  // Load task libraries
+  // task libs
   [
     'grunt-contrib-connect',
     'grunt-contrib-watch',
     'grunt-contrib-clean',
+    'grunt-grock',
     'grunt-jsdoc',
   ].forEach( grunt.loadNpmTasks, grunt );
 
-  // Definitions of tasks
+  // task definitions
   grunt.registerTask( 'default', 'Generate and serve documentation', [
     'clean:docs',
     'jsdoc',
+    'grock',
     'connect:docs'
   ] );
 

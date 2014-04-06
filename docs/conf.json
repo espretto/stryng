@@ -13,7 +13,7 @@
     "disqus": "",
     "googleAnalytics": "",
     "openGraph": {
-      "title": "Stryng",
+      "title": "stryngjs",
       "type": "website",
       "image": "",
       "site_name": "",
@@ -28,6 +28,6 @@
   "markdown": {
     "parser": "gfm",
     "hardwrap": true,
-    "tags": ["examples"]
+    "tags": ["example", "see", "todo", "throw", "throws", "exception"]
   }
 }

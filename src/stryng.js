@@ -2,13 +2,13 @@
  * [article on generics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#String_generic_methods)
  */
 
-// uglify
+// leverage uglifyjs' ability to declare global variables
 if (typeof DEBUG === 'undefined') DEBUG = true;
-
-var // one to var them all
 
 // baseline setup
 // ==============
+
+var // one to var them all
 
 // used to access native instance methods
 array, object, string, func,
@@ -19,7 +19,7 @@ VERSION = string = '0.0.1',
 // used for input validation
 INFINITY = 1 / 0,
 
-// used to limit String.fromCharCode
+// used to limit _String.fromCharCode_
 MAX_CHARCODE = 65535, // Math.pow(2, 16) - 1
 
 // used to convert to string
@@ -90,7 +90,7 @@ Object_defineProperty = ( function( defineProperty ) {
 } )( Object.defineProperty ),
 
 // instance methods
-// -------------------
+// ----------------
 
 array_forEach = array.forEach || function( iterator ) {
  
@@ -155,12 +155,12 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
 
   // http://perfectionkills.com/whitespace-deviations/
   whitespace = (
-    '\t' // '\u0009' tab
-  + '\n' // '\u000A' line feed
+    '\t'  // '\u0009' tab
+  + '\n'  // '\u000A' line feed
   + '\13' // '\u000B' vertical tab
-  + '\f' // '\u000C' form feed
-  + '\r' // '\u000D' carriage return
-  + ' ' // '\u0020' space
+  + '\f'  // '\u000C' form feed
+  + '\r'  // '\u000D' carriage return
+  + ' '   // '\u0020' space
 
   // http://www.fileformat.info/info/unicode/category/Zs/list.htm
   + '\xA0' + '\u1680\u180E\u2000\u2001' + '\u2002\u2003\u2004\u2005' + '\u2006\u2007\u2008\u2009' + '\u200A\u202F\u205F\u3000'
@@ -171,7 +171,7 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
   + '\uFEFF' // BOM - byte order mark
   ),
 
-  isSpecCompliant = true;
+  is_spec_compliant = true;
 
   // since `forEach` is generic it works on strings, too.
   array_forEach.call( whitespace, function( chr ) {
@@ -179,14 +179,14 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
     // add all whitespace characters not recognized as such
     if ( !re_whitespace.test( chr ) ){
       re_whitespace_source += chr;
-      isSpecCompliant = false;
+      is_spec_compliant = false;
     }
 
   } );
 
   // if a native implementation manages to catch up
   // with the spec it wouldn't be shimmed
-  if ( !isSpecCompliant ) {
+  if ( !is_spec_compliant ) {
 
     shim_methods.push( 'trim', 'trimRight', 'trimLeft' );
 
@@ -195,14 +195,14 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
     re_trim_right    = new RegExp( '[' + re_whitespace_source + ']*[' + re_whitespace_source + ']$' );
   }
 
-}())
+}());
 
 // type safety
 // ===========
 // the inner module `is` holds type checks. this is an excerpt from
 // my [gist](https://gist.github.com/esnippo/9960508).
 
-( function(/* arguments */) {
+( function (/* arguments */) {
 
   var klasses = [ 'Array', 'Function', 'RegExp' ];
 
@@ -232,7 +232,7 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
     };
   }
 
-}())
+}());
 
 // utility functions
 // =================
@@ -291,30 +291,42 @@ function exit() {
  * utility functions to ease manipulating Strings in Javascript.
  * the `new` operator can be omitted.
  * @class Stryng
- * @param {*} [input=""]
+ * @param {*} [value=""]
  *   the value to parse. defaults to the empty string
+ * @param {boolean} [is_mutable=false]
+ *   whether the created instance should be mutable or
+ *   create a new instance from the result of every method call
  * @returns {Stryng} -
  *   the `input`'s string representation wrapped
  *   in the instance returned.
  */
-function Stryng( input ) {
+function Stryng( value , is_mutable ) {
 
   // allow omitting the new operator
-  if ( !( this instanceof Stryng ) ) return new Stryng( input );
+  if ( !( this instanceof Stryng ) ) return new Stryng( value );
 
   /**
    * the wrapped native string primitive
    * @name Stryng~_value
    * @type {string}
    */
-  this._value = input != null ? String( input ) : exit();
+  this._value = value != null ? String( value ) : '';
+
+  /**
+   * whether the created instance should be mutable or
+   * create a new instance from the result of every method call
+   * @name Stryng~_isMutable
+   * @type {boolean}
+   */
+  this._isMutable = !!is_mutable;
 
   /**
    * the [String#_value](#_value)'s length defined via _Object.defineProperty_
    * if available, simply set onto the instance otherwise.
-   * @name Stryng~length
+   * @name Stryng#length
    * @readOnly
    * @type {number}
+   * @todo further [reading](http://www.2ality.com/2012/08/property-definition-assignment.html)
    */
   if ( Object_defineProperty ) {
     Object_defineProperty( this, 'length', {
@@ -329,10 +341,16 @@ function Stryng( input ) {
   }
 }
 
+Stryng._name = 'Stryng';
+
 /**
  * @lends Stryng.prototype
  */
-var StryngMembers = {
+var stryng_members = {
+
+  /**
+   * in case the instance was constructed to be
+   */
 
   /**
    * @returns {string} - input with first letter upper-cased.
@@ -440,7 +458,7 @@ var StryngMembers = {
    * @param {number} [endPosition=input.length]
    * @returns {boolean} -
    *   whether or not `input` truncated by `endPosition`
-   *   ends with substring `searchString`
+   *   ends with substring `searchString`.
    */
   endsWith: function( input, searchString, endPosition ) {
     input = input != null ? String( input ) : exit();
@@ -541,13 +559,6 @@ var StryngMembers = {
     while ( i !== -1 && ++count )
 
     return count;
-  },
-
-  /**
-   * @beta
-   */
-  ncount: function( input /* search string */ ) {
-    throw new Error('not yet implemented');
   },
 
   /**
@@ -671,13 +682,6 @@ var StryngMembers = {
 
     // implies parsing insertion
     return input.slice( 0, index ) + insertion + input.slice( index );
-  },
-
-  /**
-   * splits a string at the given indices.
-   */
-  splitAt: function( input /* indices */ ) {
-    throw new Error('not yet implemented');
   },
 
   /**
@@ -822,7 +826,6 @@ var StryngMembers = {
    * @returns {string} -
    *   the `input` with all non-overlapping occurrences of
    *   `replacee` replaced by `replacement`.
-   * @see Stryng.exchangeLeft, Stryng.exchangeRight
    */
   exchange: function( input, replacee, replacement ) {
     input = input != null ? String( input ) : exit();
@@ -848,7 +851,7 @@ var StryngMembers = {
    *   the `input` with `n` left-hand
    *   non-overlapping occurrences of `replacee`
    *   replaced by `replacement`
-   * @see Stryng.exchangeRight, Stryng.exchange
+   * @see exchangeRight and exchange
    */
   exchangeLeft: function( input, replacee, replacement, n ) {
     input = input != null ? String( input ) : exit();
@@ -1166,13 +1169,6 @@ var StryngMembers = {
   },
 
   /**
-   * @beta
-   */
-  unquote: function( input ) {
-    throw new Error('not yet implemented');
-  },
-
-  /**
    * @param {string} [charset="undefined"]
    * @return {boolean}
    *   whether `input` consists of
@@ -1192,7 +1188,7 @@ var StryngMembers = {
    * @param {number} [length=input.length]
    * @return {string}
    *   string of length `length`
-   *   with characters randomly choosen from `input`
+   *   with characters randomly choosen from this' string
    */
   randomize: function( input, length ) {
     if ( input == null || length <= -1 || length == INFINITY ) exit();
@@ -1221,7 +1217,7 @@ var StryngMembers = {
 
   /**
    * @return {number[]} -
-   *   an array of char code numbers representing the given string.
+   *   an array of char code numbers representing this' string.
    */
   ord: function( input ) {
     input = input != null ? String( input ) : exit();
@@ -1236,8 +1232,7 @@ var StryngMembers = {
   },
 
   /**
-   * prepends the prefixes to the given string in the given order. works similar
-   * to native `String.prototype.concat`.
+   * prepends the prefixes to this' string in the given order.
    * @param {...string} prefix
    *   an arbitrary number of strings to prepend in the given order
    * @returns {string}
@@ -1254,7 +1249,7 @@ var StryngMembers = {
     // implies parsing `args[ i ]`
     while ( i-- ) input += args[ i ];
 
-    return input;
+    return input; 
   },
 
   /**
@@ -1270,7 +1265,7 @@ var StryngMembers = {
    * @param {...string} [comparable="undefined"]
    *   strings to compare with
    * @returns {boolean} -
-   *   whether or not `input` strictly equal the
+   *   whether or not this' string strictly equals the
    *   string representation of all `comparable`s
    */
   isEqual: function( input /*, comparables */ ) {
@@ -1335,7 +1330,7 @@ var StryngMembers = {
    * @see isEquali
    */
   isEquali2: function( /* input, comparables */) {
-    // workaround an Array#map polyfill
+    // workaround an _Array#map_ polyfill
     var args = arguments,
       i = args.length;
 
@@ -1357,16 +1352,75 @@ var StryngMembers = {
   isBlank: function( input ) {
     input = input != null ? String( input ) : exit();
     return !input || !reNoWS.test( input );
+  },
+
+  /**
+   * @return {string}
+   */
+  camelCase: function(){
+    throw new Error('not yet implemented');
+  },
+
+  /**
+   * @return {string}
+   */
+  underscore: function(){
+    throw new Error('not yet implemented');
+  },
+
+  /**
+   * @return {string}
+   */
+  dasherize: function(){
+    throw new Error('not yet implemented');
+  },
+
+  /**
+   * @return {string}
+   */
+  slugify: function(){
+    throw new Error('not yet implemented');
+  },
+
+  /**
+   * @return {string}
+   */
+  unquote: function( input ) {
+    throw new Error('not yet implemented');
+  },
+
+  /**
+   * splits a string at the given indices.
+   * @return {string}
+   */
+  splitAt: function( input /* indices */ ) {
+    throw new Error('not yet implemented');
+  },
+
+  /**
+   * @return {string}
+   */
+  countMultiple: function( input /* search string */ ) {
+    throw new Error('not yet implemented');
   }
 };
 
+// building Stryng
+// ===============
+
+// the `substr` check
+// ------------------
+
 if ( 'xy'.substr( -1 ) !== 'y' ) shim_methods.push( 'substr' );
 
-array_forEach.call( Object_keys( StryngMembers ), function( fnName ) {
+// custom methods
+// --------------
 
-  var fn = StryngMembers[ fnName ];
+array_forEach.call( Object_keys( stryng_members ), function( fnName ) {
 
-  // make custom exit work
+  var fn = stryng_members[ fnName ];
+
+  // make custom `exit` work
   fn._name = fnName;
 
   // static methods
@@ -1374,24 +1428,42 @@ array_forEach.call( Object_keys( StryngMembers ), function( fnName ) {
 
   // instance methods
   Stryng.prototype[ fnName ] = function() {
+    
     // prepend the context
     array_unshift.call( arguments, this._value );
 
     var result = fn.apply( null, arguments );
 
-    // typeof check is sufficient
-    // ensure immutability and enable chaining of Stryngs
-    return 'string' === typeof result ? new Stryng( result ) : result;
+    // if the instance is configured to be mutable
+    // set the value and return `this`. if it isn't
+    // return a new instance of Stryng constructed
+    // from the result. if the result isn't a string
+    // at all, simply return it.
+    return (
+      typeof result === 'string'
+      ? this._isMutable
+      ? ( this._value = result, this )
+      : new Stryng( result )
+      : result
+    );
   };
 } );
 
+// native methods
+// --------------
+
 array_forEach.call( methods, function( fnName ) {
 
-  var fn = VERSION[ fnName ];
+  var fn = string[ fnName ];
 
-  if ( is.Function( fn ) && !array_contains.call( shim_methods, fnName ) ) {
-    // static methods
-    Stryng[ fnName ] = function( input ) {
+  // do not override our implementations
+  // if the native ones are broken
+  if ( is.Function( fn ) && shim_methods.indexOf(fnName) === -1) {
+    
+    // static methods - prefer native generics over constructing one.
+    // errors caused by wrong usage of native generic function however
+    // won't be thrown by Stryng's custom exit method.
+    Stryng[ fnName ] = String[ fnName ] || function( input ) {
       if ( input == null ) exit();
       return function_call.apply( fn, arguments )
     }
@@ -1401,17 +1473,51 @@ array_forEach.call( methods, function( fnName ) {
 
     // instance methods
     Stryng.prototype[ fnName ] = function( /* arguments */) {
+      
       var result = fn.apply( this._value, arguments );
 
-      // typeof check is sufficient
-      // ensure immutability and enable chaining of Stryngs
-      return 'string' === typeof result ? new Stryng( result ) : result;
+      return (
+        typeof result === 'string'
+        ? this._isMutable
+        ? ( this._value = result, this )
+        : new Stryng( result )
+        : result
+      );
     };
   }
 } );
 
+// seemlessness
+// ------------
+// by overriding `valueOf` and `toString` on the prototype
+// chain, instances of Stryng can be used like native ones
+// in many situations:
+// ```
+// var numeric = Stryng('123');
+// !numeric; // false
+// +numeric; // 123
+// 
+// var greeting = Stryng('Hello');
+// greeting + ' World!' // 'Hello World'
+// 
+// var dictionary = {};
+// dictionary[ greeting ] = 'Salut';
+// ```
+// however, there are exceptions to this:
+// ```
+// var stryng = Stryng();
+// typeof stryng; // 'object'
+// stryng instanceof String; // false
+// Object.prototype.toString.call(stryng); // '[object Object]'
+// ```
+// a viable check is
+// ```
+// stryng instanceof Stryng; // true
+// ```
+// but only for as long as `stryng` was actually constructed using
+// that specific `Stryng` constructor and not some other foreign (i)frame's one.
 Stryng.prototype.valueOf =
-  Stryng.prototype.toString = function() {
+Stryng.prototype.toString = function() {
     return this._value
 }
 
@@ -1463,15 +1569,15 @@ Stryng.chr = function( /* charCodes,... */ ) {
 
 Stryng.chr._name = 'chr';
 
-Stryng.fromCharCode = String_fromCharCode;
 /**
  * delegate directly to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
- * @fucntion Stryng.fromCharCode
+ * @function Stryng.fromCharCode
  * @param {number} [charCode]
  * @returns {string} -
  *   string representation of the given `charCode`s from the UTF-16 table or
  *   the empty string if no arguments passed.
  */
+Stryng.fromCharCode = String_fromCharCode;
 
 // no shim yet
 if ( String.fromCodePoint ) Stryng.fromCodePoint = String.fromCodePoint;
@@ -1479,7 +1585,7 @@ if ( String.fromCodePoint ) Stryng.fromCodePoint = String.fromCodePoint;
 // aliases
 // -------
 
-array_forEach.call( Object_keys( StryngMembers ), function( fnName ) {
+array_forEach.call( Object_keys( stryng_members ), function( fnName ) {
 
   var alias = new Stryng( fnName );
 
@@ -1524,5 +1630,12 @@ Stryng.noConflict = function() {
 
 module.exports = Stryng;
 
+/**
+ * @callback contribution
+ * @param {string} input the string to work on
+ * @param {...*}
+ * @returns -
+ *   string literal ( with `string instanceOf String` yielding false )
+ */
 
 // <script>console.log('inserting html just works')</script>

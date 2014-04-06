@@ -1,7 +1,7 @@
 
 Stryng
 ------
-The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the build-in `String` object, detects and fixes native non-spec compliant implemenations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.
+The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the built-in `String` object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.
 
 [![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/Stryng)
 
@@ -28,7 +28,13 @@ String.prototype.toStryng = function() {
 
 Documentation
 -------------
-please refer to either the [api documentation](http://espretto.github.io/Stryng/index.html) or the [annotated source](http://espretto.github.io/Stryng/grock). Many thanks to [david](https://github.com/davidshimjs)'s [jsdoc template](https://github.com/davidshimjs/jaguarjs-jsdoc) and [killercups](https://github.com/killercup) [docco > groc fork](https://github.com/killercup/grock).
+please refer to either the [api documentation](http://espretto.github.io/Stryng/index.html) or the [annotated source](http://espretto.github.io/Stryng/grock).
+
+Credits
+-------
+Many thanks to the authors of
+- [jsdoc template](https://github.com/davidshimjs/jaguarjs-jsdoc)
+- [grock](https://github.com/killercup/grock)
 
 Roadmap
 -------

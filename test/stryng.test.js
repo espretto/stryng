@@ -1,5 +1,5 @@
 
-Stryng = require('./../Stryng.js');
+Stryng = require('./../stryng.js');
 expect = require('expect.js');
 
 ///////////////////////////////////////////
@@ -37,74 +37,7 @@ describe('Stryng()', function(){
 		});
 	}
 
-	it('should allow reasonable numeric comparisons without parsing', function () {
-		
-		function toInteger(n)
-	    {
-	        return (
-	            (n = +n) !== n ? 0 : // toNumber and isNaN
-	            n && isFinite(n) ? n|0 : // ceiles negatives, floors positives - Math.floor(Math.abs(n))
-	            n // sign, zero and Infinity yet untouched
-	        );
-	    }
-
-	    expect( toInteger(NaN) > 0        ).to.equal( NaN > 0 );
-	    expect( toInteger(NaN) < 0        ).to.equal( NaN < 0 );
-	    expect( toInteger(1/0) > 0        ).to.equal( 1/0 > 0 );
-	    expect( toInteger(1/0) < 0        ).to.equal( 1/0 < 0 );
-	    expect( toInteger('Infinity') > 0 ).to.equal( 'Infinity' > 0 );
-	    expect( toInteger('Infinity') < 0 ).to.equal( 'Infinity' < 0 );
-	    expect( toInteger(-1/0) > 0       ).to.equal( -1/0 > 0 );
-	    expect( toInteger(-1/0) < 0       ).to.equal( -1/0 < 0 );
-	    expect( toInteger(-'Infinity') > 0).to.equal( -'Infinity' > 0 );
-	    expect( toInteger(-'Infinity') < 0).to.equal( -'Infinity' < 0 );
-	    expect( toInteger(undefined) > 0  ).to.equal( undefined > 0 );
-	    expect( toInteger(undefined) < 0  ).to.equal( undefined < 0 );
-	    expect( toInteger(null) > 0       ).to.equal( null > 0 );
-	    expect( toInteger(null) < 0       ).to.equal( null < 0 );
-	    expect( toInteger(false) > 0      ).to.equal( false > 0 );
-	    expect( toInteger(false) < 0      ).to.equal( false < 0 );
-	    expect( toInteger(true) > 0       ).to.equal( true > 0 );
-	    expect( toInteger(true) < 0       ).to.equal( true < 0 );
-	    expect( toInteger(1) > 0          ).to.equal( 1 > 0 );
-	    expect( toInteger(1) < 0          ).to.equal( 1 < 0 );
-	    expect( toInteger(-1) > 0         ).to.equal( -1 > 0 );
-	    expect( toInteger(-1) < 0         ).to.equal( -1 < 0 );
-	    expect( toInteger([]) > 0         ).to.equal( [] > 0 );
-	    expect( toInteger([]) < 0         ).to.equal( [] < 0 );
-	    expect( toInteger({}) > 0         ).to.equal( {} > 0 );
-	    expect( toInteger({}) < 0         ).to.equal( {} < 0 );
-	    expect( toInteger(/./) > 0        ).to.equal( /./ > 0 );
-	    expect( toInteger(/./) < 0        ).to.equal( /./ < 0 );
-	    expect( toInteger('123') > 0      ).to.equal( '123' > 0 );
-	    expect( toInteger('123') < 0      ).to.equal( '123' < 0 );
-	    expect( toInteger('-123') > 0     ).to.equal( '-123' > 0 );
-	    expect( toInteger('-123') < 0     ).to.equal( '-123' < 0 );
-	    expect( toInteger('1e1') > 0      ).to.equal( '1e1' > 0 );
-	    expect( toInteger(-0.5) < 0       ).to.not.equal( -0.5 < 0 );
-	});
-
-	it('should throw primitve', function () {
-		expect( function(){ throw "message" } ).to.throwError(/message/);
-	});
-
-	it('should handle array methods on arguments', function(){
-		expect( function(){ return [].slice.call(arguments) } ).withArgs(1,2,3).to.not.throwError();
-		expect( function(){ return Array.apply(null, arguments) } ).withArgs(1,2,3).to.not.throwError();
-	});
-
-	it('should support loop labeling', function () {
-		outer : for(var i = 10; i--;)
-		{
-			inner : while(i--)
-			{
-				break outer;
-			}
-		}
-		expect(i).to.equal(8);
-	});
-
-	// describe('.length', function(){
+	// describe.skip('.length', function(){
 
 	// 	it('should reflect the input\'s length', function () {
 	// 		var primitive = 'test',
@@ -129,17 +62,11 @@ describe('Stryng()', function(){
 	describe('.constructor()', function(){
 
 		it('should work as a factory method, too', function () {
-			expect( Stryng() ).to.be.a(Stryng);
+			expect( Stryng('') ).to.be.a(Stryng);
 		});
 
-		it.skip('should represent itself as a native String on Object.prototype.toString.call', function () {
-			var toString = Object.prototype.toString,
-				expected = toString.call('');
-
-			expect( toString.call(Stryng()) ).to.equal(expected);
-		});
-
-		it('should return the wrapped empty string if no arguments passed', function () {
+		
+		it('should force you to be explicit about what string to wrap', function () {
 			expect( Stryng().toString() ).to.equal('');
 		});
 
@@ -418,7 +345,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.join()', function(){
+	describe.skip('.join()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.join ).to.throwError(/join/);
@@ -441,7 +368,7 @@ describe('Stryng()', function(){
 		});
 	})
 
-	describe('.reverse()', function(){
+	describe.skip('.reverse()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.reverse ).to.throwError(/reverse/);
@@ -460,7 +387,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.insert()', function(){
+	describe.skip('.insert()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.insert ).to.throwError(/insert/);
@@ -487,7 +414,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.splitAt()', function(){
+	describe.skip('.splitAt()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.splitAt ).to.throwError(/splitAt/);
@@ -518,7 +445,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.splitLeft()', function(){
+	describe.skip('.splitLeft()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.splitLeft ).to.throwError(/splitLeft/);
@@ -555,7 +482,7 @@ describe('Stryng()', function(){
 		it('should work for [grouping] regular expressions, too');
 	});
 
-	describe('.splitRight()', function(){
+	describe.skip('.splitRight()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.splitRight ).to.throwError(/splitRight/);
@@ -571,7 +498,7 @@ describe('Stryng()', function(){
 
 	});
 
-	describe('.exchange()', function(){
+	describe.skip('.exchange()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.exchange ).to.throwError(/exchange/);
@@ -590,7 +517,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.exchangeLeft()', function(){
+	describe.skip('.exchangeLeft()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.exchangeLeft ).to.throwError(/exchangeLeft/);
@@ -603,7 +530,7 @@ describe('Stryng()', function(){
 		// refer to Stryng.splitLeft for further tests
 	});
 
-	describe('.exchangeRight()', function(){
+	describe.skip('.exchangeRight()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.exchangeRight ).to.throwError(/exchangeRight/);
@@ -616,7 +543,7 @@ describe('Stryng()', function(){
 		// refer to Stryng.splitRight for further tests
 	});
 
-	describe('.padLeft()', function(){
+	describe.skip('.padLeft()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.padLeft ).to.throwError(/padLeft/);
@@ -645,7 +572,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.padRight()', function(){
+	describe.skip('.padRight()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.padRight ).to.throwError(/padRight/);
@@ -662,7 +589,7 @@ describe('Stryng()', function(){
 		// refer to Stryng.padLeft for further tests
 	});
 
-	describe('.pad()', function(){
+	describe.skip('.pad()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.pad ).to.throwError(/pad/);
@@ -673,7 +600,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.prepend()', function(){
+	describe.skip('.prepend()', function(){
 
 		it('should fail if input\'s missing', function (){
 			expect( Stryng.prepend ).to.throwError(/prepend/);
@@ -688,7 +615,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.stripLeft()', function(){
+	describe.skip('.stripLeft()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.stripLeft ).to.throwError(/stripLeft/);			
@@ -707,7 +634,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.stripRight()', function(){
+	describe.skip('.stripRight()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.stripRight ).to.throwError(/stripRight/);			
@@ -726,7 +653,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.strip()', function(){
+	describe.skip('.strip()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.strip ).to.throwError(/strip/);			
@@ -745,7 +672,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.truncate()', function(){
+	describe.skip('.truncate()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.truncate ).to.throwError(/truncate/);
@@ -776,7 +703,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.quote()', function(){
+	describe.skip('.quote()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.quote ).to.throwError(/quote/);
@@ -800,7 +727,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.unquote()', function(){
+	describe.skip('.unquote()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.unquote ).to.throwError(/unquote/);
@@ -809,7 +736,7 @@ describe('Stryng()', function(){
 		it('unfinished escape issues yet');
 	});
 
-	describe('.isEqual()', function(){
+	describe.skip('.isEqual()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.isEqual ).to.throwError(/isEqual/);
@@ -831,7 +758,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.isEquali()', function(){
+	describe.skip('.isEquali()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.isEquali ).to.throwError(/isEquali/);
@@ -846,7 +773,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.consistsOf()', function(){
+	describe.skip('.consistsOf()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.consistsOf ).to.throwError(/consistsOf/);
@@ -857,7 +784,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.isEmpty()', function(){
+	describe.skip('.isEmpty()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.isEmpty ).to.throwError(/isEmpty/);
@@ -872,7 +799,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.isBlank()', function(){
+	describe.skip('.isBlank()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.isBlank ).to.throwError(/isBlank/);
@@ -899,34 +826,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.isNumeric()', function(){
-
-		it('should fail if input\'s missing', function () {
-			expect( Stryng.isNumeric ).to.throwError(/isNumeric/);
-		});
-
-		it('should work opposite to native isNaN and parse beforehand', function () {
-			var o = {
-				toString:function()
-				{
-					return "123e1"
-				}
-			};
-			expect( Stryng.isNumeric(o) ).to.be.ok();
-			expect( !isNaN(o) 			).to.be.ok();
-		});
-
-		it('should return false where parseFloat would still recognize a number', function () {
-			expect( Stryng.isNumeric('123e2whatever') ).to.not.be.ok();
-			expect( parseFloat('123e2whatever') 	  ).to.equal(12300);
-		});
-
-		it('should return false for the empty string', function () {
-			expect( Stryng.isNumeric('') ).to.not.be.ok();
-		});
-	});
-
-	describe('.random()', function(){
+	describe.skip('.random()', function(){
 
 		it('should return the empty string if no length passed', function () {
 			expect( Stryng.random().toString() ).to.equal('');
@@ -960,7 +860,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.ord()', function(){
+	describe.skip('.ord()', function(){
 
 		it('should fail if input\'s missing', function () {
 			expect( Stryng.ord ).to.throwError(/ord/);
@@ -975,7 +875,7 @@ describe('Stryng()', function(){
 		});
 	});
 
-	describe('.chr()', function(){
+	describe.skip('.chr()', function(){
 
 		it('should return the empty string if no arguments passed', function () {
 			expect( Stryng.chr().toString() ).to.equal('');
