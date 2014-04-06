@@ -45,13 +45,15 @@ but there are of course exceptions to this
 
 Documentation
 -------------
-please refer to either the [api documentation](http://espretto.github.io/Stryng/index.html) or the [annotated source](http://espretto.github.io/Stryng/grock).
+please refer to either the [api documentation](http://espretto.github.io/Stryng), [grock's annotated source](http://espretto.github.io/Stryng/grock) or [docker's annotated source](http://espretto.github.io/Stryng/docker).
 
 Credits
 -------
 Many thanks to the authors of
+
 - [jsdoc template](https://github.com/davidshimjs/jaguarjs-jsdoc)
 - [grock](https://github.com/killercup/grock)
+- [docker](https://github.com/jbt/docker)
 
 Roadmap
 -------
