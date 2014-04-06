@@ -1,5 +1,5 @@
 
-Stryng = require('./../stryng.js');
+Stryng = require('./../src/stryng.js');
 expect = require('expect.js');
 
 ///////////////////////////////////////////

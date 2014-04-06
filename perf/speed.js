@@ -100,6 +100,8 @@ Benchmark.options.setup = function()
 		+ '</body>'
 		+ '</html>';
 
+		array_slice = Array.prototype.slice;
+
 };
 
 // globals
@@ -248,6 +250,20 @@ suites.push(
 
 			Stryng.isEqual2('hello', 'hello', 'hello', 'hello', 'hello');
 		})
+);
+
+suites.push(
+
+	Benchmark.Suite({name: 'toArray'})
+
+		.add('array slice', function(){
+			array_slice.call('0123456789ABCDEF');
+		})
+
+		.add('string split', function(){
+			'0123456789ABCDEF'.split('')
+		})
+
 )
 
 suites = suites.filter(function(suite){

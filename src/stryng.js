@@ -57,9 +57,10 @@ is = object = {},
 // static methods
 // --------------
 
-String_fromCharCode = String.fromCharCode,
-JSON_stringify      = typeof JSON !== 'undefined' && JSON.stringify,
-Math_random         = Math.random,
+String_fromCharCode  = String.fromCharCode,
+String_fromCodePoint = String.fromCodePoint,
+JSON_stringify       = typeof JSON !== 'undefined' && JSON.stringify,
+Math_random          = Math.random,
 
 Object_keys = Object.keys || function( object ) {
   
@@ -84,7 +85,7 @@ Object_defineProperty = ( function( defineProperty ) {
 
     return defineProperty;
   } catch ( e ) {
-    //! return undefined
+    // return `undefined` implicitely
   }
 
 } )( Object.defineProperty ),
@@ -122,18 +123,31 @@ array_flatten = array.flatten || function(){
   }
 }
 
-array_join      = array.join,
-array_push      = array.push,
-array_shift     = array.shift,
+array_join      = array.join, // deps join2 only
+array_push      = array.push, // faster than `array = array.concat( items )`
+array_shift     = array.shift,// deps join2, isEquali2 only
 array_slice     = array.slice,
 array_splice    = array.splice,
 array_unshift   = array.unshift,
 function_call   = func.call,
 object_toString = object.toString,
 
-// for the w3c wishlist
-object_forOwn = function( iterator ){
-  array_forEach.call( Object_keys( this ), iterator );
+// make this one pretty for the w3c wishlist
+object_forOwn = function( iterator, context ) {
+  
+  var o = this, i;
+
+  if( o == null ){
+    throw new TypeError('can\'t convert ' + o + ' to object');
+  }
+
+  o = Object( o );
+
+  for ( i in o ) {
+    if ( o.hasOwnProperty( i ) ) {
+      iterator.call( context, o[ i ], i, o );
+    }
+  }
 },
 
 // the whitespace shim
@@ -143,7 +157,6 @@ object_forOwn = function( iterator ){
 re_no_whitespace = /\S/,
 re_trim_left     = /^\s\s*/,
 re_trim_right    = /\s*\s$/,
-// http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
 re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
 
 (function(){
@@ -154,8 +167,8 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
   re_whitespace_source = re_whitespace.source,
 
   // http://perfectionkills.com/whitespace-deviations/
-  whitespace = (
-    '\t'  // '\u0009' tab
+  whitespace = (''
+  + '\t'  // '\u0009' tab
   + '\n'  // '\u000A' line feed
   + '\13' // '\u000B' vertical tab
   + '\f'  // '\u000C' form feed
@@ -163,7 +176,11 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
   + ' '   // '\u0020' space
 
   // http://www.fileformat.info/info/unicode/category/Zs/list.htm
-  + '\xA0' + '\u1680\u180E\u2000\u2001' + '\u2002\u2003\u2004\u2005' + '\u2006\u2007\u2008\u2009' + '\u200A\u202F\u205F\u3000'
+  + '\xA0'
+  + '\u1680\u180E\u2000\u2001' // prevent
+  + '\u2002\u2003\u2004\u2005' // code
+  + '\u2006\u2007\u2008\u2009' // formatter
+  + '\u200A\u202F\u205F\u3000' // from mangling
 
   // http://es5.github.io/#x15.5.4.20
   + '\u2028' // line separator
@@ -239,26 +256,45 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
 
 // toInteger
 // ---------
-// fully (spec)[http://www.ecma-international.org/ecma-262/5.1/#sec-9.4] compliant
-// implementation of `toInteger`. in the following scenarios calling `toInteger` can
-// replaced with a shorter and faster inline comparisons:
-// 
-// - an `isNegative` check can be performed without parsing by
-//   `x <= -1` since all results of the implicit call to `toNumber` with
-//   `x` in range `]-1,0]` get ceiled to zero
-// - an `isPositiveInfinity` check can be performed without parsing by
-//   `x == 1/0` since only values `Infinity` itself and its string representation
-//   `'Infinity'` result in `1/0` when implicitly passed to `toNumber`.
+// fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
+// implementation of `toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/10).
+// in the following scenarios calling `toInteger` can be replaced with faster inline comparisons:
+// ### isNegative
+// ```
+// var x = -0.5;
+// x < 0; // yields true
+// toInteger( x ) < 0; // yields false because it ceils negative values and hence compares 0 < 0
+// ```
+// the faster equivalent of the above `toInteger` call and comparison is
+// ```
+// x <= -1;
+// ```
+// ### isNotFinite
+// ```
+// toInteger( 'Infinity' ) == Infinity; // true
+// toInteger( Infinity ) == Infinity; // true
+// toInteger( 1/0 ) == Infinity; // true
+// ```
+// the above expressions are the only expressions which are evaluated to
+// `Infinity`. However, since `toInteger` uses `toNumber` and simply returns
+// results `+0`, `−0`, `+∞` and `−∞` you may eually use
+// ```
+// 'Infinity' == Infinity; // true
+// Infinity == Infinity; // true
+// 1/0 == Infinity; // true
+// ```
+// worth a zealot's blog post..
 // 
 function toInteger( any ) {
+  // steps 3 and 4 are switched in this implementation
+  // 
+  // 1. Let number be the result of calling `toNumber` on the input argument.
+  // 2. If number is `NaN`, return `+0`.
+  // 3. If number is `+0`, `−0`, `+∞`, or `−∞`, return number i.e. leave zero and Infinity untouched
+  // 4. Return the result of computing `sign(number) × floor(abs(number))` i.e. ceil negatives, floor positives
   return (
-    // steps 3 and 4 are switched in this implementation
-    // 1. Let number be the result of calling `toNumber` on the input argument.
-    // 2. If number is `NaN`, return `+0`.
-    // 3. If number is `+0`, `−0`, `+∞`, or `−∞`, return number i.e. leave zero and Infinity untouched
-    // 4. Return the result of computing `sign(number) × floor(abs(number))` i.e. ceil negatives, floor positives
-    ( any = +any ) !== any ? 0 :
-    any && isFinite( any ) ? any | 0 :
+    isNaN( any = +any ) ? 0 :
+    any && isFinite( any ) ? any - ( any % 1 ) :
     any
   );
 }
@@ -280,7 +316,7 @@ function exit() {
     args += arg + ', '
   } );
 
-  // strip trailing
+  // strip trailing `', '`
   throw new Error( message + ( args ? args.slice( 0, -2 ) : '' ) + ']' );
 }
 
@@ -341,24 +377,31 @@ function Stryng( value , is_mutable ) {
   }
 }
 
-Stryng._name = 'Stryng';
+/**
+ * in case the instance was not constructed to be mutable
+ * this is the hook to get a copy of it.
+ * @return {Stryng} -
+ *   a copy of the Stryng instance
+ */
+Stryng.prototype.clone = function( is_mutable ){
+  return new Stryng( this._value, is_mutable );
+};
 
 /**
+ * the herein defined methods will be available as both
+ * static functions on the `Stryng` namespace and methods
+ * on instances of the `Stryng` class.
  * @lends Stryng.prototype
  */
 var stryng_members = {
 
   /**
-   * in case the instance was constructed to be
-   */
-
-  /**
-   * @returns {string} - input with first letter upper-cased.
-   * @todo support diacritics and ligatures
-   * @example
+   * @return {string} - input with first letter upper-cased.
+   * @examples
    * ```
    * Stryng.capitalize('foo'); // yields "Foo"
    * ```
+   * @todo support diacritics and ligatures
    */
   capitalize: function( input ) {
     input = input != null ? String( input ) : exit();
@@ -413,16 +456,17 @@ var stryng_members = {
   /**
    * shim for native [String#contains](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/contains)
    * @param {string} [searchString="undefined"]
+   * @param {number} [index=0] the index to start searching
    * @returns {boolean} -
    *   whether or not `input` contains the substring `searchString`
    */
-  contains: function( input, searchString ) {
-    return input != null ? String( input ).indexOf( searchString ) !== -1 : exit();
+  contains: function( input, searchString, start ) {
+    return input != null ? String( input ).indexOf( searchString, start ) !== -1 : exit();
   },
 
   /**
    * shim for native [String#startsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.startswith)
-   * @param {string} [searchString="undefined"]
+   * @param {string|RegExp} [searchString="undefined"]
    * @param {number} [position=0]
    * @returns {boolean} -
    *   whether or not `input` at index `position`
@@ -431,21 +475,21 @@ var stryng_members = {
   startsWith: function( input, searchString, position ) {
     input = input != null ? String( input ) : exit();
 
-    // omit regex check
+    if( is.RegExp( searchString ) ){
+      return !input.substring( position ).search( searching ); // true if matched at index zero
+    }
 
-    // implies correct parsing and covers "out of bounds"
-    var i = input.indexOf( searchString, position );
+    // implies correct parsing of `position` and covers "out of bounds"
+    var i = input.indexOf( searchString, position ),
+      len;
 
-    // early exit
-    if ( i !== -1 ) {
-      var len = input.length;
+    if ( i !== -1 ) { // early exit
 
+      // apply the reasonable minimum and maximum values.
+      len = input.length; 
       return i === (
-        // default for negatives (get ceiled)
-        position <= -1 ? 0 :
-        // maximum
+        position === void 0 || position < 0 ? 0 :
         position > len ? len :
-        // last resort
         toInteger( position )
       );
     }
@@ -463,23 +507,60 @@ var stryng_members = {
   endsWith: function( input, searchString, endPosition ) {
     input = input != null ? String( input ) : exit();
 
+    if( is.RegExp( searchString ) ){
+      
+      // ensure the regular expression ends with `'$'`
+      // and reconstruct it if it doesn't.
+      var re        = searchString,
+        re_source   = re.source,
+        len         = input.length,
+        endPosition = (
+          endPosition === void 0 || endPosition > len ? len :
+          endPosition < 0 ? 0 :
+          toInteger( endPosition )
+        ),
+        searchArea = input.substring( 0, endPosition );
+
+      if( !Stryng.endsWith( re_source, '$' )){
+
+        re_source += '$';
+
+        var flags = '';
+
+        object_forOwn.call( {
+          'ignoreCase': 'i',
+          'multiline': 'm',
+          'extended': 'x',
+          'sticky': 'y',
+          'global': 'g'
+        }, function( prop, flag ) {
+
+            if ( re[ prop ] ) flags += flag;
+        });
+
+        re = new RegExp(re_source + '$', flags);
+      }
+      
+      return re.test( searchArea );
+    }
+
     searchString = String( searchString );
 
-    // early exit for the empty searchString
-    if ( !searchString ) return true;
+    if ( !searchString ) return true; // early exit for the empty searchString
 
-    var len = input.length;
+    // implies correct parsing of `endPosition` and covers "out of bounds"
+    var i = input.lastIndexOf( searchString, endPosition );
 
-    endPosition = (
-      // default for `undefined` and values greater than `len`
-      endPosition === void 0 || endPosition > len ? len :
-      // default for negatives ( would simply be ceiled by `toInteger` )
-      endPosition <= -1 ? 0 :
-      // last resort
-      toInteger( endPosition )
-    );
-
-    return input.substring( endPosition - searchString.length, endPosition ) === searchString;
+    if( i !== -1 ){
+      len = input.length;
+      // apply the reasonable (default) minimum and maximum values.
+      return i + searchString.length === (
+        endPosition === void 0 || endPosition > len ? len :
+        endPosition < 0 ? 0 :
+        toInteger( endPosition )
+      );
+    }
+    return false;
   },
 
   /**
@@ -487,14 +568,14 @@ var stryng_members = {
    * @param {number} [n=0]
    * @returns {string} -
    *   the `input` `n` times concatenated with the empty string.
-   * @throws if <code>n</code> is either negative or not finite.
+   * @throws if <code>toInteger( n )</code> is either negative or not finite.
    */
   repeat: function( input, count ) {
     if ( input == null || count <= -1 || count == INFINITY ) exit();
 
     count = toInteger( count );
 
-    // implies parsing `input`
+    // implies parsing `input` to string
     for ( var result = ''; count--; result += input );
 
     return result;
@@ -509,13 +590,16 @@ var stryng_members = {
   substr: function( input, start, length ) {
     input = input != null ? String( input ) : exit();
 
-    start = start <= -1
-    // add length if is negative
-    ? ( start = toInteger( start ) + input.length ) < 0
-    // set zero if still is negative
-    ? 0 : start : start;
-
-    // implies parsing length
+    start = (
+      start <= -1
+      ? ( start = toInteger( start ) + input.length ) < 0
+      ? 0
+      : start
+      : start
+    );
+    // `start` is now in range `]-1,input.length]` and will
+    // be parsed correctly ( values in range `]-1,0]` are ceiled to zero
+    // by the implicit `toInteger` call). same goes for `length`.
     return input.substr( start, length );
   },
 
@@ -538,9 +622,8 @@ var stryng_members = {
    * @param {string} [searchString="undefined"]
    *   substring to search for
    * @returns {number} -
-   *   number of non-overlapping occurrences of
-   *   `searchString` within `input`.
-   *   the empty string is considered a <em>character boundary</em>
+   *   number of non-overlapping occurrences of `searchString` within `input`.
+   *   the empty string is considered a _character boundary_
    *   thus `input.length + 1` will always be the result for that.
    */
   count: function( input, searchString ) {
@@ -574,15 +657,16 @@ var stryng_members = {
     if ( !searchString ) return input.length + 1;
 
     var length = searchString.length,
-      count = 0;
+      count = 0,
+      i;
 
     if ( length === 1 ) {
-      for ( var i = input.length; i--; ) {
+      for ( i = input.length; i--; ) {
         // cast from boolean to number
         count += input.charAt( i ) === searchString;
       }
     } else {
-      for ( var i = input.indexOf( searchString ); i !== -1; count++ ) {
+      for ( i = input.indexOf( searchString ); i !== -1; count++ ) {
         i = input.indexOf( searchString, i + length );
       }
     }
@@ -644,7 +728,10 @@ var stryng_members = {
   reverse2: function( input ) {
     input = input != null ? String( input ) : exit();
 
-    for ( var result = '', i = input.length; i--; result += input.charAt( i ) );
+    var result = '', 
+      i = input.length;
+
+    while( i-- ) result += input.charAt( i );
 
     return result;
   },
@@ -661,7 +748,7 @@ var stryng_members = {
 
     var length = input.length;
 
-    if ( length < 2 ) return input;
+    if ( length < 2 ) return input; // early exit for the empty string and single char
 
     for ( var i = --length; i--; input += input.charAt( i ) );
 
@@ -678,9 +765,9 @@ var stryng_members = {
     input = input != null ? String( input ) : exit();
 
     // slice's native parsing will apply different defaults to the first and second argument
-    if ( index === void 0 ) index = toInteger( index );
+    if ( arguments.length < 2 ) index = toInteger( index );
 
-    // implies parsing insertion
+    // implies parsing `insertion`
     return input.slice( 0, index ) + insertion + input.slice( index );
   },
 
@@ -698,7 +785,7 @@ var stryng_members = {
     input = input != null ? String( input ) : exit();
 
     // toUint32(-1) == Math.pow(2, 32) - 1 (default)
-    n = ( n === void 0 ? -1 : n ) >>> 0;
+    n = ( arguments.length < 3 ? -1 : n ) >>> 0;
 
     // early exit for zero
     if ( !n ) return [];
@@ -830,7 +917,7 @@ var stryng_members = {
   exchange: function( input, replacee, replacement ) {
     input = input != null ? String( input ) : exit();
 
-    // omit regex check
+    // omit regex check as suggested by the spec
 
     replacee = String( replacee );
     replacement = String( replacement );
@@ -1416,9 +1503,7 @@ if ( 'xy'.substr( -1 ) !== 'y' ) shim_methods.push( 'substr' );
 // custom methods
 // --------------
 
-array_forEach.call( Object_keys( stryng_members ), function( fnName ) {
-
-  var fn = stryng_members[ fnName ];
+object_forOwn.call( stryng_members, function( fn, fnName ) {
 
   // make custom `exit` work
   fn._name = fnName;
@@ -1501,7 +1586,7 @@ array_forEach.call( methods, function( fnName ) {
 // greeting + ' World!' // 'Hello World'
 // 
 // var dictionary = {};
-// dictionary[ greeting ] = 'Salut';
+// dictionary[ greeting ] = 'Salut'; // {'Hello': 'Salut'}
 // ```
 // however, there are exceptions to this:
 // ```
@@ -1559,7 +1644,7 @@ Stryng.random._name = 'random';
 /**
  * delegates to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
  * @param {...number} charCode
- * @returns {string} -
+ * @returns {string} - 
  *   the concatenated string representations of the given
  *   `charCode`s from the UTF-16 table. empty if no arguments passed
  */
@@ -1567,7 +1652,7 @@ Stryng.chr = function( /* charCodes,... */ ) {
   return String_fromCharCode.apply( null, arguments );
 };
 
-Stryng.chr._name = 'chr';
+Stryng.chr._name = 'chr'; 
 
 /**
  * delegate directly to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
@@ -1578,9 +1663,7 @@ Stryng.chr._name = 'chr';
  *   the empty string if no arguments passed.
  */
 Stryng.fromCharCode = String_fromCharCode;
-
-// no shim yet
-if ( String.fromCodePoint ) Stryng.fromCodePoint = String.fromCodePoint;
+Stryng.fromCodePoint = String_fromCodePoint;
 
 // aliases
 // -------
@@ -1608,7 +1691,6 @@ Stryng.prototype.shallowStringify = Stryng.prototype.quote;
 Stryng.append = Stryng.concat;
 Stryng.prototype.append = Stryng.prototype.concat;
 
-// ------
 // export
 // ------
 
@@ -1638,4 +1720,4 @@ module.exports = Stryng;
  *   string literal ( with `string instanceOf String` yielding false )
  */
 
-// <script>console.log('inserting html just works')</script>
+// <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>

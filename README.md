@@ -26,6 +26,23 @@ String.prototype.toStryng = function() {
 // 3 dots 
 ```
 
+wherever you forget to pass an argument expected to be a string `'undefined'` as the result of calling `String( undefined )` will be applied as the default. this derives from javascript's native behaviour.
+```
+'undefined'.contains(); // true
+'undefined'.startsWith(); // true
+'undefined'.endsWith(); // true
+'undefined'.indexOf(); // 0 ( instead of ? )
+'undefined'.lastIndexOf(); // same as the above
+'undefined'.search(); // same as the above again
+'this is yours'.replace('yours'); // 'this is undefined'
+new RegExp().test('undefined'); // true
+```
+but there are of course exceptions to this
+```
+'this is '.concat(); // 'this is ' instead of 'this is undefined'
+'start_undefined_end'.split(); // ['start_undefined_end'] instead of ['start_', '_end']
+```
+
 Documentation
 -------------
 please refer to either the [api documentation](http://espretto.github.io/Stryng/index.html) or the [annotated source](http://espretto.github.io/Stryng/grock).

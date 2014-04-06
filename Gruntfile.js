@@ -17,6 +17,25 @@ module.exports = function( grunt ) {
       }
     },
 
+    docker: {
+      app: {
+        expand: true,
+        src: DOCS_IN,
+        dest: DOCS_OUT + '/docker',
+        options: {
+          onlyUpdated: false,
+          colourScheme: 'perldoc',
+          ignoreHidden: false,
+          sidebarState: true,
+          exclude: [],
+          lineNums: true,
+          js: [],
+          css: [],
+          extras: ['goToLine', 'fileSearch']
+        }
+      }
+    },
+
     grock: {
       options: {
         github: false,
@@ -61,7 +80,7 @@ module.exports = function( grunt ) {
         files: DOCS_IN.concat([
           'docs/conf.json'
         ]),
-        tasks: ['jsdoc', 'grock']
+        tasks: ['jsdoc', 'grock', 'docker']
       }
     }
 
@@ -72,6 +91,7 @@ module.exports = function( grunt ) {
     'grunt-contrib-connect',
     'grunt-contrib-watch',
     'grunt-contrib-clean',
+    'grunt-docker',
     'grunt-grock',
     'grunt-jsdoc',
   ].forEach( grunt.loadNpmTasks, grunt );
@@ -81,6 +101,7 @@ module.exports = function( grunt ) {
     'clean:docs',
     'jsdoc',
     'grock',
+    'docker',
     'connect:docs'
   ] );
 
