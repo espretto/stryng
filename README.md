@@ -45,7 +45,7 @@ but there are of course exceptions to this
 
 Documentation
 -------------
-please refer to either the [api documentation](http://espretto.github.io/Stryng), [grock's annotated source](http://espretto.github.io/Stryng/grock) or [docker's annotated source](http://espretto.github.io/Stryng/docker).
+please refer to either the [api documentation](http://espretto.github.io/Stryng), [grock's annotated source](http://espretto.github.io/Stryng/grock) or [docker's annotated source](http://espretto.github.io/Stryng/docker/README.md.html).
 
 Credits
 -------
