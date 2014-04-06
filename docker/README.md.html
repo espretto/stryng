@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>README.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "", thisFile = "README.md", defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+  <script src="goToLine.js"></script>
+  <script src="fileSearch.js"></script>
+  <link rel="stylesheet" href="goToLine.css" />
+  <link rel="stylesheet" href="fileSearch.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+      <div class="heading h2">
+        <a href="#stryng">Stryng</a>
+      </div>
+      <div class="heading h2">
+        <a href="#let%20me%20introduce">Let me introduce</a>
+      </div>
+      <div class="heading h2">
+        <a href="#documentation">Documentation</a>
+      </div>
+      <div class="heading h2">
+        <a href="#credits">Credits</a>
+      </div>
+      <div class="heading h2">
+        <a href="#roadmap">Roadmap</a>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><div class="docs markdown">
+<div class="pilwrap" id="stryng">
+  <h2>
+    <a href="#stryng" name="stryng" class="pilcrow">&#182;</a>
+    Stryng
+  </h2>
+</div>
+
+
+<p>The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
+
+<p><a href="https://ci.testling.com/espretto/Stryng"><img src="https://ci.testling.com/espretto/stryng.png" alt="browser support" title="" /></a></p>
+
+
+<div class="pilwrap" id="let%20me%20introduce">
+  <h2>
+    <a href="#let%20me%20introduce" name="let%20me%20introduce" class="pilcrow">&#182;</a>
+    Let me introduce
+  </h2>
+</div>
+
+
+<div class='highlight'><pre><code language=''>String.prototype.toStryng = function() {
+  return new Stryng( this );
+};
+
+'The quick brown fox'.toStryng()
+// now we are ready you may use
+.stripRight( 'fox' )
+// which leaves us with 'The quick brown ' - chaining on
+.truncate( 15 )
+// yields 'The quick...'
+.split(' ')[1]
+.capitalize()
+// you knew "Quick..." was coming
+.count('.')
+// 3 dots 
+</code></pre></div>
+
+<p>wherever you forget to pass an argument expected to be a string <code>'undefined'</code> as the result of calling <code>String( undefined )</code> will be applied as the default. this derives from javascript's native behaviour.</p>
+
+<div class='highlight'><pre><code language=''>'undefined'.contains(); // true
+'undefined'.startsWith(); // true
+'undefined'.endsWith(); // true
+'undefined'.indexOf(); // 0 ( instead of ? )
+'undefined'.lastIndexOf(); // same as the above
+'undefined'.search(); // same as the above again
+'this is yours'.replace('yours'); // 'this is undefined'
+new RegExp().test('undefined'); // true
+</code></pre></div>
+
+<p>but there are of course exceptions to this</p>
+
+<div class='highlight'><pre><code language=''>'this is '.concat(); // 'this is ' instead of 'this is undefined'
+'start_undefined_end'.split(); // ['start_undefined_end'] instead of ['start_', '_end']
+</code></pre></div>
+
+
+<div class="pilwrap" id="documentation">
+  <h2>
+    <a href="#documentation" name="documentation" class="pilcrow">&#182;</a>
+    Documentation
+  </h2>
+</div>
+
+
+<p>please refer to either the <a href="http://espretto.github.io/Stryng">api documentation</a>, <a href="http://espretto.github.io/Stryng/grock">grock's annotated source</a> or <a href="http://espretto.github.io/Stryng/docker">docker's annotated source</a>.</p>
+
+
+<div class="pilwrap" id="credits">
+  <h2>
+    <a href="#credits" name="credits" class="pilcrow">&#182;</a>
+    Credits
+  </h2>
+</div>
+
+
+<p>Many thanks to the authors of
+- <a href="https://github.com/davidshimjs/jaguarjs-jsdoc">jsdoc template</a>
+- <a href="https://github.com/killercup/grock">grock</a>
+- <a href="https://github.com/jbt/docker">docker</a></p>
+
+
+<div class="pilwrap" id="roadmap">
+  <h2>
+    <a href="#roadmap" name="roadmap" class="pilcrow">&#182;</a>
+    Roadmap
+  </h2>
+</div>
+
+
+<ul>
+<li>refactor tests</li>
+<li>integrate them into docs</li>
+<li>renew testling setup</li>
+<li>extend with plugin <code>Stryng.esc</code> for encoding conversions related to url parsing and slugifying</li>
+</ul></div>
+  </div>
+</body>
+</html>

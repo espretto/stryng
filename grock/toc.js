@@ -1,8 +1,41 @@
 window.files = [
 {
-  "path": "stryng.js.html",
+  "path": "index.html",
+  "originalName": "README.md",
+  "originalPath": "README.md",
+  "name": "index.html",
+  "toc": [
+    {
+      "level": 2,
+      "slug": "stryng",
+      "title": "Stryng"
+    },
+    {
+      "level": 2,
+      "slug": "let-me-introduce",
+      "title": "Let me introduce"
+    },
+    {
+      "level": 2,
+      "slug": "documentation",
+      "title": "Documentation"
+    },
+    {
+      "level": 2,
+      "slug": "credits",
+      "title": "Credits"
+    },
+    {
+      "level": 2,
+      "slug": "roadmap",
+      "title": "Roadmap"
+    }
+  ]
+},
+{
+  "path": "src/stryng.js.html",
   "originalName": "stryng.js",
-  "originalPath": "stryng.js",
+  "originalPath": "src/stryng.js",
   "name": "stryng.js.html",
   "lang": "javascript",
   "title": "baseline setup",
@@ -58,6 +91,16 @@ window.files = [
       "title": "toInteger"
     },
     {
+      "level": 3,
+      "slug": "isnegative",
+      "title": "isNegative"
+    },
+    {
+      "level": 3,
+      "slug": "isnotfinite",
+      "title": "isNotFinite"
+    },
+    {
       "level": 2,
       "slug": "exit",
       "title": "exit"
@@ -66,6 +109,31 @@ window.files = [
       "level": 1,
       "slug": "main",
       "title": "Main"
+    },
+    {
+      "level": 1,
+      "slug": "building-stryng",
+      "title": "building Stryng"
+    },
+    {
+      "level": 2,
+      "slug": "the-substr-check",
+      "title": "the substr check"
+    },
+    {
+      "level": 2,
+      "slug": "custom-methods",
+      "title": "custom methods"
+    },
+    {
+      "level": 2,
+      "slug": "native-methods",
+      "title": "native methods"
+    },
+    {
+      "level": 2,
+      "slug": "seemlessness",
+      "title": "seemlessness"
     },
     {
       "level": 2,
