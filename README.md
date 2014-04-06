@@ -26,7 +26,7 @@ String.prototype.toStryng = function() {
 // 3 dots 
 ```
 
-wherever you forget to pass an argument expected to be a string `'undefined'` as the result of calling `String( undefined )` will be applied as the default. this derives from javascript's native behaviour.
+wherever you forget to pass an argument expected to be a string `'undefined'` -- as the result of calling `String( undefined )` -- will be applied as the default. this derives from javascript's native behaviour.
 ```
 'undefined'.contains(); // true
 'undefined'.startsWith(); // true

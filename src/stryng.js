@@ -534,13 +534,12 @@ var stryng_members = {
           'sticky': 'y',
           'global': 'g'
         }, function( prop, flag ) {
-
-            if ( re[ prop ] ) flags += flag;
+          if ( re[ prop ] ) flags += flag;
         });
 
-        re = new RegExp(re_source + '$', flags);
+        re = new RegExp( re_source + '$', flags );
       }
-      
+
       return re.test( searchArea );
     }
 

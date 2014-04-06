@@ -40,7 +40,7 @@ module.exports = function( grunt ) {
       options: {
         github: false,
         index: 'README.md',
-        out: DOCS_OUT + '/annotated-source',
+        out: DOCS_OUT + '/grock',
         style: 'thin',
         verbose: true
       },
