@@ -83,6 +83,16 @@ Math_random          = Math.random,
 String_fromCharCode  = String.fromCharCode,
 String_fromCodePoint = String.fromCodePoint,
 
+// fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
+// implementation of `Number.toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
+Number_toInteger = Number.toInteger || function( any ) {
+  return (
+    ( n = +n ) && isFinite( n ) // toNumber and isFinite
+    ? n - ( n % 1 ) // ceil negatives, floor positives
+    : n || 0 // leave be +-Infinity, translate NaN to zero
+  );
+}
+
 Object_defineProperty = ( function( defineProperty ) {
 
   // - try to define a dummy property on an object literal which fails
@@ -134,7 +144,7 @@ array_flatten = array.flatten || function(){
   return array;
 }
 
-array_push      = array.push, // faster than `array = array.concat( items )`
+array_push      = array.push,
 array_slice     = array.slice,
 array_splice    = array.splice,
 array_unshift   = array.unshift,
@@ -251,6 +261,33 @@ re_linebreaks    = /\n|\r(?!\n)|\u2028|\u2029|\r\n/g;
 
 if ( 'xy'.substr( -1 ) !== 'y' ) shim_methods.push( 'substr' );
 
+// custom exit
+// -----------
+// wraps the process of throwing an _Error_.
+// in _DEBUG_ mode composes the error's message
+// of the custom _Stryng_ function's `_name` property
+// and the arguments passed i.e. logs the stacktrace of the level above.
+// 
+// - get the `caller` function
+// - stringify its arguments
+// - throw the error with the custom message
+function exit( message ) {
+  if( DEBUG ){
+
+    var
+      args    = '',
+      caller  = arguments.callee.caller,
+      message = 'invalid usage of Stryng.' + caller._name + '() with args [';
+
+    array_forEach.call( caller.arguments, function( arg ) { args += arg + ', ' } );
+
+    throw new Error( message + ( args ? args.slice( 0, -2 ) : '' ) + ']. ' + ( message || '' ) );
+
+  } else {
+    throw new Error( 'invalid usage of Stryng member. ' + (message || '') );
+  }
+}
+
 // type safety
 // ===========
 // the inner module `is` holds type checks. this is an excerpt from
@@ -279,95 +316,6 @@ if ( typeof regex === 'object' ) {
   };
 }
 
-// utility functions
-// =================
-// 
-// toInteger
-// ---------
-// fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
-// implementation of `toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
-// 
-// 1. let number be the result of calling `toNumber` on the input argument.
-// 2. if number is `NaN`, return `+0`.
-// 3. if number is `+0`, `−0`, `+Infinity`, or `−Infinity`, return number i.e. leave zeros and infinites untouched
-// 4. Rireturn the result of computing `sign(number) × floor(abs(number))` i.e. ceil negatives, floor positives
-// 
-// in the following scenarios calling `toInteger` can be replaced with faster inline comparisons:
-// ### isNegative
-// ```
-// var x = -0.5;
-// x < 0; // yields true
-// toInteger( x ) < 0; // yields false because it ceils negative values and hence compares 0 < 0
-// ```
-// the faster equivalent of the above `toInteger` call and comparison is
-// ```
-// x <= -1;
-// ```
-// ### isNotFinite
-// ```
-// toInteger( 'Infinity' ) == Infinity; // true
-// toInteger( Infinity ) == Infinity; // true
-// toInteger( 1/0 ) == Infinity; // true
-// ```
-// the above expressions are the only ones evaluated to `Infinity`.
-// However, since `toInteger` uses `toNumber` internally and simply returns
-// results `+0`, `−0`, `+Infinity` and `−Infinity` of `toNumber` you may equally use
-// ```
-// 'Infinity' == Infinity; // true
-// Infinity == Infinity; // true
-// 1/0 == Infinity; // true
-// ```
-// to spare another function call. same goes for `-Infinity`.
-// 
-// ### apply zero as minimum
-// instead of
-// ```
-// x = toInteger( x );
-// x = Math.min( 0, x );
-// ```
-// you may equally do
-// ```
-// x = x < 0 ? 0 : Math.floor( x ) || 0;
-// ```
-// where the last bit zeros `NaN`.
-// 
-// worth a zealot's blog post..
-// 
-function toInteger( any ) {
-  return (
-    ( n = +n ) && isFinite( n ) // toNumber and isFinite
-    ? n - ( n % 1 ) // ceil negatives, floor positives
-    : n || 0 // leave be +-Infinity, translate NaN to zero
-  );
-}
-
-// exit
-// ----
-// wraps the process of throwing an _Error_.
-// in _DEBUG_ mode composes the error's message
-// of the custom _Stryng_ function's `_name` property
-// and the arguments passed i.e. logs the stacktrace of the level above.
-// 
-// - get the `caller` function
-// - stringify its arguments
-// - throw the error with the custom message
-function exit( message ) {
-  if( DEBUG ){
-
-    var
-      args    = '',
-      caller  = arguments.callee.caller,
-      message = 'invalid usage of Stryng.' + caller._name + '() with args [';
-
-    array_forEach.call( caller.arguments, function( arg ) { args += arg + ', ' } );
-
-    throw new Error( message + ( args ? args.slice( 0, -2 ) : '' ) + ']. ' + ( message || '' ) );
-
-  } else {
-    throw new Error( 'invalid usage of Stryng member. ' + (message || '') );
-  }
-}
-
 // class constructor
 // =================
 
@@ -378,7 +326,7 @@ function exit( message ) {
  * @param {boolean} [is_mutable=false]
  *   whether the created instance should be mutable or
  *   create a new instance from the result of every method call
- * @returns {Stryng} -
+ * @return {Stryng} -
  *   the `input`'s string representation wrapped
  *   in the instance returned.
  */
@@ -397,10 +345,10 @@ function Stryng( value , is_mutable ) {
   /**
    * whether the created instance should be mutable or
    * create a new instance from the result of every method call
-   * @name Stryng~_isMutable
+   * @name Stryng~_is_mutable
    * @type {boolean}
    */
-  this._isMutable = !!is_mutable;
+  this._is_mutable = !!is_mutable;
 
   /**
    * the [String#_value](#_value)'s length defined via _Object.defineProperty_
@@ -430,7 +378,7 @@ function Stryng( value , is_mutable ) {
  * this is the hook to get a copy of it. delegates to [Stryng#constructor](#Stryng)
  * @param {boolean} [is_mutable=false]
  *   whether the cloned instance should be mutable or
- *   create a new instance from the result of every method call
+ *   create a new instance from the internal result of every method call
  * @return {Stryng} -
  *   a copy of the _Stryng_ instance
  */
@@ -446,7 +394,7 @@ Stryng.prototype.clone = function( is_mutable ){
 // instance methods__, which makes it a lot shorter, less verbose and
 // easier to highlight the fact that all instance methods are availabe
 // as static ones but __not vice versa__. the one exception to this is [Stryng#clone](#clone)
-// which only licves on _Stryng_'s prototype.
+// which only lives on _Stryng_'s prototype.
 
 /**
  * @lends Stryng.prototype
@@ -454,79 +402,59 @@ Stryng.prototype.clone = function( is_mutable ){
 var stryng_members = {
 
   /**
-   * @return {string} - input with first letter upper-cased.
-   * @examples
-   * ```
-   * Stryng.capitalize('foo'); // yields "Foo"
-   * ```
-   * @todo support diacritics and ligatures
-   */
-  capitalize: function( input ) {
-    input = input != null ? String( input ) : exit();
-
-    var length = input.length;
-
-    return (
-      !length ? input :
-      length === 1 ? input.toUpperCase() :
-      input.charAt( 0 ).toUpperCase() + input.substring( 1 )
-    );
-  },
-
-  /**
    * shim for native [String#trim](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.20)
-   * @returns {string}
+   * @return {string}
    */
   trim: function( input ) {
     return input != null ?
       String( input )
-      .replace( reTrimLeft, '' )
-      .replace( reTrimRight, '' ) : exit();
+      .replace( re_trim_left, '' )
+      .replace( re_trim_right, '' ) : exit();
   },
 
   /**
    * shim for non-standard [String#trimLeft](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimLeft)
-   * @returns {string}
+   * @return {string}
    */
   trimLeft: function( input ) {
-    return input != null ? String( input ).replace( reTrimLeft, '' ) : exit();
+    return input != null ? String( input ).replace( re_trim_left, '' ) : exit();
   },
 
   /**
    * shim for non-standard [String#trimRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimRight)
-   * @returns {string}
+   * @return {string}
    */
   trimRight: function( input ) {
-    return input != null ? String( input ).replace( reTrimRight, '' ) : exit();
+    return input != null ? String( input ).replace( re_trim_right, '' ) : exit();
   },
 
   /**
    * shim for native [String#contains](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/contains)
-   * @param {string} [searchString="undefined"]
+   * @param {string} [search="undefined"]
    * @param {number} [index=0] the index to start searching
-   * @returns {boolean} -
-   *   whether or not `input` contains the substring `searchString`
+   * @return {boolean} -
+   *   whether or not `input` contains the substring `search`
    */
-  contains: function( input, searchString, start ) {
-    return input != null ? String( input ).indexOf( searchString, start ) !== -1 : exit();
+  contains: function( input, search, start ) {
+    return input != null ? String( input ).indexOf( search, start ) !== -1 : exit();
   },
 
   /**
    * shim for native [String#startsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.startswith)
-   * @param {string|RegExp} [searchString="undefined"]
+   * @param {string|RegExp} [search="undefined"]
    * @param {number} [position=0]
-   * @returns {boolean} -
+   * @return {boolean} -
    *   whether or not `input` at index `position`
-   *   begins with substring `searchString`
+   *   begins with substring `search`
    */
-  startsWith: function( input, searchString, position ) {
+  startsWith: function( input, search, position ) {
     input = input != null ? String( input ) : exit();
 
-    // - if `searchString` is a regular expression,
+    // - if `search` is a regular expression,
     //   return whether or not it matches the beginning of
     //   this' string starting at `position`.
     // - let `i` be the index returned by _String#indexOf_.
-    //   let `position` and `searchString` be parsed correctly internally
+    //   let `position` and `search` be parsed correctly internally
     // - return `false` if not found i.e. `i === -1`
     // - let `input_len` be this' string's length
     // - parse the `position` argument by the following rules
@@ -535,11 +463,11 @@ var stryng_members = {
     //   - floor if positive parsable, zero if `NaN`
     // - return whether or not `i` equals the above's result
 
-    if( is.RegExp( searchString ) ){
-      return !input.substring( position ).search( searchString );
+    if( is.RegExp( search ) ){
+      return !input.substring( position ).search( search );
     }
 
-    var i = input.indexOf( searchString, position ), input_len;
+    var i = input.indexOf( search, position ), input_len;
 
     if ( i === -1 ) return false;
 
@@ -553,65 +481,65 @@ var stryng_members = {
 
   /**
    * shim for native [String#endsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.endswith)
-   * @param {string} [searchString="undefined"]
-   * @param {number} [endPosition=input.length]
-   * @returns {boolean} -
-   *   whether or not `input` truncated by `endPosition`
-   *   ends with substring `searchString`.
+   * @param {string} [search="undefined"]
+   * @param {number} [end_position=input.length]
+   * @return {boolean} -
+   *   whether or not `input` truncated by `end_position`
+   *   ends with substring `search`.
    */
-  endsWith: function( input, searchString, endPosition ) {
+  endsWith: function( input, search, end_position ) {
     input = input != null ? String( input ) : exit();
 
     // - let `input_len` be this' string's length
-    // - parse the `endPosition` argument by the following rules
+    // - parse the `end_position` argument by the following rules
     //   - default and max to `input_len`
     //   - min to zero
     //   - floor if parsable, zero if `NaN`
-    // - if `searchString` is a regular expression
+    // - if `search` is a regular expression
     //   - throw an error if the regular expression does not match the
     //     end of its input i.e. does not end with `'$'`
-    //   - truncate this' string at `endPosition`
-    //   - return whether or not `searchString` matches the above's result
+    //   - truncate this' string at `end_position`
+    //   - return whether or not `search` matches the above's result
     // - let `i` be the index returned by _String#lastIndexOf_.
-    //   let `position` and `searchString` be parsed correctly internally
+    //   let `position` and `search` be parsed correctly internally
     // - return `false` if not found i.e. `i === -1`
-    // - parse the `endPosition` argument as described above
+    // - parse the `end_position` argument as described above
     // - return whether or not `i` equals the above's result
 
     var
       input_len = input.length, i,
-      endPosition = (
-        endPosition === void 0 || endPosition > input_len ? input_len :
-        endPosition < 0 ? 0 :
-        Math_floor( endPosition ) || 0
+      end_position = (
+        end_position === void 0 || end_position > input_len ? input_len :
+        end_position < 0 ? 0 :
+        Math_floor( end_position ) || 0
       );
 
-    if( is.RegExp( searchString ) ){
+    if( is.RegExp( search ) ){
       
-      var re_source = searchString.source;
+      var re_source = search.source;
       if( !re_source_matches_end.test( re_source ) ){
-        exit('"searchString" must match end i.e. end with "$"');
+        exit('"search" must match end i.e. end with "$"');
       }
 
-      return searchString.test( input.substring( 0, endPosition ) );
+      return search.test( input.substring( 0, end_position ) );
     }
 
-    searchString = String( searchString );
+    search = String( search );
 
-    if ( !searchString ) return true;
+    if ( !search ) return true;
 
-    i = input.lastIndexOf( searchString, endPosition );
+    i = input.lastIndexOf( search, end_position );
       
-    return i !== -1 && ( i + searchString.length === endPosition );
+    return i !== -1 && ( i + search.length === end_position );
   },
 
   /**
    * shim for native [String#repeat](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.repeat).
    * reduction of concat operations inspired by [mout/string/repeat](https://github.com/mout/mout/blob/v0.9.0/src/string/repeat.js)
    * @param {number} [n=0]
-   * @returns {string} -
+   * @return {string} -
    *   this' string `n` times concatenated to the empty string.
-   * @throws if <code>toInteger( n )</code> is either negative or infinite.
+   * @throws if <code>Number_toInteger( n )</code> is either negative or infinite.
    */
   repeat: function( input, n ) {
     if ( input == null || n <= -1 || n == INFINITY ) exit();
@@ -633,19 +561,19 @@ var stryng_members = {
   /**
    * shim for native [String#substr](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.substr)
    * @param {number} [start=0]
-   * @param {number} [length=this' length - start]
-   * @returns {string}
+   * @param {number} [length=length-start] this' string's length minus `start`
+   * @return {string}
    */
   substr: function( input, start, length ) {
     input = input != null ? String( input ) : exit();
 
     // - parse the `start` argument.
-    //   - if `toInteger( start )` is negative, add `input.length`
+    //   - if `Number_toInteger( start )` is negative, add `input.length`
     //   - if it still is negative, set to zero
     // - leave it up to `substr`'s implicit parsing any otherwise
     start = (
-      start <= -1 // same as `toInteger( start ) < 0`
-      ? ( start = toInteger( start ) + input.length ) < 0
+      start <= -1 // same as `Number_toInteger( start ) < 0`
+      ? ( start = Number_toInteger( start ) + input.length ) < 0
       ? 0
       : start
       : start
@@ -659,7 +587,7 @@ var stryng_members = {
    * to do the opposite use [Stryng.strip](#strip).
    * @param {string} [outfix="undefined"] prefix and suffix
    * @param {number} [n=0] number of operations
-   * @returns {string}
+   * @return {string}
    * @requires Stryng#repeat
    */
   wrap: function( input, outfix, n ) {
@@ -670,27 +598,27 @@ var stryng_members = {
   },
 
   /**
-   * @param {string} [searchString="undefined"]
+   * @param {string} [search="undefined"]
    *   substring to search for
-   * @returns {number} -
-   *   number of non-overlapping occurrences of `searchString` within `input`.
+   * @return {number} -
+   *   number of non-overlapping occurrences of `search` within `input`.
    *   the empty string is considered a _character boundary_
    *   thus `input.length + 1` will always be the result for that.
    */
-  count: function( input, searchString ) {
+  count: function( input, search ) {
     input = input != null ? String( input ) : exit();
 
-    searchString = String( searchString );
+    search = String( search );
 
-    // early exit for the empty searchString
-    if ( !searchString ) return input.length + 1;
+    // early exit for the empty search
+    if ( !search ) return input.length + 1;
 
     var
-      length = searchString.length,
+      length = search.length,
       count  = 0,
       i      = -length; // prepare first run
 
-    do i = input.indexOf( searchString, i + length );
+    do i = input.indexOf( search, i + length );
     while ( i !== -1 && ++count )
 
     return count;
@@ -699,9 +627,9 @@ var stryng_members = {
   /**
    * delegates to _Arrray#join_.
    * @param {(...*|Array.<*>)} [joinees=[]] , nestable
-   * @returns {string} -
+   * @return {string} -
    *   `joinees` joined by native `Array.prototype.join`.
-   *   returns the empty string if no second, third .. argument is passed
+   *   return the empty string if no second, third .. argument is passed
    * @example
    * ```
    * Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brown fox'
@@ -717,7 +645,7 @@ var stryng_members = {
   },
 
   /**
-   * @returns {string} -
+   * @return {string} -
    *   the reversed string. usefull yet unefficient to verify palindroms.
    * @deprecated https://github.com/mathiasbynens/esrever
    */
@@ -731,7 +659,7 @@ var stryng_members = {
   /**
    * @param {number} [position=0] index of insertion, can be negative
    * @param {string} [insertion="undefined"]
-   * @returns {string} -
+   * @return {string} -
    *   the `input` split at `position` and rejoined using `insertion` as the delimiter
    */
   insert: function( input, position, insertion ) {
@@ -739,7 +667,7 @@ var stryng_members = {
 
     // slice's native parsing will apply different
     // defaults for `undefined` to the first and second argument
-    if( position === void 0 ) position = toInteger( position );
+    if( position === void 0 ) position = Number_toInteger( position );
 
     // implies parsing `insertion`
     return input.slice( 0, position ) + insertion + input.slice( position );
@@ -751,46 +679,48 @@ var stryng_members = {
     
     var
       delimiter_len,
-      rest = input,
+
       matches,
       match,
       groups = null,
-      preceding,
+
+      head,
+      tail = input,
+
       index,
       lastIndex = 0,
       global_index = 0;
 
-    // - let `rest` be this's string
-    // - try to find/match argument `delimiter` in/on `rest`
+    // - let `tail` be this's string
+    // - try to find/match argument `delimiter` in/on `tail`
     // - let `match` either be the `delimiter` or the
     //   substring matched by the regular expression
-    // - if found, call argument `iterator` within the context
-    //   of argument `context` and pass arguments
-    //   - the substring of this' string preceding `match`
+    // - if found, call argument `iterator` on `context` and pass arguments
+    //   - the substring of this' string head `match`
     //   - `match` itself
     //   - the captured groups if any, null otherwise
     //   - `match`'s start index
     //   - the substring of this' string following `match`
     // - otherwise let `lastIndex` be `match`'s start index plus `match`'s length
-    //   and front-cut `rest` by that.
+    //   and front-cut `tail` by that.
     // - if not found call argument `iterator` within the context
     //   of argument `context` and pass arguments
-    //   [`rest`, `null`, `null`, `-1`, `''`]
+    //   [`tail`, `null`, `null`, `-1`, `''`]
     
     if ( is.RegExp( delimiter ) ) {
 
-      while( matches = rest.match( delimiter ) ){
+      while( matches = tail.match( delimiter ) ){
         global_index += lastIndex;
         
         index     = matches.index;
-        preceding = rest.substring( 0, index );
+        head      = tail.substring( 0, index );
         match     = matches.shift();
         groups    = matches.length ? matches : null;
         lastIndex = index + match.length;
         if ( lastIndex <= index ) lastIndex = index + 1;
-        rest = rest.substring( lastIndex );
+        tail = tail.substring( lastIndex );
         
-        if ( false === iterator.call( context, preceding, match, groups, global_index, rest )) break;
+        if ( false === iterator.call( context, head, match, groups, global_index, tail )) break;
       }
 
     } else {
@@ -798,16 +728,15 @@ var stryng_members = {
       delimiter     = String( delimiter );
       delimiter_len = delimiter.length;
 
-      while ( ( index = rest.indexOf( delimiter ) ) !== -1 ){
+      while ( ( index = tail.indexOf( delimiter ) ) !== -1 ){
         global_index += lastIndex;
         
-        preceding = rest.substring( 0, index );
+        head      = tail.substring( 0, index );
         lastIndex = index + delimiter_len;
-        match     = rest.substring( index, lastIndex );
         if ( lastIndex <= index ) lastIndex = index + 1;
-        rest = rest.substring( lastIndex );
+        tail = tail.substring( lastIndex );
 
-        if ( false === iterator.call( context, preceding, match, groups, global_index, rest )) break;
+        if ( false === iterator.call( context, head, delimiter, groups, global_index, tail )) break;
       }
     }
     iterator.call( context, rest, null, null, -1, '' );
@@ -818,7 +747,7 @@ var stryng_members = {
    * @param {number} [n=<Math.pow(2, 32) - 1>]
    *   maximum number of split operations.
    *   as per [ecma-262/5.1](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14)
-   * @returns {string[]} -
+   * @return {string[]} -
    *   the `input` split by the given `delimiter`
    *   with anything past the `n`th occurrence of
    *   `delimiter` untouched yet included in the array.
@@ -878,7 +807,7 @@ var stryng_members = {
    * @param {number} [n=Math.pow(2, 32) - 1]
    *   maximum number of split operations.
    *   defaults to the number of non-overlapping occurrences of `delimiter`
-   * @returns {string[]} -
+   * @return {string[]} -
    *   the `input` split by the given `delimiter`
    *   with anything in front of the `n`th occurrence of
    *   `delimiter` - counting backwards - untouched yet included in the array.
@@ -920,40 +849,15 @@ var stryng_members = {
   },
 
   /**
-   * implementation of UNIX's head command
-   * @param  {number} n number of lines to return
-   * @return {string[]} -
-   *   `n` lines split from the beginning of this' string
-   * @see Stryng#splitLeft
-   */
-  head: function( input, n ){
-    // implies parsing `input` and `n`
-    return Stryng.splitLeft( input, re_linebreaks, n );
-  },
-
-  /**
-   * implementation of UNIX's tail command
-   * @param  {number} n number of lines to return
-   * @return {string[]} -
-   *   `n` lines split from the beginning of this' string
-   * @see Stryng#splitRight
-   */
-  tail: function( input, n ){
-    // implies parsing `input` and `n`
-    return Stryng.splitRight( input, re_linebreaks, n );
-  },
-
-  /**
    * @param {string} [replacee="undefined"] string to replace
    * @param {string} [replacement="undefined"] replacement
-   * @returns {string} -
+   * @return {string} -
    *   the `input` with all non-overlapping occurrences of
    *   `replacee` replaced by `replacement`.
    */
   exchange: function( input, replacee, replacement ) {
-    input = input != null ? String( input ) : exit();
-
-    replacee = String( replacee );
+    input       = input != null ? String( input ) : exit();
+    replacee    = String( replacee );
     replacement = String( replacement );
 
     // early exit for equality
@@ -974,8 +878,8 @@ var stryng_members = {
    * @see Stryng#exchangeRight
    */
   exchangeLeft: function( input, replacee, replacement, n ) {
-    input = input != null ? String( input ) : exit();
-    replacee = String( replacee );
+    input       = input != null ? String( input ) : exit();
+    replacee    = String( replacee );
     replacement = String( replacement );
 
     // early exit for equality
@@ -997,8 +901,8 @@ var stryng_members = {
    * @see Stryng.exchangeLeft, Stryng.exchange
    */
   exchangeRight: function( input, replacee, replacement, n ) {
-    input = input != null ? String( input ) : exit();
-    replacee = String( replacee );
+    input       = input != null ? String( input ) : exit();
+    replacee    = String( replacee );
     replacement = String( replacement );
 
     // early exit for equality
@@ -1009,29 +913,29 @@ var stryng_members = {
   },
 
   /**
-   * @param {number} maxLength
+   * @param {number} max_len
    * @param {string} padding
    * @return {string} -
    *   the `input` with `padding`
    *   prepended as often as needed for `input`
-   *   to reach but not exceed a length of `maxLength`
+   *   to reach but not exceed a length of `max_len`
    * @see Stryng#justRight, Stryng#just
    */
-  justLeft: function( input, maxLength, padding ) {
-    if ( input == null || maxLength <= -1 || maxLength == INFINITY ) exit();
+  justLeft: function( input, max_len, padding ) {
+    if ( input == null || max_len <= -1 || max_len == INFINITY ) exit();
 
-    input = String( input );
-    padding = String( padding );
-    maxLength = toInteger( maxLength );
-
-    var iLength = input.length;
+    input     = String( input );
+    padding   = String( padding );
+    max_len = Number_toInteger( max_len );
+    
+    var input_len = input.length;
 
     // early exit for the empty padding
-    if ( maxLength <= iLength || !padding ) return input;
+    if ( max_len <= input_len || !padding ) return input;
 
     var pLength = padding.length;
 
-    while ( input.length + pLength <= maxLength ) {
+    while ( input.length + pLength <= max_len ) {
       input = padding + input;
     }
 
@@ -1039,29 +943,29 @@ var stryng_members = {
   },
 
   /**
-   * @param {number} maxLength
+   * @param {number} max_len
    * @param {string} padding
    * @return {string}
    *   the `input` with `padding`
    *   appended as often as needed for `input`
-   *   to reach but not exceed a length of `maxLength`
+   *   to reach but not exceed a length of `max_len`
    * @see Stryng.justLeft, Stryng.just
    */
-  justRight: function( input, maxLength, padding ) {
-    if ( input == null || maxLength <= -1 || maxLength == INFINITY ) exit();
+  justRight: function( input, max_len, padding ) {
+    if ( input == null || max_len <= -1 || max_len == INFINITY ) exit();
 
-    input = String( input );
-    padding = String( padding );
-    maxLength = toInteger( maxLength );
+    input     = String( input );
+    padding   = String( padding );
+    max_len = Number_toInteger( max_len );
 
-    var iLength = input.length;
+    var input_len = input.length;
 
     // early exit for the empty padding
-    if ( maxLength <= iLength || !padding ) return input;
+    if ( max_len <= input_len || !padding ) return input;
 
     var pLength = padding.length;
 
-    while ( input.length + pLength <= maxLength ) {
+    while ( input.length + pLength <= max_len ) {
       input += padding;
     }
 
@@ -1069,29 +973,29 @@ var stryng_members = {
   },
 
   /**
-   * @param {number} maxLength
+   * @param {number} max_len
    * @param {string} padding
    * @return {string}
    *   the `input` with `padding`
    *   appended as often as needed for `input`
-   *   to reach but not exceed a length of `maxLength`
+   *   to reach but not exceed a length of `max_len`
    * @see Stryng.justLeft, Stryng.justRight
    */
-  just: function( input, maxLength, padding ) {
-    if ( input == null || maxLength <= -1 || maxLength == INFINITY ) exit();
+  just: function( input, max_len, padding ) {
+    if ( input == null || max_len <= -1 || max_len == INFINITY ) exit();
 
-    input = String( input );
-    padding = String( padding );
-    maxLength = toInteger( maxLength );
+    input     = String( input );
+    padding   = String( padding );
+    max_len = Number_toInteger( max_len );
 
-    var iLength = input.length;
+    var input_len = input.length;
 
     // early exit for the empty padding
-    if ( maxLength <= iLength || !padding ) return input;
+    if ( max_len <= input_len || !padding ) return input;
 
     var pLength = padding.length << 1; // fast double
 
-    while ( input.length + pLength <= maxLength ) {
+    while ( input.length + pLength <= max_len ) {
       input = padding + input + padding;
     }
 
@@ -1106,13 +1010,13 @@ var stryng_members = {
    *   string to remove
    * @param {number} [n=Math.pow(2, 32) - 1]
    *   number of operations.
-   * @returns {string} -
+   * @return {string} -
    * @example
    * Stryng.stripLeft('lefty loosy', 'lefty ');
-   * // returns 'loosy'
+   * // return 'loosy'
    *
    * Stryng.stripLeft('blubblubblub', 'blub');
-   * // returns the empty string
+   * // return the empty string
    */
   stripLeft: function( input, prefix, n ) {
     input = input != null ? String( input ) : exit();
@@ -1120,22 +1024,23 @@ var stryng_members = {
     // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
     // - parse `prefix` to string
     // - early exit before processing senseless arguments
-    // - set an index `pending_i` to zero
+    // - set an index `pending_index` to zero
     // - increment it by `prefix.length` as long as fast native
-    //   _String#indexOf_ returns just the result of that addition
+    //   _String#indexOf_ return just the result of that addition
     //   and we are not running out of `n`.
     n = ( n === void 0 ? -1 : n ) >>> 0;
     prefix = String( prefix );
 
     if ( !n || !prefix ) return input;
 
-    var prefix_len = prefix.length,
-      pending_i = 0, i;
+    var
+      prefix_len = prefix.length,
+      pending_index = 0, i;
 
-    do i = input.indexOf( prefix, pending_i );
-    while ( n-- && i === pending_i && ( pending_i += prefix_len ) );
+    do i = input.indexOf( prefix, pending_index );
+    while ( n-- && i === pending_index && ( pending_index += prefix_len ) );
 
-    return pending_i ? input.substring( pending_i ) : input;
+    return pending_index ? input.substring( pending_index ) : input;
   },
 
   /**
@@ -1144,7 +1049,7 @@ var stryng_members = {
    *   string to remove
    * @param {number} [n=Math.pow(2, 32) - 1]
    *   number of operations.
-   * @returns {string} -
+   * @return {string} -
    */
   stripRight: function( input, suffix, n ) {
     input = input != null ? String( input ) : exit();
@@ -1154,7 +1059,7 @@ var stryng_members = {
     // - early exit before processing senseless arguments
     // - set an index `p` to `input.length`
     // - decrement it by `suffix.length` as long as fast native
-    //   _String#lastIndexOf_ returns just the result of that subtraction
+    //   _String#lastIndexOf_ return just the result of that subtraction
     //   and we are not running out of `n`.
 
     n      = ( n === void 0 ? -1 : n ) >>> 0;
@@ -1164,23 +1069,23 @@ var stryng_members = {
 
     var
       suffix_len = suffix.length,
-      pending_i  = input.length,
+      pending_index  = input.length,
       i;
 
     do {
-      pending_i -= suffix_len;
-      i          = input.lastIndexOf( suffix, pending_i );
+      pending_index -= suffix_len;
+      i = input.lastIndexOf( suffix, pending_index );
     }
-    while ( n-- && i !== -1 && i === pending_i );
+    while ( n-- && i !== -1 && i === pending_index );
 
-    return input.substring( 0, pending_i + suffix_len );
+    return input.substring( 0, pending_index + suffix_len );
   },
 
   /**
    * the combination of [Stryng.stripLeft](#stripLeft) and [Stryng.stripRight](#stripRight)
    * @param {string} outfix string to remove
    * @param {number} [n=1] number of operations (recursion depth)
-   * @returns {string} -
+   * @return {string} -
    *   
    */
   strip: function( input, outfix, n ) {
@@ -1188,41 +1093,41 @@ var stryng_members = {
   },
 
   /**
-   * @param {number} maxLength
+   * @param {number} max_len
    * @param {string} [ellipsis="..."]
-   * @returns {string} -
+   * @return {string} -
    *   the `input` sliced to fit the given
-   *   `maxLength` including the `ellipsis`
+   *   `max_len` including the `ellipsis`
    */
-  truncate: function( input, maxLength, ellipsis ) {
+  truncate: function( input, max_len, ellipsis ) {
     input = input != null ? String( input ) : exit();
 
-    // - parse `maxLength` with `toUInt32`, default to `Math.pow(2, 32) - 1`
-    // - if `maxLength` is zero return the empty string
-    // - if `maxLength` is bigger than `input.length`
+    // - parse `max_len` with `toUInt32`, default to `Math.pow(2, 32) - 1`
+    // - if `max_len` is zero return the empty string
+    // - if `max_len` is bigger than `input.length`
     //   there's to need to truncate, return this' string
     // - parse `ellipsis` to string, default to `'...'`
-    // - if `ellipsis.length` is bigger than `maxLength`,
-    //   return the last `maxLength` characters of `ellipsis`
+    // - if `ellipsis.length` is bigger than `max_len`,
+    //   return the last `max_len` characters of `ellipsis`
     // - return the concatenation of this' string's first
-    //   `maxLength - ellipsis_len` characters and `ellipsis`
+    //   `max_len - ellipsis_len` characters and `ellipsis`
 
-    maxLength = ( maxLength === void 0 ? -1 : maxLength ) >>> 0;
+    max_len = ( max_len === void 0 ? -1 : max_len ) >>> 0;
 
-    if ( !maxLength ) return '';
-    if ( maxLength >= input.length ) return input;
+    if ( !max_len ) return '';
+    if ( max_len >= input.length ) return input;
 
     ellipsis = ellipsis !== void 0 ? String( ellipsis ) : '...';
 
     var ellipsis_len = ellipsis.length;
 
-    if ( ellipsis_len >= maxLength ) return ellipsis.slice( -maxLength );
+    if ( ellipsis_len >= max_len ) return ellipsis.slice( -max_len );
 
-    return input.substring( 0, maxLength - ellipsis_len ) + ellipsis;
+    return input.substring( 0, max_len - ellipsis_len ) + ellipsis;
   },
 
   /**
-   * @returns {string} -
+   * @return {string} -
    *   the `input` wrapped in double quotes
    */
   quote: function( input ) {
@@ -1241,11 +1146,11 @@ var stryng_members = {
 
     var
       result = '',
-      length = input.length,
+      input_len = input.length,
       i      = 0,
       char_code;
 
-    for (; i < length; i++) {
+    for (; i < input_len; i++) {
       char_code = input.charCodeAt( i );
 
       result +=
@@ -1286,41 +1191,6 @@ var stryng_members = {
   },
 
   /**
-   * @param {number} [length=input.length]
-   * @return {string} -
-   *   string of length `length` with characters randomly choosen from this' string
-   */
-  randomize: function( input, length ) {
-    if ( input == null || length <= -1 || length == INFINITY ) exit();
-
-    input  = String( input );
-    length = length < 0 ? 0 : Math_floor( length ) || 0;
-
-    var result = '';
-
-    while( length--){
-      result += input.charAt( Math_floor( Math_random() * length ) );
-    }
-
-    return result;
-  },
-
-  shuffle: function( input ){
-    input = input != null ? String( input ) : exit();
-
-    var
-      characters = input.split(''),
-      result     = '',
-      i          = characters.length;
-
-    while( i-- ){
-      result += characters.splice( Math_floor( Math_random() * i ), 1 )[0];
-    }
-
-    return result;
-  },
-
-  /**
    * @return {number[]} -
    *   an array of char code numbers representing this' string.
    */
@@ -1340,7 +1210,7 @@ var stryng_members = {
    * prepends the prefixes to this' string in the given order.
    * @param {...string} prefix
    *   an arbitrary number of strings to prepend recursivelyin the given order
-   * @returns {string}
+   * @return {string}
    */
   prepend: function( /* input, prefix.. */) {
     var args = arguments, input, i;
@@ -1360,7 +1230,7 @@ var stryng_members = {
   /**
    * @param {...string} [comparable="undefined"]
    *   strings to compare with
-   * @returns {boolean} -
+   * @return {boolean} -
    *   whether or not this' string strictly equals the
    *   string representation of all `comparable`s
    */
@@ -1383,7 +1253,7 @@ var stryng_members = {
    * case-insensitive version of [Stryng.isEqual](#isEqual)
    * @param {...string} [comparable='undefined']
    *   strings to compare with
-   * @returns {boolean} -
+   * @return {boolean} -
    */
   isEquali: function( input /*, comparable.. */ ) {
     input = input != null ? String( input ).toLowerCase() : exit();
@@ -1401,18 +1271,38 @@ var stryng_members = {
   },
 
   /**
-   * @returns {boolean} - whether the string has length `0`
+   * @return {boolean} - whether the string has length `0`
    */
   isEmpty: function( input ) {
     return input != null ? !String( input ) : exit();
   },
 
   /**
-   * @returns {boolean} - whether the string is empty or consists of whitespace only
+   * @return {boolean} - whether the string is empty or consists of whitespace only
    */
   isBlank: function( input ) {
     input = input != null ? String( input ) : exit();
     return !input || !re_no_whitespace.test( input );
+  },
+
+  /**
+   * @return {string} - input with first letter upper-cased.
+   * @examples
+   * ```
+   * Stryng.capitalize('foo'); // yields "Foo"
+   * ```
+   * @todo support diacritics and ligatures
+   */
+  capitalize: function( input ) {
+    input = input != null ? String( input ) : exit();
+
+    var input_len = input.length;
+
+    return (
+      !input_len ? input :
+      input_len === 1 ? input.toUpperCase() :
+      input.charAt( 0 ).toUpperCase() + input.substring( 1 )
+    );
   },
 
   /**
@@ -1473,10 +1363,10 @@ var stryng_members = {
  * generates a string of random characters which default to the ASCII printables.
  * to choose randomly from the whole Unicode table call `Stryng.random(n, 0, -1)`.
  * @param {number} [length=0]
- * @param {number} [from=32]
- * @param {number} [to=126]
- * @returns {string} -
- *   string of length `n` with characters
+ * @param {number} [from=32] inclusively
+ * @param {number} [to=127] exclusively assuming _Math.random_ never yields `1`
+ * @return {string} -
+ *   string of length `n` with characters (ASCII by default)
  *   randomly choosen from the Unicode table with
  *   code-range [`from`, `to`]
  */
@@ -1485,9 +1375,8 @@ Stryng.random = function( length, from, to ) {
 
   length = length < 0 ? 0 : Math_floor( length ) || 0;
 
-  // printable ASCII characters by default
   from = from === void 0 ? 32  : ( from >>> 0 );
-  to   = to   === void 0 ? 126 : ( to   >>> 0 );
+  to   = to   === void 0 ? 127 : ( to   >>> 0 );
 
   if( to > MAX_CHARCODE ) exit();
 
@@ -1509,7 +1398,7 @@ if ( DEBUG ) Stryng.random._name = 'random';
 /**
  * delegates to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
  * @param {...number} charCode
- * @returns {string} - 
+ * @return {string} - 
  *   the concatenated string representations of the given
  *   `charCode`s from the UTF-16 table. empty if no arguments passed
  */
@@ -1525,7 +1414,7 @@ if( DEBUG ) Stryng.chr._name = 'chr';
  * delegate directly to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
  * @function Stryng.fromCharCode
  * @param {number} [charCode]
- * @returns {string} -
+ * @return {string} -
  *   string representation of the given `charCode`s from the UTF-16 table or
  *   the empty string if no arguments passed.
  */
@@ -1544,9 +1433,9 @@ Stryng.fromCodePoint = String_fromCodePoint;
 // - populate the function onto Stryng's prototype wrapped in another which..
 // - unshifts the _Stryng_ instance's wrapped `_value`
 //   to become the first argument among the proxied ones to the static function
-// - decides upon the type of `result` and whether this `_isMutable` what to return.
+// - decides upon the type of `result` and whether this `_is_mutable` what to return.
 //   - if `result` isn't a string at all, simply return it
-//   - if the instance `_isMutable`, assign `result` to `_value` and return `this`
+//   - if the instance `_is_mutable`, assign `result` to `_value` and return `this`
 //   - if not, return a new instance of _Stryng_ constructed from `result`
 
 object_forOwn.call( stryng_members, function( fn, fn_name ) {
@@ -1563,7 +1452,7 @@ object_forOwn.call( stryng_members, function( fn, fn_name ) {
     result = fn.apply( null, args );
 
     if( typeof result === 'string' ){ // we can rest assured that this is a primitive
-      if( this._isMutable ){
+      if( this._is_mutable ){
         this._value = result;
         if ( !Object_defineProperty ){
           this.length = result.length;
@@ -1589,9 +1478,9 @@ object_forOwn.call( stryng_members, function( fn, fn_name ) {
 // - calls the native instance method in the context of the Stryng
 //   instance's wrapped `_value`
 // - proxies the given `arguments`
-// - decides upon the type of `result` and whether this `_isMutable` what to return.
+// - decides upon the type of `result` and whether this `_is_mutable` what to return.
 //   - if the result isn't a string at all, simply return it
-//   - if the instance `_isMutable`, set the value and return `this`
+//   - if the instance `_is_mutable`, set the value and return `this`
 //   - if not, return a new instance of _Stryng_ constructed from the result
 //   
 // [1]: http://bonsaiden.github.io/JavaScript-Garden/#function.arguments
@@ -1605,10 +1494,6 @@ array_forEach.call( methods, function( fn_name ) {
       if ( input == null ) exit();
       return function_call.apply( fn, arguments )
     }
-    // the above is equivalent to
-    // ```
-    // Function.bind.call( Function.call, fn )
-    // ```
 
     if( DEBUG ) Stryng[ fn_name ]._name = fn_name;
 
@@ -1617,7 +1502,7 @@ array_forEach.call( methods, function( fn_name ) {
       var result = fn.apply( this._value, arguments );
 
       if( typeof result === 'string' ){ // we can rest assured that this is a primitive
-        if( this._isMutable ){
+        if( this._is_mutable ){
           this._value = result;
           if ( !Object_defineProperty ){
             this.length = result.length;
@@ -1667,6 +1552,8 @@ Stryng.prototype.toString = function() {
 
 // aliases
 // -------
+// every function that ends with either `Left` or `Right` is
+// available with prefix `l` or `r` respectively instead.
 
 object_forOwn.call( stryng_members, function( fn, fn_name ) {
 
@@ -1697,7 +1584,7 @@ Stryng.prototype.append = Stryng.prototype.concat;
 /**
  * restores the provious value assigned to `window.Stryng` if it
  * is different from `undefined`, otherwise cleans up the global namespace with `delete`.
- * @returns {Stryng} -
+ * @return {Stryng} -
  *   the inner reference _Stryng_ holds to itself
  */
 Stryng.noConflict = function() {
@@ -1717,7 +1604,7 @@ module.exports = Stryng;
  * @callback contribution
  * @param {string} input the string to work on
  * @param {...*}
- * @returns -
+ * @return -
  *   string literal ( with `string instanceOf String` yielding false )
  */
 

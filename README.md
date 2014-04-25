@@ -75,3 +75,55 @@ Roadmap
 - integrate them into docs
 - renew testling setup
 - extend with plugin `Stryng.esc` for encoding conversions related to url parsing and slugifying
+
+About toInteger
+---------------
+
+from the [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4):
+
+1. let number be the result of calling `toNumber` on the input argument.
+2. if number is `NaN`, return `+0`.
+3. if number is `+0`, `−0`, `+Infinity`, or `−Infinity`, return number i.e. leave zeros and infinites untouched
+4. Rireturn the result of computing `sign(number) × floor(abs(number))` i.e. ceil negatives, floor positives
+
+in the following scenarios calling `Number.toInteger` can be replaced with faster inline comparisons:
+### isNegative
+```
+var x = -0.5;
+x < 0; // yields true
+Number_toInteger( x ) < 0; // yields false because it ceils negative values and hence compares 0 < 0
+```
+the faster equivalent of the above `Number_toInteger` call and comparison is
+```
+x <= -1;
+```
+### isNotFinite
+```
+Number_toInteger( 'Infinity' ) == Infinity; // true
+Number_toInteger( Infinity ) == Infinity; // true
+Number_toInteger( 1/0 ) == Infinity; // true
+```
+the above expressions are the only ones evaluated to `Infinity`.
+However, since `Number_toInteger` uses `toNumber` internally and simply return
+results `+0`, `−0`, `+Infinity` and `−Infinity` of `toNumber` you may equally use
+```
+'Infinity' == Infinity; // true
+Infinity == Infinity; // true
+1/0 == Infinity; // true
+```
+to spare another function call. same goes for `-Infinity`.
+
+### apply zero as minimum
+instead of
+```
+x = Number_toInteger( x );
+x = Math.max( 0, x );
+```
+you may equally do
+```
+x = x < 0 ? 0 : Math.floor( x ) || 0;
+```
+where the last bit zeros `NaN`.
+
+worth a zealot's blog post..
+
