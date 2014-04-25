@@ -1,7 +1,7 @@
 
 
 Benchmark = require('benchmark');
-Stryng = require('./../stryng.js');
+Stryng = require('./../src/stryng.js');
 
 // baseline setup
 // ==============
@@ -266,9 +266,29 @@ suites.push(
 
 )
 
+var value = Array(1e6).join('-');
+var reference = {};
+
+suites.push(
+
+	Benchmark.Suite({name:'func'})
+
+		.add('call by value', function(){
+			(function(arg){
+				Array(1e6).join('-')
+			}(value));
+		})
+
+		.add('call by reference', function(){
+			(function(arg){
+				Array(1e6).join('-')
+			}(reference));
+		})
+);
+
 suites = suites.filter(function(suite){
 
-	return !suite.name.indexOf('join')
+	return !suite.name.indexOf('func')
 
 });
 
