@@ -1156,7 +1156,7 @@ var stryng_members = {
       result +=
       
       char_code === 34 ? "\\\"": // double quote
-      31 < char_code && char_code > 127 ? String_fromCharCode( char_code ) : // ASCII printables
+      31 < char_code && char_code < 127 ? String_fromCharCode( char_code ) : // ASCII printables
       char_code === 8  ? "\\b" : // backspace
       char_code === 9  ? "\\t" : // tab
       char_code === 10 ? "\\n" : // new line
