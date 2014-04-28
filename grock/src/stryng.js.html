@@ -24,11 +24,6 @@
     
       <div class="segment">
       
-      
-      </div>
-    
-      <div class="segment">
-      
         <div class="comments ">
           <div class="wrapper"><p>if the necessity of manipulating strings correctly in JavaScript arises
 you will find yourself dealing with weird native behaviors,
@@ -61,7 +56,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper"><span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> DEBUG === <span class="hljs-string">'undefined'</span>) DEBUG = <span class="hljs-literal">true</span>;
+        <div class="code"><pre class="wrapper"><span class="hljs-keyword">if</span> ( <span class="hljs-keyword">typeof</span> DEBUG === <span class="hljs-string">'undefined'</span> ) DEBUG = <span class="hljs-literal">true</span>;
 </pre></div>
       
       </div>
@@ -99,7 +94,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper">VERSION = string = <span class="hljs-string">'0.0.1'</span>,
+        <div class="code"><pre class="wrapper">  VERSION = string = <span class="hljs-string">'0.0.1'</span>,
 </pre></div>
       
       </div>
@@ -112,7 +107,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper">INFINITY = <span class="hljs-number">1</span> / <span class="hljs-number">0</span>,
+        <div class="code"><pre class="wrapper">  INFINITY = <span class="hljs-number">1</span> / <span class="hljs-number">0</span>,
 </pre></div>
       
       </div>
@@ -125,7 +120,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper">MAX_CHARCODE = <span class="hljs-number">65535</span>, <span class="hljs-comment">// Math.pow(2, 16) - 1</span>
+        <div class="code"><pre class="wrapper">  MAX_CHARCODE = <span class="hljs-number">65535</span>, <span class="hljs-comment">// Math.pow(2, 16) - 1</span>
 </pre></div>
       
       </div>
@@ -138,7 +133,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper"><span class="hljs-built_in">String</span> = func = string.constructor,
+        <div class="code"><pre class="wrapper">  <span class="hljs-built_in">String</span> = func = string.constructor,
 </pre></div>
       
       </div>
@@ -151,33 +146,32 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper">methods = array = (
-+ <span class="hljs-string">'charAt,'</span>
-+ <span class="hljs-string">'charCodeAt,'</span>
-+ <span class="hljs-string">'codePointAt,'</span>
-+ <span class="hljs-string">'concat,'</span>
-+ <span class="hljs-string">'contains,'</span>
-+ <span class="hljs-string">'endsWith'</span>
-+ <span class="hljs-string">'indexOf,'</span>
-+ <span class="hljs-string">'lastIndexOf,'</span>
-+ <span class="hljs-string">'localeCompare,'</span>
-+ <span class="hljs-string">'match,'</span>
-+ <span class="hljs-string">'normalize,'</span>
-+ <span class="hljs-string">'replace,'</span>
-+ <span class="hljs-string">'search,'</span>
-+ <span class="hljs-string">'slice,'</span>
-+ <span class="hljs-string">'split,'</span>
-+ <span class="hljs-string">'startsWith,'</span>
-+ <span class="hljs-string">'substr,'</span>
-+ <span class="hljs-string">'substring,'</span>
-+ <span class="hljs-string">'toLocaleLowerCase,'</span>
-+ <span class="hljs-string">'toLocaleUpperCase,'</span>
-+ <span class="hljs-string">'toLowerCase,'</span>
-+ <span class="hljs-string">'toUpperCase,'</span>
-+ <span class="hljs-string">'trim,'</span>
-+ <span class="hljs-string">'trimLeft,'</span>
-+ <span class="hljs-string">'trimRight'</span>
-).split( <span class="hljs-string">','</span> ),
+        <div class="code"><pre class="wrapper">  methods = array = ( <span class="hljs-string">'charAt,'</span> <span class="hljs-comment">// charAt</span>
+    + <span class="hljs-string">'charCodeAt,'</span> <span class="hljs-comment">// charCodeAt</span>
+    + <span class="hljs-string">'codePointAt,'</span> <span class="hljs-comment">// codePointAt</span>
+    + <span class="hljs-string">'concat,'</span> <span class="hljs-comment">// concat</span>
+    + <span class="hljs-string">'contains,'</span> <span class="hljs-comment">// contains</span>
+    + <span class="hljs-string">'endsWith'</span> <span class="hljs-comment">// endsWit</span>
+    + <span class="hljs-string">'indexOf,'</span> <span class="hljs-comment">// indexOf</span>
+    + <span class="hljs-string">'lastIndexOf,'</span> <span class="hljs-comment">// lastIndexOf</span>
+    + <span class="hljs-string">'localeCompare,'</span> <span class="hljs-comment">// localeCompare</span>
+    + <span class="hljs-string">'match,'</span> <span class="hljs-comment">// match</span>
+    + <span class="hljs-string">'normalize,'</span> <span class="hljs-comment">// normalize</span>
+    + <span class="hljs-string">'replace,'</span> <span class="hljs-comment">// replace</span>
+    + <span class="hljs-string">'search,'</span> <span class="hljs-comment">// search</span>
+    + <span class="hljs-string">'slice,'</span> <span class="hljs-comment">// slice</span>
+    + <span class="hljs-string">'split,'</span> <span class="hljs-comment">// split</span>
+    + <span class="hljs-string">'startsWith,'</span> <span class="hljs-comment">// startsWith</span>
+    + <span class="hljs-string">'substr,'</span> <span class="hljs-comment">// substr</span>
+    + <span class="hljs-string">'substring,'</span> <span class="hljs-comment">// substring</span>
+    + <span class="hljs-string">'toLocaleLowerCase,'</span> <span class="hljs-comment">// toLocaleLowerCase</span>
+    + <span class="hljs-string">'toLocaleUpperCase,'</span> <span class="hljs-comment">// toLocaleUpperCase</span>
+    + <span class="hljs-string">'toLowerCase,'</span> <span class="hljs-comment">// toLowerCase</span>
+    + <span class="hljs-string">'toUpperCase,'</span> <span class="hljs-comment">// toUpperCase</span>
+    + <span class="hljs-string">'trim,'</span> <span class="hljs-comment">// trim</span>
+    + <span class="hljs-string">'trimLeft,'</span> <span class="hljs-comment">// trimLeft</span>
+    + <span class="hljs-string">'trimRight'</span> <span class="hljs-comment">// trimRight</span>
+  ).split( <span class="hljs-string">','</span> ),
 </pre></div>
       
       </div>
@@ -190,7 +184,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper">shim_methods = [],
+        <div class="code"><pre class="wrapper">  shim_methods = [],
 </pre></div>
       
       </div>
@@ -203,7 +197,7 @@ function call with passing a reference to a Stryng object or a string primitive<
         </div>
       
       
-        <div class="code"><pre class="wrapper">is = object = {},
+        <div class="code"><pre class="wrapper">  is = object = {},
 </pre></div>
       
       </div>
@@ -211,7 +205,7 @@ function call with passing a reference to a Stryng object or a string primitive<
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="method-shortcuts"><a href="#method-shortcuts" class="anchor"></a>method shortcuts</h1><p>create quick access variables for both native static functions
+          <div class="wrapper"><h2 id="method-shortcuts"><a href="#method-shortcuts" class="anchor"></a>method shortcuts</h2><p>create quick access variables for both native static functions
 and instance methods. polyfills are reduced in functionality and byte-size.
 they are thus <strong>for internal use only</strong> and neither populated onto
 native prototypes nor intended to be spec-compliant.</p>
@@ -224,17 +218,35 @@ native prototypes nor intended to be spec-compliant.</p>
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h2 id="static-methods"><a href="#static-methods" class="anchor"></a>static methods</h2></div>
+          <div class="wrapper"><h3 id="static-methods"><a href="#static-methods" class="anchor"></a>static methods</h3></div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">JSON_stringify       = <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">JSON</span> !== <span class="hljs-string">'undefined'</span> &amp;&amp; <span class="hljs-built_in">JSON</span>.stringify,
-Math_floor           = <span class="hljs-built_in">Math</span>.floor,
-Math_random          = <span class="hljs-built_in">Math</span>.random,
-String_fromCharCode  = <span class="hljs-built_in">String</span>.fromCharCode,
-String_fromCodePoint = <span class="hljs-built_in">String</span>.fromCodePoint,
-
-Object_defineProperty = ( <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( defineProperty )</span> {</span>
+        <div class="code"><pre class="wrapper">  JSON_stringify = <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">JSON</span> !== <span class="hljs-string">'undefined'</span> &amp;&amp; <span class="hljs-built_in">JSON</span>.stringify,
+  Math_floor = <span class="hljs-built_in">Math</span>.floor,
+  Math_random = <span class="hljs-built_in">Math</span>.random,
+  String_fromCharCode = <span class="hljs-built_in">String</span>.fromCharCode,
+  String_fromCodePoint = <span class="hljs-built_in">String</span>.fromCodePoint,
+</pre></div>
+      
+      </div>
+    
+      <div class="segment">
+      
+        <div class="comments ">
+          <div class="wrapper"><p>fully <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.4">spec</a> compliant
+implementation of <code>Number.toInteger</code>, tested and benchmarked at <a href="http://jsperf.com/to-integer/11">jsperf</a>.</p>
+</div>
+        </div>
+      
+      
+        <div class="code"><pre class="wrapper">  Number_toInteger = <span class="hljs-built_in">Number</span>.toInteger || <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( any )</span> {</span>
+    <span class="hljs-keyword">return</span> (
+      ( n = +n ) &amp;&amp; <span class="hljs-built_in">isFinite</span>( n ) <span class="hljs-comment">// toNumber and isFinite</span>
+      ? n - ( n % <span class="hljs-number">1</span> ) <span class="hljs-comment">// ceil negatives, floor positives</span>
+      : n || <span class="hljs-number">0</span> <span class="hljs-comment">// leave be +-Infinity, translate NaN to zero</span>
+    );
+  },
 </pre></div>
       
       </div>
@@ -255,12 +267,15 @@ Object_defineProperty = ( <span class="hljs-function"><span class="hljs-keyword"
         </div>
       
       
-        <div class="code"><pre class="wrapper">  <span class="hljs-keyword">try</span> {
-    defineProperty( {}, string, { value: <span class="hljs-number">1</span> } );
-    <span class="hljs-keyword">return</span> defineProperty;
-  } <span class="hljs-keyword">catch</span> ( e ) {}
+        <div class="code"><pre class="wrapper">  Object_defineProperty = ( <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( defineProperty )</span> {</span>
+    <span class="hljs-keyword">try</span> {
+      defineProperty( {}, string, {
+        value: <span class="hljs-number">1</span>
+      } );
+      <span class="hljs-keyword">return</span> defineProperty;
+    } <span class="hljs-keyword">catch</span> ( e ) {}
 
-} )( <span class="hljs-built_in">Object</span>.defineProperty ),
+  } )( <span class="hljs-built_in">Object</span>.defineProperty ),
 </pre></div>
       
       </div>
@@ -268,64 +283,23 @@ Object_defineProperty = ( <span class="hljs-function"><span class="hljs-keyword"
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h2 id="instance-methods"><a href="#instance-methods" class="anchor"></a>instance methods</h2></div>
+          <div class="wrapper"><h3 id="instance-methods"><a href="#instance-methods" class="anchor"></a>instance methods</h3></div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">array_forEach = array.forEach || <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( iterator )</span> {</span>
- 
-  <span class="hljs-keyword">var</span> array = <span class="hljs-keyword">this</span>, i = array.length;
+        <div class="code"><pre class="wrapper">  array_forEach = array.forEach || <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( iterator )</span> {</span>
 
-  <span class="hljs-keyword">while</span>( i-- ) iterator( array[ i ] );
-},
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><ul>
-<li>fast forwardly iterate over this.
-do not cache <code>this.length</code> since it may change.</li>
-<li>let <code>item</code> be this&#39;s element at index <code>i</code></li>
-<li>if <code>item</code> is iterable<ul>
-<li>unshift the index <code>i</code> and <code>1</code>
-to comply with the signature of <em>Array#splice</em></li>
-<li>replace the iterable item with its contents ( in situ )</li>
-<li>do not increment the index in order to process the first
-element of <code>item</code>&#39;s contents in the next iteration</li>
-</ul>
-</li>
-<li>go for the next item otherwise</li>
-<li>return <code>this</code> -- mutated</li>
-</ul>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">array_flatten = array.flatten || <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
-  
-  <span class="hljs-keyword">var</span> array = <span class="hljs-keyword">this</span>, i = <span class="hljs-number">0</span>, item;
+    <span class="hljs-keyword">var</span> array = <span class="hljs-keyword">this</span>,
+      i = array.length;
 
-  <span class="hljs-keyword">while</span> ( i !== array.length ) {
-    item = array[ i ];
-    <span class="hljs-keyword">if</span> ( is.Array( item ) ) {
-      item.unshift( i, <span class="hljs-number">1</span> );
-      array_splice.apply( array, item );
-    } <span class="hljs-keyword">else</span> {
-      i++;
-    }
-  }
-  <span class="hljs-keyword">return</span> array;
-}
+    <span class="hljs-keyword">while</span> ( i-- ) iterator( array[ i ] );
+  },
 
-array_push      = array.push, <span class="hljs-comment">// faster than `array = array.concat( items )`</span>
-array_slice     = array.slice,
-array_splice    = array.splice,
-array_unshift   = array.unshift,
-function_call   = func.call,
-object_toString = object.toString,
+  array_push = array.push,
+  array_slice = array.slice,
+  array_unshift = array.unshift,
+  function_call = func.call,
+  object_toString = object.toString,
 </pre></div>
       
       </div>
@@ -339,25 +313,26 @@ used in favor of the composition of <em>Array#forEach</em> and <em>Object.keys</
         </div>
       
       
-        <div class="code"><pre class="wrapper">object_forOwn = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( iterator, context )</span> {</span>
-  
-  <span class="hljs-keyword">var</span> object = <span class="hljs-keyword">this</span>, key, return_value;
+        <div class="code"><pre class="wrapper">  object_forOwn = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( iterator, context )</span> {</span>
 
-  <span class="hljs-keyword">if</span>( object == <span class="hljs-literal">null</span> ){
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">TypeError</span>(<span class="hljs-string">'can\'t convert '</span> + object + <span class="hljs-string">' to object'</span>);
-  }
+    <span class="hljs-keyword">var</span> object = <span class="hljs-keyword">this</span>,
+      key, return_value;
 
-  object = <span class="hljs-built_in">Object</span>( object );
+    <span class="hljs-keyword">if</span> ( object == <span class="hljs-literal">null</span> ) {
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">TypeError</span>( <span class="hljs-string">'can\'t convert '</span> + object + <span class="hljs-string">' to object'</span> );
+    }
 
-  <span class="hljs-keyword">for</span> ( key <span class="hljs-keyword">in</span> object ) {
-    <span class="hljs-keyword">if</span> ( object.hasOwnProperty( key ) ) {
-      return_value = iterator.call( context, object[ key ], key, object );
-      <span class="hljs-keyword">if</span>( return_value === <span class="hljs-literal">false</span> ){
-        <span class="hljs-keyword">break</span>;
+    object = <span class="hljs-built_in">Object</span>( object );
+
+    <span class="hljs-keyword">for</span> ( key <span class="hljs-keyword">in</span> object ) {
+      <span class="hljs-keyword">if</span> ( object.hasOwnProperty( key ) ) {
+        return_value = iterator.call( context, object[ key ], key, object );
+        <span class="hljs-keyword">if</span> ( return_value === <span class="hljs-literal">false</span> ) {
+          <span class="hljs-keyword">break</span>;
+        }
       }
     }
-  }
-},
+  },
 </pre></div>
       
       </div>
@@ -365,7 +340,7 @@ used in favor of the composition of <em>Array#forEach</em> and <em>Object.keys</
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="regular-expressions"><a href="#regular-expressions" class="anchor"></a>regular expressions</h1></div>
+          <div class="wrapper"><h2 id="regular-expressions"><a href="#regular-expressions" class="anchor"></a>regular expressions</h2></div>
         </div>
       
       
@@ -379,7 +354,7 @@ used in favor of the composition of <em>Array#forEach</em> and <em>Object.keys</
         </div>
       
       
-        <div class="code"><pre class="wrapper">re_source_matches_end = regex = <span class="hljs-regexp">/[^\\]\$$/</span>,
+        <div class="code"><pre class="wrapper">  re_source_matches_end = regex = <span class="hljs-regexp">/[^\\]\$$/</span>,
 </pre></div>
       
       </div>
@@ -387,7 +362,7 @@ used in favor of the composition of <em>Array#forEach</em> and <em>Object.keys</
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h2 id="the-whitespace-shim"><a href="#the-whitespace-shim" class="anchor"></a>the whitespace shim</h2><p>native implementations of <em>String#trim</em> might miss out
+          <div class="wrapper"><h3 id="the-whitespace-shim"><a href="#the-whitespace-shim" class="anchor"></a>the whitespace shim</h3><p>native implementations of <em>String#trim</em> might miss out
 on some of the more exotic characters considered <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.2">whitespace</a>,
 <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-7.3">line terminators</a> or the mysterious <a href="http://www.fileformat.info/info/unicode/category/Zs/list.html">&quot;Zs&quot;</a>.
 this section detects those flaws and constructs the regular expressions used
@@ -406,41 +381,39 @@ their associated methods as <em>to be shimmed</em></li>
         </div>
       
       
-        <div class="code"><pre class="wrapper">re_no_whitespace = <span class="hljs-regexp">/\S/</span>,
-re_trim_left     = <span class="hljs-regexp">/^\s\s*/</span>,
-re_trim_right    = <span class="hljs-regexp">/\s*\s$/</span>,
-re_linebreaks    = <span class="hljs-regexp">/\n|\r(?!\n)|\u2028|\u2029|\r\n/g</span>;
+        <div class="code"><pre class="wrapper">  re_no_whitespace = <span class="hljs-regexp">/\S/</span>,
+  re_whitespaces = <span class="hljs-regexp">/\s\s*/g</span>,
+  re_trim_left = <span class="hljs-regexp">/^\s\s*/</span>,
+  re_trim_right = <span class="hljs-regexp">/\s*\s$/</span>,
+  re_linebreaks = <span class="hljs-regexp">/\r?\n)|\u2028|\u2029/g</span>;
 
-(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+( <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
 
-  <span class="hljs-keyword">var</span>
+  <span class="hljs-keyword">var</span> is_spec_compliant = <span class="hljs-literal">true</span>,
+    re_whitespace = <span class="hljs-regexp">/\s/</span>,
+    re_whitespace_source = re_whitespace.source,
 
-  is_spec_compliant = <span class="hljs-literal">true</span>,
-  re_whitespace = <span class="hljs-regexp">/\s/</span>,
-  re_whitespace_source = re_whitespace.source,
+    whitespace = ( <span class="hljs-string">''</span> + <span class="hljs-string">'\t'</span> <span class="hljs-comment">// '\u0009' tab</span>
+      + <span class="hljs-string">'\n'</span> <span class="hljs-comment">// '\u000A' line feed</span>
+      + <span class="hljs-string">'\13'</span> <span class="hljs-comment">// '\u000B' vertical tab</span>
+      + <span class="hljs-string">'\f'</span> <span class="hljs-comment">// '\u000C' form feed</span>
+      + <span class="hljs-string">'\r'</span> <span class="hljs-comment">// '\u000D' carriage return</span>
+      + <span class="hljs-string">' '</span> <span class="hljs-comment">// '\u0020' space</span>
 
-  whitespace = (<span class="hljs-string">''</span>
-  + <span class="hljs-string">'\t'</span>  <span class="hljs-comment">// '\u0009' tab</span>
-  + <span class="hljs-string">'\n'</span>  <span class="hljs-comment">// '\u000A' line feed</span>
-  + <span class="hljs-string">'\13'</span> <span class="hljs-comment">// '\u000B' vertical tab</span>
-  + <span class="hljs-string">'\f'</span>  <span class="hljs-comment">// '\u000C' form feed</span>
-  + <span class="hljs-string">'\r'</span>  <span class="hljs-comment">// '\u000D' carriage return</span>
-  + <span class="hljs-string">' '</span>   <span class="hljs-comment">// '\u0020' space</span>
+      + <span class="hljs-string">'\xA0'</span> <span class="hljs-comment">// NBSP</span>
+      + <span class="hljs-string">'\u1680\u180E\u2000\u2001'</span> <span class="hljs-comment">// prevent</span>
+      + <span class="hljs-string">'\u2002\u2003\u2004\u2005'</span> <span class="hljs-comment">// formatter</span>
+      + <span class="hljs-string">'\u2006\u2007\u2008\u2009'</span> <span class="hljs-comment">// from</span>
+      + <span class="hljs-string">'\u200A\u202F\u205F\u3000'</span> <span class="hljs-comment">// mangling</span>
 
-  + <span class="hljs-string">'\xA0'</span> <span class="hljs-comment">// NBSP</span>
-  + <span class="hljs-string">'\u1680\u180E\u2000\u2001'</span>
-  + <span class="hljs-string">'\u2002\u2003\u2004\u2005'</span>
-  + <span class="hljs-string">'\u2006\u2007\u2008\u2009'</span>
-  + <span class="hljs-string">'\u200A\u202F\u205F\u3000'</span>
-
-  + <span class="hljs-string">'\u2028'</span> <span class="hljs-comment">// line separator</span>
-  + <span class="hljs-string">'\u2029'</span> <span class="hljs-comment">// paragraph separator</span>
-  + <span class="hljs-string">'\uFEFF'</span> <span class="hljs-comment">// BOM - byte order mark</span>
-  );
+      + <span class="hljs-string">'\u2028'</span> <span class="hljs-comment">// line separator</span>
+      + <span class="hljs-string">'\u2029'</span> <span class="hljs-comment">// paragraph separator</span>
+      + <span class="hljs-string">'\uFEFF'</span> <span class="hljs-comment">// BOM - byte order mark</span>
+    );
 
   array_forEach.call( whitespace, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( chr )</span> {</span> <span class="hljs-comment">// Array#forEach is generic</span>
 
-    <span class="hljs-keyword">if</span> ( !re_whitespace.test( chr ) ){
+    <span class="hljs-keyword">if</span> ( !re_whitespace.test( chr ) ) {
       re_whitespace_source += chr;
       is_spec_compliant = <span class="hljs-literal">false</span>;
     }
@@ -451,12 +424,15 @@ re_linebreaks    = <span class="hljs-regexp">/\n|\r(?!\n)|\u2028|\u2029|\r\n/g</
 
     shim_methods.push( <span class="hljs-string">'trim'</span>, <span class="hljs-string">'trimRight'</span>, <span class="hljs-string">'trimLeft'</span> );
 
+    <span class="hljs-keyword">var</span> re_whitespaces_source = <span class="hljs-string">'['</span> + re_whitespace_source + <span class="hljs-string">']['</span> + re_whitespace_source + <span class="hljs-string">']*'</span>;
+
     re_no_whitespace = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>( <span class="hljs-string">'[^'</span> + re_whitespace_source + <span class="hljs-string">']'</span> );
-    re_trim_left     = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>( <span class="hljs-string">'^['</span> + re_whitespace_source + <span class="hljs-string">']['</span> + re_whitespace_source + <span class="hljs-string">']*'</span> );
-    re_trim_right    = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>( <span class="hljs-string">'['</span> + re_whitespace_source + <span class="hljs-string">']*['</span> + re_whitespace_source + <span class="hljs-string">']$'</span> );
+    re_whitespaces = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>( re_whitespaces_source, <span class="hljs-string">'g'</span> );
+    re_trim_left = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>( <span class="hljs-string">'^'</span> + re_whitespaces_source );
+    re_trim_right = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>( <span class="hljs-string">'['</span> + re_whitespace_source + <span class="hljs-string">']+$'</span> );
   }
 
-}());
+}() );
 </pre></div>
       
       </div>
@@ -479,7 +455,45 @@ mark as <em>to be shimmed</em> if it doesn&#39;t.</p>
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="type-safety"><a href="#type-safety" class="anchor"></a>type safety</h1><p>the inner module <code>is</code> holds type checks. this is an excerpt from
+          <div class="wrapper"><h2 id="custom-exit"><a href="#custom-exit" class="anchor"></a>custom exit</h2><p>wraps the process of throwing an <em>Error</em>.
+in <em>DEBUG</em> mode composes the error&#39;s message
+of the custom <em>Stryng</em> function&#39;s <code>_name</code> property
+and the arguments passed i.e. logs the stacktrace of the level above.</p>
+<ul>
+<li>get the <code>caller</code> function</li>
+<li>stringify its arguments</li>
+<li>throw the error with the custom message</li>
+</ul>
+</div>
+        </div>
+      
+      
+        <div class="code"><pre class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">exit</span><span class="hljs-params">( message )</span> {</span>
+  <span class="hljs-keyword">if</span> ( DEBUG ) {
+
+    <span class="hljs-keyword">var</span>
+    args = <span class="hljs-string">''</span>,
+      caller = <span class="hljs-built_in">arguments</span>.callee.caller,
+      message = <span class="hljs-string">'invalid usage of Stryng.'</span> + caller._name + <span class="hljs-string">'() with args ['</span>;
+
+    array_forEach.call( caller.arguments, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( arg )</span> {</span>
+      args += arg + <span class="hljs-string">', '</span>
+    } );
+
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>( message + ( args ? args.slice( <span class="hljs-number">0</span>, -<span class="hljs-number">2</span> ) : <span class="hljs-string">''</span> ) + <span class="hljs-string">']. '</span> + ( message || <span class="hljs-string">''</span> ) );
+
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>( <span class="hljs-string">'invalid usage of Stryng member. '</span> + ( message || <span class="hljs-string">''</span> ) );
+  }
+}
+</pre></div>
+      
+      </div>
+    
+      <div class="segment">
+      
+        <div class="comments ">
+          <div class="wrapper"><h2 id="type-safety"><a href="#type-safety" class="anchor"></a>type safety</h2><p>the inner module <code>is</code> holds type checks. this is an excerpt from
 my <a href="https://gist.github.com/esnippo/9960508">gist</a> inspired by the
 <a href="http://jquery.com">jQuery</a> and <a href="http://underscorejs.org">underscore</a> libraries.</p>
 <ul>
@@ -515,86 +529,16 @@ is.Array = <span class="hljs-built_in">Array</span>.isArray || is.Array;
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="utility-functions"><a href="#utility-functions" class="anchor"></a>utility functions</h1><h2 id="tointeger"><a href="#tointeger" class="anchor"></a>toInteger</h2><p>fully <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.4">spec</a> compliant
-implementation of <code>toInteger</code>, tested and benchmarked at <a href="http://jsperf.com/to-integer/11">jsperf</a>.</p>
-<ol>
-<li>let number be the result of calling <code>toNumber</code> on the input argument.</li>
-<li>if number is <code>NaN</code>, return <code>+0</code>.</li>
-<li>if number is <code>+0</code>, <code>−0</code>, <code>+Infinity</code>, or <code>−Infinity</code>, return number i.e. leave zeros and infinites untouched</li>
-<li>Rireturn the result of computing <code>sign(number) × floor(abs(number))</code> i.e. ceil negatives, floor positives
-in the following scenarios calling <code>toInteger</code> can be replaced with faster inline comparisons:<h3 id="isnegative"><a href="#isnegative" class="anchor"></a>isNegative</h3><pre><code>var x = -<span class="hljs-number">0</span>.<span class="hljs-number">5</span>;
-x &lt; <span class="hljs-number">0</span>; <span class="hljs-regexp">//</span> yields <span class="hljs-keyword">true</span>
-toInteger( x ) &lt; <span class="hljs-number">0</span>; <span class="hljs-regexp">//</span> yields <span class="hljs-keyword">false</span> because it ceils negative values <span class="hljs-keyword">and</span> hence compares <span class="hljs-number">0</span> &lt; <span class="hljs-number">0</span>
-</code></pre>the faster equivalent of the above <code>toInteger</code> call and comparison is<pre><code><span class="hljs-attribute">x &lt;</span>=<span class="hljs-string"> -1;</span>
-</code></pre><h3 id="isnotfinite"><a href="#isnotfinite" class="anchor"></a>isNotFinite</h3><pre><code>toInteger( <span class="hljs-string">'Infinity'</span> ) == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
-toInteger( <span class="hljs-literal">Infinity</span> ) == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
-toInteger( <span class="hljs-number">1</span>/<span class="hljs-number">0</span> ) == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
-</code></pre>the above expressions are the only ones evaluated to <code>Infinity</code>.
-However, since <code>toInteger</code> uses <code>toNumber</code> internally and simply returns
-results <code>+0</code>, <code>−0</code>, <code>+Infinity</code> and <code>−Infinity</code> of <code>toNumber</code> you may equally use<pre><code><span class="hljs-string">'Infinity'</span> == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
-<span class="hljs-literal">Infinity</span> == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
-<span class="hljs-number">1</span>/<span class="hljs-number">0</span> == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
-</code></pre>to spare another function call. same goes for <code>-Infinity</code>.<h3 id="apply-zero-as-minimum"><a href="#apply-zero-as-minimum" class="anchor"></a>apply zero as minimum</h3>instead of<pre><code><span class="hljs-setting">x = <span class="hljs-value">toInteger( x );</span></span>
-<span class="hljs-setting">x = <span class="hljs-value">Math.min( <span class="hljs-number">0</span>, x );</span></span>
-</code></pre>you may equally do<pre><code><span class="hljs-attribute">x </span>=<span class="hljs-string"> x &lt; 0 ? 0 : Math.floor( x ) || 0;</span>
-</code></pre>where the last bit zeros <code>NaN</code>.
-worth a zealot&#39;s blog post..</li>
-</ol>
-</div>
+          <div class="wrapper"><h1 id="defining-stryng"><a href="#defining-stryng" class="anchor"></a>defining Stryng</h1></div>
         </div>
       
-      
-        <div class="code"><pre class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">toInteger</span><span class="hljs-params">( any )</span> {</span>
-  <span class="hljs-keyword">return</span> (
-    ( n = +n ) &amp;&amp; <span class="hljs-built_in">isFinite</span>( n ) <span class="hljs-comment">// toNumber and isFinite</span>
-    ? n - ( n % <span class="hljs-number">1</span> ) <span class="hljs-comment">// ceil negatives, floor positives</span>
-    : n || <span class="hljs-number">0</span> <span class="hljs-comment">// leave be +-Infinity, translate NaN to zero</span>
-  );
-}
-</pre></div>
       
       </div>
     
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h2 id="exit"><a href="#exit" class="anchor"></a>exit</h2><p>wraps the process of throwing an <em>Error</em>.
-in <em>DEBUG</em> mode composes the error&#39;s message
-of the custom <em>Stryng</em> function&#39;s <code>_name</code> property
-and the arguments passed i.e. logs the stacktrace of the level above.</p>
-<ul>
-<li>get the <code>caller</code> function</li>
-<li>stringify its arguments</li>
-<li>throw the error with the custom message</li>
-</ul>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">exit</span><span class="hljs-params">( message )</span> {</span>
-  <span class="hljs-keyword">if</span>( DEBUG ){
-
-    <span class="hljs-keyword">var</span>
-      args    = <span class="hljs-string">''</span>,
-      caller  = <span class="hljs-built_in">arguments</span>.callee.caller,
-      message = <span class="hljs-string">'invalid usage of Stryng.'</span> + caller._name + <span class="hljs-string">'() with args ['</span>;
-
-    array_forEach.call( caller.arguments, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( arg )</span> {</span> args += arg + <span class="hljs-string">', '</span> } );
-
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>( message + ( args ? args.slice( <span class="hljs-number">0</span>, -<span class="hljs-number">2</span> ) : <span class="hljs-string">''</span> ) + <span class="hljs-string">']. '</span> + ( message || <span class="hljs-string">''</span> ) );
-
-  } <span class="hljs-keyword">else</span> {
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>( <span class="hljs-string">'invalid usage of Stryng member. '</span> + (message || <span class="hljs-string">''</span>) );
-  }
-}
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><h1 id="class-constructor"><a href="#class-constructor" class="anchor"></a>class constructor</h1></div>
+          <div class="wrapper"><h2 id="constructor"><a href="#constructor" class="anchor"></a>constructor</h2></div>
         </div>
       
       
@@ -616,7 +560,7 @@ and the arguments passed i.e. logs the stacktrace of the level above.</p>
         </div>
       
       
-        <div class="code"><pre class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Stryng</span><span class="hljs-params">( value , is_mutable )</span> {</span>
+        <div class="code"><pre class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Stryng</span><span class="hljs-params">( value, is_mutable )</span> {</span>
 </pre></div>
       
       </div>
@@ -654,7 +598,7 @@ and the arguments passed i.e. logs the stacktrace of the level above.</p>
       
         <div class="comments doc-section">
           <div class="wrapper"><p><span class='doc-section-header'>
- name Stryng~<em>isMutable and of type _boolean</em>
+ name Stryng~<em>is_mutable and of type _boolean</em>
 </span></p>
 <p>whether the created instance should be mutable or
 create a new instance from the result of every method call</p>
@@ -662,7 +606,7 @@ create a new instance from the result of every method call</p>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  <span class="hljs-keyword">this</span>._isMutable = !!is_mutable;
+        <div class="code"><pre class="wrapper">  <span class="hljs-keyword">this</span>._is_mutable = !! is_mutable;
 </pre></div>
       
       </div>
@@ -699,18 +643,18 @@ if available, simply set onto the instance otherwise.</p>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><h1 id="cloning-mutables"><a href="#cloning-mutables" class="anchor"></a>cloning mutables</h1><p>in case the instance was not constructed to be mutable
+          <div class="wrapper"><h2 id="cloning-mutables"><a href="#cloning-mutables" class="anchor"></a>cloning mutables</h2><p>in case the instance was not constructed to be mutable
 this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#constructor</a></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>is_mutable</code> is optional, must be a boolean, and has a default value of false.</strong><br/>(whether the cloned instance should be mutable or create a new instance from the result of every method call)</li>
+<li><strong><code>is_mutable</code> is optional, must be a boolean, and has a default value of false.</strong><br/>(whether the cloned instance should be mutable or create a new instance from the internal result of every method call)</li>
 </ul>
 <p><strong>Returns a Stryng</strong><br/>(- a copy of the <em>Stryng</em> instance)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">Stryng.prototype.clone = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( is_mutable )</span>{</span>
+        <div class="code"><pre class="wrapper">Stryng.prototype.clone = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( is_mutable )</span> {</span>
   <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Stryng( <span class="hljs-keyword">this</span>._value, is_mutable );
 };
 </pre></div>
@@ -720,13 +664,13 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="instance-amp-static-functions"><a href="#instance-amp-static-functions" class="anchor"></a>instance &amp; static functions</h1><p>the herein defined methods will be available as both
+          <div class="wrapper"><h2 id="instance-methods-amp-static-functions"><a href="#instance-methods-amp-static-functions" class="anchor"></a>instance methods &amp; static functions</h2><p>the herein defined methods will be available as both
 static functions on the <code>Stryng</code> namespace and instance methods
 of the <code>Stryng</code> class. they are declared as static but <strong>documented as
 instance methods</strong>, which makes it a lot shorter, less verbose and
 easier to highlight the fact that all instance methods are availabe
 as static ones but <strong>not vice versa</strong>. the one exception to this is <a href="#clone">Stryng#clone</a>
-which only licves on <em>Stryng</em>&#39;s prototype.</p>
+which only lives on <em>Stryng</em>&#39;s prototype.</p>
 </div>
         </div>
       
@@ -751,32 +695,6 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p>TODO: support diacritics and ligatures</p>
-<p><strong>Returns a string</strong><br/>(- input with first letter upper-cased.)</p>
-<p>Example:</p>
-<pre><code><span class="hljs-constant">Stryng</span>.capitalize(<span class="hljs-string">'foo'</span>); <span class="hljs-regexp">//</span> yields <span class="hljs-string">"Foo"</span>
-</code></pre></div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  capitalize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
-    input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
-
-    <span class="hljs-keyword">var</span> length = input.length;
-
-    <span class="hljs-keyword">return</span> (
-      !length ? input :
-      length === <span class="hljs-number">1</span> ? input.toUpperCase() :
-      input.charAt( <span class="hljs-number">0</span> ).toUpperCase() + input.substring( <span class="hljs-number">1</span> )
-    );
-  },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
           <div class="wrapper"><p>shim for native <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.20">String#trim</a></p>
 <p><strong>Returns a string</strong></p>
 </div>
@@ -786,8 +704,8 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
         <div class="code"><pre class="wrapper">  trim: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
     <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ?
       <span class="hljs-built_in">String</span>( input )
-      .replace( reTrimLeft, <span class="hljs-string">''</span> )
-      .replace( reTrimRight, <span class="hljs-string">''</span> ) : exit();
+      .replace( re_trim_left, <span class="hljs-string">''</span> )
+      .replace( re_trim_right, <span class="hljs-string">''</span> ) : exit();
   },
 </pre></div>
       
@@ -803,7 +721,7 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
       
       
         <div class="code"><pre class="wrapper">  trimLeft: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
-    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).replace( reTrimLeft, <span class="hljs-string">''</span> ) : exit();
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).replace( re_trim_left, <span class="hljs-string">''</span> ) : exit();
   },
 </pre></div>
       
@@ -819,7 +737,7 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
       
       
         <div class="code"><pre class="wrapper">  trimRight: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
-    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).replace( reTrimRight, <span class="hljs-string">''</span> ) : exit();
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).replace( re_trim_right, <span class="hljs-string">''</span> ) : exit();
   },
 </pre></div>
       
@@ -831,16 +749,16 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
           <div class="wrapper"><p>shim for native <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/contains">String#contains</a></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>searchString</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong></li>
+<li><strong><code>search</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong></li>
 <li><strong><code>index</code> is optional, must be a number, and has a default value of 0.</strong><br/>(the index to start searching)</li>
 </ul>
-<p><strong>Returns a boolean</strong><br/>(- whether or not <code>input</code> contains the substring <code>searchString</code>)</p>
+<p><strong>Returns a boolean</strong><br/>(- whether or not <code>input</code> contains the substring <code>search</code>)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  contains: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, searchString, start )</span> {</span>
-    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).indexOf( searchString, start ) !== -<span class="hljs-number">1</span> : exit();
+        <div class="code"><pre class="wrapper">  contains: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, search, start )</span> {</span>
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).indexOf( search, start ) !== -<span class="hljs-number">1</span> : exit();
   },
 </pre></div>
       
@@ -852,15 +770,15 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
           <div class="wrapper"><p>shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.startswith">String#startsWith</a></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>searchString</code> is optional, can be a string or a RegExp, and has a default value of &quot;undefined&quot;.</strong></li>
+<li><strong><code>search</code> is optional, can be a string or a RegExp, and has a default value of &quot;undefined&quot;.</strong></li>
 <li><strong><code>position</code> is optional, must be a number, and has a default value of 0.</strong></li>
 </ul>
-<p><strong>Returns a boolean</strong><br/>(- whether or not <code>input</code> at index <code>position</code> begins with substring <code>searchString</code>)</p>
+<p><strong>Returns a boolean</strong><br/>(- whether or not <code>input</code> at index <code>position</code> begins with substring <code>search</code>)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  startsWith: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, searchString, position )</span> {</span>
+        <div class="code"><pre class="wrapper">  startsWith: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, search, position )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 </pre></div>
       
@@ -870,11 +788,11 @@ which only licves on <em>Stryng</em>&#39;s prototype.</p>
       
         <div class="comments ">
           <div class="wrapper"><ul>
-<li>if <code>searchString</code> is a regular expression,
+<li>if <code>search</code> is a regular expression,
 return whether or not it matches the beginning of
 this&#39; string starting at <code>position</code>.</li>
-<li>let <code>i</code> be the index returned by <em>String#indexOf</em>.
-let <code>position</code> and <code>searchString</code> be parsed correctly internally</li>
+<li>otherwise let <code>i</code> be the index returned by <em>String#indexOf</em>.
+let <code>position</code> and <code>search</code> be parsed correctly internally</li>
 <li>return <code>false</code> if not found i.e. <code>i === -1</code></li>
 <li>let <code>input_len</code> be this&#39; string&#39;s length</li>
 <li>parse the <code>position</code> argument by the following rules<ul>
@@ -889,11 +807,12 @@ let <code>position</code> and <code>searchString</code> be parsed correctly inte
         </div>
       
       
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span>( is.RegExp( searchString ) ){
-      <span class="hljs-keyword">return</span> !input.substring( position ).search( searchString );
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( is.RegExp( search ) ) {
+      <span class="hljs-keyword">return</span> !input.substring( position ).search( search );
     }
 
-    <span class="hljs-keyword">var</span> i = input.indexOf( searchString, position ), input_len;
+    <span class="hljs-keyword">var</span> i = input.indexOf( search, position ),
+      input_len;
 
     <span class="hljs-keyword">if</span> ( i === -<span class="hljs-number">1</span> ) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 
@@ -914,15 +833,15 @@ let <code>position</code> and <code>searchString</code> be parsed correctly inte
           <div class="wrapper"><p>shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.endswith">String#endsWith</a></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>searchString</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong></li>
-<li><strong><code>endPosition</code> is optional, must be a number, and has a default value of input.length.</strong></li>
+<li><strong><code>search</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong></li>
+<li><strong><code>end_position</code> is optional, must be a number, and has a default value of input.length.</strong></li>
 </ul>
-<p><strong>Returns a boolean</strong><br/>(- whether or not <code>input</code> truncated by <code>endPosition</code> ends with substring <code>searchString</code>.)</p>
+<p><strong>Returns a boolean</strong><br/>(- whether or not <code>input</code> truncated by <code>end_position</code> ends with substring <code>search</code>.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  endsWith: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, searchString, endPosition )</span> {</span>
+        <div class="code"><pre class="wrapper">  endsWith: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, search, end_position )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 </pre></div>
       
@@ -933,54 +852,52 @@ let <code>position</code> and <code>searchString</code> be parsed correctly inte
         <div class="comments ">
           <div class="wrapper"><ul>
 <li>let <code>input_len</code> be this&#39; string&#39;s length</li>
-<li>parse the <code>endPosition</code> argument by the following rules<ul>
+<li>parse the <code>end_position</code> argument by the following rules<ul>
 <li>default and max to <code>input_len</code></li>
 <li>min to zero</li>
 <li>floor if parsable, zero if <code>NaN</code></li>
 </ul>
 </li>
-<li>if <code>searchString</code> is a regular expression<ul>
+<li>if <code>search</code> is a regular expression<ul>
 <li>throw an error if the regular expression does not match the
 end of its input i.e. does not end with <code>&#39;$&#39;</code></li>
-<li>truncate this&#39; string at <code>endPosition</code></li>
-<li>return whether or not <code>searchString</code> matches the above&#39;s result</li>
+<li>truncate this&#39; string at <code>end_position</code></li>
+<li>return whether or not <code>search</code> matches the above&#39;s result</li>
 </ul>
 </li>
-<li>let <code>i</code> be the index returned by <em>String#lastIndexOf</em>.
-let <code>position</code> and <code>searchString</code> be parsed correctly internally</li>
+<li>otherwise let <code>i</code> be the index returned by <em>String#lastIndexOf</em>.
+let <code>position</code> and <code>search</code> be parsed correctly internally</li>
 <li>return <code>false</code> if not found i.e. <code>i === -1</code></li>
-<li>parse the <code>endPosition</code> argument as described above</li>
 <li>return whether or not <code>i</code> equals the above&#39;s result</li>
 </ul>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">var</span>
-      input_len = input.length, i,
-      endPosition = (
-        endPosition === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> || endPosition &gt; input_len ? input_len :
-        endPosition &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> :
-        Math_floor( endPosition ) || <span class="hljs-number">0</span>
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">var</span> input_len = input.length,
+      i,
+      end_position = (
+        end_position === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> || end_position &gt; input_len ? input_len :
+        end_position &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> :
+        Math_floor( end_position ) || <span class="hljs-number">0</span>
       );
 
-    <span class="hljs-keyword">if</span>( is.RegExp( searchString ) ){
-      
-      <span class="hljs-keyword">var</span> re_source = searchString.source;
-      <span class="hljs-keyword">if</span>( !re_source_matches_end.test( re_source ) ){
-        exit(<span class="hljs-string">'"searchString" must match end i.e. end with "$"'</span>);
+    <span class="hljs-keyword">if</span> ( is.RegExp( search ) ) {
+
+      <span class="hljs-keyword">if</span> ( !re_source_matches_end.test( search.source ) ) {
+        exit( <span class="hljs-string">'"search" must match end i.e. end with "$"'</span> );
       }
 
-      <span class="hljs-keyword">return</span> searchString.test( input.substring( <span class="hljs-number">0</span>, endPosition ) );
+      <span class="hljs-keyword">return</span> search.test( input.substring( <span class="hljs-number">0</span>, end_position ) );
     }
 
-    searchString = <span class="hljs-built_in">String</span>( searchString );
+    search = <span class="hljs-built_in">String</span>( search );
 
-    <span class="hljs-keyword">if</span> ( !searchString ) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">if</span> ( !search ) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 
-    i = input.lastIndexOf( searchString, endPosition );
-      
-    <span class="hljs-keyword">return</span> i !== -<span class="hljs-number">1</span> &amp;&amp; ( i + searchString.length === endPosition );
+    i = input.lastIndexOf( search, end_position );
+
+    <span class="hljs-keyword">return</span> i !== -<span class="hljs-number">1</span> &amp;&amp; ( i + search.length === end_position );
   },
 </pre></div>
       
@@ -995,14 +912,14 @@ reduction of concat operations inspired by <a href="https://github.com/mout/mout
 <ul>
 <li><strong><code>n</code> is optional, must be a number, and has a default value of 0.</strong></li>
 </ul>
-<p><strong>Returns a string</strong><br/>(- this&#39; string <code>n</code> times concatenated to the empty string.)<br/><strong>and</strong> If <code>toInteger( n )</code> is either negative or infinite.</p>
+<p><strong>Returns a string</strong><br/>(- this&#39; string <code>n</code> times concatenated to the empty string.)<br/><strong>and</strong> If <code>Number_toInteger( n )</code> is either negative or infinite.</p>
 </div>
         </div>
       
       
         <div class="code"><pre class="wrapper">  repeat: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, n )</span> {</span>
     <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || n &lt;= -<span class="hljs-number">1</span> || n == INFINITY ) exit();
-    
+
     n = n &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( n ) || <span class="hljs-number">0</span>;
 
     <span class="hljs-keyword">var</span> result = <span class="hljs-string">''</span>;
@@ -1026,15 +943,15 @@ reduction of concat operations inspired by <a href="https://github.com/mout/mout
           <div class="wrapper"><p>shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.substr">String#substr</a></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>start</code> is optional, must be a number, and has a default value of 0.</strong></li>
-<li><strong><code>length</code> must be a number and has a default value of this&#39;.</strong><br/>(length - start])</li>
+<li><strong><code>position</code> is optional, must be a number, and has a default value of 0.</strong></li>
+<li><strong><code>length</code> is optional, must be a number, and has a default value of length-position.</strong><br/>(this&#39; string&#39;s length minus <code>position</code>)</li>
 </ul>
 <p><strong>Returns a string</strong></p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  substr: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, start, length )</span> {</span>
+        <div class="code"><pre class="wrapper">  substr: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, position, length )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 </pre></div>
       
@@ -1044,9 +961,9 @@ reduction of concat operations inspired by <a href="https://github.com/mout/mout
       
         <div class="comments ">
           <div class="wrapper"><ul>
-<li>parse the <code>start</code> argument.<ul>
-<li>if <code>toInteger( start )</code> is negative, add <code>input.length</code></li>
-<li>if it still is negative, set to zero</li>
+<li>parse the <code>position</code> argument.<ul>
+<li>if <code>Number_toInteger( position )</code> is negative, add <code>input.length</code></li>
+<li>if it still is negative, set it to zero</li>
 </ul>
 </li>
 <li>leave it up to <code>substr</code>&#39;s implicit parsing any otherwise</li>
@@ -1055,15 +972,9 @@ reduction of concat operations inspired by <a href="https://github.com/mout/mout
         </div>
       
       
-        <div class="code"><pre class="wrapper">    start = (
-      start &lt;= -<span class="hljs-number">1</span> <span class="hljs-comment">// same as `toInteger( start ) &lt; 0`</span>
-      ? ( start = toInteger( start ) + input.length ) &lt; <span class="hljs-number">0</span>
-      ? <span class="hljs-number">0</span>
-      : start
-      : start
-    );
-    
-    <span class="hljs-keyword">return</span> input.substr( start, length );
+        <div class="code"><pre class="wrapper">    position = position &lt;= -<span class="hljs-number">1</span> ? ( position = Number_toInteger( position ) + input.length ) &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : position : position;
+
+    <span class="hljs-keyword">return</span> input.substr( position, length );
   },
 </pre></div>
       
@@ -1112,17 +1023,17 @@ to do the opposite use <a href="#strip">Stryng.strip</a>.</p>
         <div class="comments doc-section">
           <div class="wrapper"><p>Parameters:</p>
 <ul>
-<li><strong><code>searchString</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong><br/>(substring to search for)</li>
+<li><strong><code>search</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong><br/>(substring to search for)</li>
 </ul>
-<p><strong>Returns a number</strong><br/>(- number of non-overlapping occurrences of <code>searchString</code> within <code>input</code>. the empty string is considered a <em>character boundary</em> thus <code>input.length + 1</code> will always be the result for that.)</p>
+<p><strong>Returns a number</strong><br/>(- number of non-overlapping occurrences of <code>search</code> within <code>input</code>. the empty string is considered a <em>character boundary</em> thus <code>input.length + 1</code> will always be the result for that.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  count: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, searchString )</span> {</span>
+        <div class="code"><pre class="wrapper">  count: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, search )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 
-    searchString = <span class="hljs-built_in">String</span>( searchString );
+    search = <span class="hljs-built_in">String</span>( search );
 </pre></div>
       
       </div>
@@ -1130,19 +1041,18 @@ to do the opposite use <a href="#strip">Stryng.strip</a>.</p>
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><p>early exit for the empty searchString</p>
+          <div class="wrapper"><p>early exit for the empty search</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( !searchString ) <span class="hljs-keyword">return</span> input.length + <span class="hljs-number">1</span>;
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( !search ) <span class="hljs-keyword">return</span> input.length + <span class="hljs-number">1</span>;
 
-    <span class="hljs-keyword">var</span>
-      length = searchString.length,
-      count  = <span class="hljs-number">0</span>,
-      i      = -length; <span class="hljs-comment">// prepare first run</span>
+    <span class="hljs-keyword">var</span> length = search.length,
+      count = <span class="hljs-number">0</span>,
+      i = -length; <span class="hljs-comment">// prepare first run</span>
 
-    <span class="hljs-keyword">do</span> i = input.indexOf( searchString, i + length );
+    <span class="hljs-keyword">do</span> i = input.indexOf( search, i + length );
     <span class="hljs-keyword">while</span> ( i !== -<span class="hljs-number">1</span> &amp;&amp; ++count )
 
     <span class="hljs-keyword">return</span> count;
@@ -1157,22 +1067,22 @@ to do the opposite use <a href="#strip">Stryng.strip</a>.</p>
           <div class="wrapper"><p>delegates to <em>Arrray#join</em>.</p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>joinees</code> is optional, can be a (...<em> or an Array.&lt;</em>&gt;), and has a default value of [.</strong><br/>(] , nestable)</li>
+<li><strong><code>joinees</code> is optional, must be any number of strings, and has a default value of [.</strong><br/>(])</li>
 </ul>
-<p><strong>Returns a string</strong><br/>(- <code>joinees</code> joined by native <code>Array.prototype.join</code>. returns the empty string if no second, third .. argument is passed)</p>
+<p><strong>Returns a string</strong><br/>(- <code>joinees</code> joined by native <code>Array.prototype.join</code>. return the empty string if no second, third .. argument is passed)</p>
 <p>Example:</p>
 <pre><code>Stryng.join(<span class="hljs-string">' '</span>, <span class="hljs-operator">the</span><span class="hljs-string">', ['</span>quick<span class="hljs-string">', ['</span>brown<span class="hljs-string">', ['</span>fox<span class="hljs-string">']]]); // yeilds '</span><span class="hljs-operator">the</span> quick brown fox<span class="hljs-string">'</span>
 </code></pre></div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  join: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( delimiter <span class="hljs-comment">/*, strings... */</span> )</span> {</span>
+        <div class="code"><pre class="wrapper">  join: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( delimiter <span class="hljs-comment">/*, string... */</span> )</span> {</span>
     <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>; <span class="hljs-comment">// promote compression</span>
 
     <span class="hljs-keyword">if</span> ( delimiter == <span class="hljs-literal">null</span> ) exit();
     <span class="hljs-keyword">if</span> ( args.length === <span class="hljs-number">1</span> ) <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
 
-    <span class="hljs-keyword">return</span> array_flatten.call( array_slice.call( <span class="hljs-built_in">arguments</span>, <span class="hljs-number">1</span> ) ).join( delimiter );
+    <span class="hljs-keyword">return</span> array_slice.call( args, <span class="hljs-number">1</span> ).join( delimiter );
   },
 </pre></div>
       
@@ -1181,9 +1091,9 @@ to do the opposite use <a href="#strip">Stryng.strip</a>.</p>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><span class='doc-section-header'>
- deprecated <a href="https://github.com/mathiasbynens/esrever">https://github.com/mathiasbynens/esrever</a>
-</span></p>
+          <div class="wrapper"><p>this is a naive implementation of reversing a string.
+for an alternative that know how to properly reverse
+diacritics and accented character use <a href="https://github.com/mathiasbynens/esrever">esrever</a>.</p>
 <p><strong>Returns a string</strong><br/>(- the reversed string. usefull yet unefficient to verify palindroms.)</p>
 </div>
         </div>
@@ -1227,7 +1137,7 @@ defaults for <code>undefined</code> to the first and second argument</p>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span>( position === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ) position = toInteger( position );
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( position === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ) position = Number_toInteger( position );
 </pre></div>
       
       </div>
@@ -1244,16 +1154,15 @@ defaults for <code>undefined</code> to the first and second argument</p>
   },
 
 
-  iterate: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, delimiter, iterator, context )</span>{</span>
+  iterate: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, delimiter, iterator, context )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
-    
-    <span class="hljs-keyword">var</span>
-      delimiter_len,
-      rest = input,
+
+    <span class="hljs-keyword">var</span> delimiter_len,
       matches,
       match,
       groups = <span class="hljs-literal">null</span>,
-      preceding,
+      head,
+      tail = input,
       index,
       lastIndex = <span class="hljs-number">0</span>,
       global_index = <span class="hljs-number">0</span>;
@@ -1265,13 +1174,12 @@ defaults for <code>undefined</code> to the first and second argument</p>
       
         <div class="comments ">
           <div class="wrapper"><ul>
-<li>let <code>rest</code> be this&#39;s string</li>
-<li>try to find/match argument <code>delimiter</code> in/on <code>rest</code></li>
+<li>let <code>tail</code> be this&#39;s string</li>
+<li>try to find/match argument <code>delimiter</code> in/on <code>tail</code></li>
 <li>let <code>match</code> either be the <code>delimiter</code> or the
 substring matched by the regular expression</li>
-<li>if found, call argument <code>iterator</code> within the context
-of argument <code>context</code> and pass arguments<ul>
-<li>the substring of this&#39; string preceding <code>match</code></li>
+<li>if found, call argument <code>iterator</code> on <code>context</code> and pass arguments<ul>
+<li>the substring of this&#39; string head <code>match</code></li>
 <li><code>match</code> itself</li>
 <li>the captured groups if any, null otherwise</li>
 <li><code>match</code>&#39;s start index</li>
@@ -1279,47 +1187,45 @@ of argument <code>context</code> and pass arguments<ul>
 </ul>
 </li>
 <li>otherwise let <code>lastIndex</code> be <code>match</code>&#39;s start index plus <code>match</code>&#39;s length
-and front-cut <code>rest</code> by that.</li>
+and front-cut <code>tail</code> by that.</li>
 <li>if not found call argument <code>iterator</code> within the context
 of argument <code>context</code> and pass arguments
-[<code>rest</code>, <code>null</code>, <code>null</code>, <code>-1</code>, <code>&#39;&#39;</code>]</li>
+[<code>tail</code>, <code>null</code>, <code>null</code>, <code>-1</code>, <code>&#39;&#39;</code>]</li>
 </ul>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    
-    <span class="hljs-keyword">if</span> ( is.RegExp( delimiter ) ) {
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( is.RegExp( delimiter ) ) {
 
-      <span class="hljs-keyword">while</span>( matches = rest.match( delimiter ) ){
+      <span class="hljs-keyword">while</span> ( matches = tail.match( delimiter ) ) {
         global_index += lastIndex;
-        
-        index     = matches.index;
-        preceding = rest.substring( <span class="hljs-number">0</span>, index );
-        match     = matches.shift();
-        groups    = matches.length ? matches : <span class="hljs-literal">null</span>;
+
+        index = matches.index;
+        head = tail.substring( <span class="hljs-number">0</span>, index );
+        match = matches.shift();
+        groups = matches.length ? matches : <span class="hljs-literal">null</span>;
         lastIndex = index + match.length;
         <span class="hljs-keyword">if</span> ( lastIndex &lt;= index ) lastIndex = index + <span class="hljs-number">1</span>;
-        rest = rest.substring( lastIndex );
-        
-        <span class="hljs-keyword">if</span> ( <span class="hljs-literal">false</span> === iterator.call( context, preceding, match, groups, global_index, rest )) <span class="hljs-keyword">break</span>;
+        tail = tail.substring( lastIndex );
+
+        <span class="hljs-keyword">if</span> ( <span class="hljs-literal">false</span> === iterator.call( context, head, match, groups, global_index, tail ) ) <span class="hljs-keyword">break</span>;
       }
 
     } <span class="hljs-keyword">else</span> {
 
-      delimiter     = <span class="hljs-built_in">String</span>( delimiter );
+      delimiter = <span class="hljs-built_in">String</span>( delimiter );
       delimiter_len = delimiter.length;
 
-      <span class="hljs-keyword">while</span> ( ( index = rest.indexOf( delimiter ) ) !== -<span class="hljs-number">1</span> ){
+      <span class="hljs-keyword">while</span> ( ( index = tail.indexOf( delimiter ) ) !== -<span class="hljs-number">1</span> ) {
         global_index += lastIndex;
-        
-        preceding = rest.substring( <span class="hljs-number">0</span>, index );
-        lastIndex = index + delimiter_len;
-        match     = rest.substring( index, lastIndex );
-        <span class="hljs-keyword">if</span> ( lastIndex &lt;= index ) lastIndex = index + <span class="hljs-number">1</span>;
-        rest = rest.substring( lastIndex );
 
-        <span class="hljs-keyword">if</span> ( <span class="hljs-literal">false</span> === iterator.call( context, preceding, match, groups, global_index, rest )) <span class="hljs-keyword">break</span>;
+        head = tail.substring( <span class="hljs-number">0</span>, index );
+        lastIndex = index + delimiter_len;
+        <span class="hljs-keyword">if</span> ( lastIndex &lt;= index ) lastIndex = index + <span class="hljs-number">1</span>;
+        tail = tail.substring( lastIndex );
+
+        <span class="hljs-keyword">if</span> ( <span class="hljs-literal">false</span> === iterator.call( context, head, delimiter, groups, global_index, tail ) ) <span class="hljs-keyword">break</span>;
       }
     }
     iterator.call( context, rest, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, -<span class="hljs-number">1</span>, <span class="hljs-string">''</span> );
@@ -1334,7 +1240,7 @@ of argument <code>context</code> and pass arguments
           <div class="wrapper"><p>Parameters:</p>
 <ul>
 <li><strong><code>delimiter</code> is optional, can be a string or a RegExp, and has a default value of &quot;undefined&quot;.</strong></li>
-<li><strong><code>n</code> must be a number and has a default value of &lt;Math.pow(2,.</strong><br/>(32) - 1&gt;] maximum number of split operations. as per <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14">ecma-262/5.1</a>)</li>
+<li><strong><code>n</code> is optional, must be a number, and has a default value of Math.pow(2,32)-1.</strong><br/>(maximum number of split operations. as per <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14">ecma-262/5.1</a>)</li>
 </ul>
 <p><strong>Returns a string[]</strong><br/>(- the <code>input</code> split by the given <code>delimiter</code> with anything past the <code>n</code>th occurrence of <code>delimiter</code> untouched yet included in the array.)</p>
 </div>
@@ -1386,16 +1292,17 @@ called on this&#39; string with <code>delimiter</code></li>
       diff;
 
     <span class="hljs-keyword">if</span> ( is.RegExp( delimiter ) ) {
-      <span class="hljs-keyword">while</span> ( n-- &amp;&amp; ( match = input.match( delimiter ))){
+      <span class="hljs-keyword">while</span> ( n-- &amp;&amp; ( match = input.match( delimiter ) ) ) {
         index = match.index;
         result.push( input.substring( <span class="hljs-number">0</span>, index ) );
         lastIndex = index + match.shift().length; <span class="hljs-comment">// mutates `match`</span>
-        <span class="hljs-keyword">if</span> ( lastIndex &lt;= lastIndex ) lastIndex = index + <span class="hljs-number">1</span>; <span class="hljs-comment">// avoid endless loop</span>
+        <span class="hljs-keyword">if</span> ( lastIndex &lt;= index ) lastIndex = index + <span class="hljs-number">1</span>; <span class="hljs-comment">// avoid endless loop</span>
         <span class="hljs-keyword">if</span> ( match.length ) array_push.apply( result, match ); <span class="hljs-comment">// mutate instead of recreate as concat would</span>
         input = input.substring( lastIndex );
       }
       result.push( input ); <span class="hljs-comment">// push what's left</span>
     } <span class="hljs-keyword">else</span> {
+      delimiter = <span class="hljs-built_in">String</span>( delimiter );
       result = input.split( delimiter );
       diff = result.length - n;
       <span class="hljs-keyword">if</span> ( diff &gt; <span class="hljs-number">0</span> ) {
@@ -1416,7 +1323,7 @@ called on this&#39; string with <code>delimiter</code></li>
 <p>Parameters:</p>
 <ul>
 <li><strong><code>delimiter</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong></li>
-<li><strong><code>n</code> must be a number and has a default value of Math.pow(2,.</strong><br/>(32) - 1] maximum number of split operations. defaults to the number of non-overlapping occurrences of <code>delimiter</code>)</li>
+<li><strong><code>n</code> is optional, must be a number, and has a default value of Math.pow(2,32)-1.</strong><br/>(maximum number of split operations. defaults to the number of non-overlapping occurrences of <code>delimiter</code>)</li>
 </ul>
 <p><strong>Returns a string[]</strong><br/>(- the <code>input</code> split by the given <code>delimiter</code> with anything in front of the <code>n</code>th occurrence of <code>delimiter</code> - counting backwards - untouched yet included in the array.)</p>
 </div>
@@ -1435,7 +1342,14 @@ called on this&#39; string with <code>delimiter</code></li>
           <div class="wrapper"><ul>
 <li>parse <code>n</code> with <code>toUInt32</code>, default to <code>Math.pow(2, 32) - 1</code></li>
 <li>return the empty array if <code>n</code> is zero</li>
-<li>let <code>result</code> be the result of <em>String#split</em>
+<li>if <code>delimiter</code> is a regular expression<ul>
+<li>check its source if it matches a string&#39;s end by <code>$</code></li>
+<li>extract <code>n</code> matches using <em>String#match</em> combined with
+subsequently truncating this&#39; string.</li>
+<li>unshift the substrings between the matches and any captured groups to <code>result</code></li>
+</ul>
+</li>
+<li>otherwise let <code>result</code> be the result of <em>String#split</em>
 called on this&#39; string with <code>delimiter</code></li>
 <li>if argument <code>n</code> is lesser than <code>result.length</code><ul>
 <li>remove the first <code>n</code> items from <code>result</code></li>
@@ -1449,16 +1363,40 @@ called on this&#39; string with <code>delimiter</code></li>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    
-    n = ( n === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : n ) &gt;&gt;&gt; <span class="hljs-number">0</span>;
+        <div class="code"><pre class="wrapper">    n = ( n === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : n ) &gt;&gt;&gt; <span class="hljs-number">0</span>;
 
     <span class="hljs-keyword">if</span> ( !n ) <span class="hljs-keyword">return</span> [];
 
-    <span class="hljs-keyword">var</span> result = input.split( delimiter ),
+    <span class="hljs-keyword">var</span> result,
+      index,
+      lastIndex,
+      match,
+      diff;
+
+    <span class="hljs-keyword">if</span> ( is.RegExp( delimiter ) ) {
+
+      <span class="hljs-keyword">if</span> ( !re_source_matches_end.test( delimiter.source ) ) {
+        exit( <span class="hljs-string">'"delimiter" must match end i.e. end with "$"'</span> );
+      }
+
+      <span class="hljs-keyword">while</span> ( n-- &amp;&amp; ( match = input.match( delimiter ) ) ) {
+        index = match.index;
+        lastIndex = index + match.shift().length; <span class="hljs-comment">// mutates `match`</span>
+        result.unshift( input.substring( lastIndex ) );
+        <span class="hljs-keyword">if</span> ( index &gt;= lastIndex ) index = lastIndex - <span class="hljs-number">1</span>; <span class="hljs-comment">// avoid endless loop</span>
+        <span class="hljs-keyword">if</span> ( match.length ) array_unshift.apply( result, match ); <span class="hljs-comment">// mutate instead of recreate as concat would</span>
+        input = input.substring( <span class="hljs-number">0</span>, index );
+      }
+      result.unshift( input ); <span class="hljs-comment">// unshift what's right</span>
+    } <span class="hljs-keyword">else</span> {
+
+      delimiter = <span class="hljs-built_in">String</span>( delimiter );
+      result = input.split( delimiter ),
       diff = result.length - n;
 
-    <span class="hljs-keyword">if</span> ( diff &gt; <span class="hljs-number">0</span> ) {
-      result.unshift( result.splice( <span class="hljs-number">0</span>, diff ).join( delimiter ) );
+      <span class="hljs-keyword">if</span> ( diff &gt; <span class="hljs-number">0</span> ) {
+        result.unshift( result.splice( <span class="hljs-number">0</span>, diff ).join( delimiter ) );
+      }
     }
 
     <span class="hljs-keyword">return</span> result;
@@ -1488,66 +1426,63 @@ called on this&#39; string with <code>delimiter</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><span class='doc-section-header'>
- see Stryng#splitLeft
-</span></p>
-<p>implementation of UNIX&#39;s head command</p>
+          <div class="wrapper"><p>splits a string at the given indices. negative indices are allowed.
+if the resulting substrings overlap, the first one dominates, the latter is front-cut.</p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>n</code> must be a number.</strong><br/>(number of lines to return)</li>
+<li><strong><code>index</code> must be any number of numbers.</strong><br/>(indices to split at. negatives allowed)</li>
 </ul>
-<p><strong>Returns a string[]</strong><br/>(- <code>n</code> lines split from the beginning of this&#39; string)</p>
+<p><strong>Returns a string[]</strong><br/>(- the resulting array of substrings.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  head: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, n )</span>{</span></pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>implies parsing <code>input</code> and <code>n</code></p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">return</span> Stryng.splitLeft( input, re_linebreaks, n );
-  },
+        <div class="code"><pre class="wrapper">  splitAt: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input <span class="hljs-comment">/*, index... */</span> )</span> {</span>
+    input = intput != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 </pre></div>
       
       </div>
     
       <div class="segment">
       
-        <div class="comments doc-section">
-          <div class="wrapper"><p><span class='doc-section-header'>
- see Stryng#splitRight
-</span></p>
-<p>implementation of UNIX&#39;s tail command</p>
-<p>Parameters:</p>
-<ul>
-<li><strong><code>n</code> must be a number.</strong><br/>(number of lines to return)</li>
-</ul>
-<p><strong>Returns a string[]</strong><br/>(- <code>n</code> lines split from the beginning of this&#39; string)</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  tail: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, n )</span>{</span></pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
         <div class="comments ">
-          <div class="wrapper"><p>implies parsing <code>input</code> and <code>n</code></p>
+          <div class="wrapper"><ul>
+<li>for each index<ul>
+<li>if it is negative, add this&#39; string&#39;s length</li>
+<li>apply <code>pending_index</code> of the previous iteration ( initially zero ) as <code>index</code>&#39;s minimum</li>
+<li>push what&#39;s within input between <code>pending_index</code> and <code>index</code> to <code>result</code></li>
+<li>update <code>pending_index</code> for the next iteration</li>
+</ul>
+</li>
+<li>push what&#39;s left to the result and return it.</li>
+</ul>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">return</span> Stryng.splitRight( input, re_linebreaks, n );
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">var</span> input_len = input.length,
+      args = <span class="hljs-built_in">arguments</span>,
+      args_len = args.length,
+      i = <span class="hljs-number">1</span>, <span class="hljs-comment">// skip `input`</span>
+      index = <span class="hljs-number">0</span>,
+      pending_index = <span class="hljs-number">0</span>,
+      result = [];
+
+    <span class="hljs-keyword">for</span> ( ; i &lt; args_len; i++ ) {
+      index = Number_toInteger( args[ i ] );
+      <span class="hljs-keyword">if</span> ( index &lt; <span class="hljs-number">0</span> ) {
+        index += input_len;
+      }
+      <span class="hljs-keyword">if</span> ( index &lt;= pending_index ) {
+        result.push( <span class="hljs-string">''</span> ); <span class="hljs-comment">// faster than slicing the empty string first</span>
+        index = pending_index;
+      } <span class="hljs-keyword">else</span> {
+        result.push( input.slice( pending_index, index ) );
+        pending_index = index;
+      }
+    }
+    result.push( input.substring( index ) );
+    <span class="hljs-keyword">return</span> result;
   },
 </pre></div>
       
@@ -1568,7 +1503,6 @@ called on this&#39; string with <code>delimiter</code></li>
       
         <div class="code"><pre class="wrapper">  exchange: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, replacee, replacement )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
-
     replacee = <span class="hljs-built_in">String</span>( replacee );
     replacement = <span class="hljs-built_in">String</span>( replacement );
 </pre></div>
@@ -1710,26 +1644,27 @@ called on this&#39; string with <code>delimiter</code></li>
       
         <div class="comments doc-section">
           <div class="wrapper"><p><span class='doc-section-header'>
- see Stryng#justRight, Stryng#just
+ see Stryng.justLeft, Stryng.justRight
 </span></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>maxLength</code> must be a number.</strong></li>
-<li><strong><code>padding</code> must be a string.</strong></li>
+<li><strong><code>max_len</code> must be a number.</strong></li>
+<li><strong><code>fill</code> must be a string.</strong></li>
 </ul>
-<p><strong>Returns a string</strong><br/>(- the <code>input</code> with <code>padding</code> prepended as often as needed for <code>input</code> to reach but not exceed a length of <code>maxLength</code>)</p>
+<p><strong>Returns a string</strong><br/>(the <code>input</code> with <code>fill</code> appended as often as needed for <code>input</code> to reach but not exceed a length of <code>max_len</code>. this&#39; string is never truncated.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  justLeft: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, maxLength, padding )</span> {</span>
-    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || maxLength &lt;= -<span class="hljs-number">1</span> || maxLength == INFINITY ) exit();
+        <div class="code"><pre class="wrapper">  just: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, max_len, fill )</span> {</span>
+    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || max_len &lt;= -<span class="hljs-number">1</span> || max_len == INFINITY ) exit();
 
     input = <span class="hljs-built_in">String</span>( input );
-    padding = <span class="hljs-built_in">String</span>( padding );
-    maxLength = toInteger( maxLength );
+    fill = <span class="hljs-built_in">String</span>( fill );
+    max_len = max_len &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( max_len ) || <span class="hljs-number">0</span>;
 
-    <span class="hljs-keyword">var</span> iLength = input.length;
+    <span class="hljs-keyword">var</span> input_len = input.length,
+      fill_len = fill.length * <span class="hljs-number">2</span>; <span class="hljs-comment">// safe, `&lt;&lt; 1` isn't</span>
 </pre></div>
       
       </div>
@@ -1737,17 +1672,65 @@ called on this&#39; string with <code>delimiter</code></li>
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><p>early exit for the empty padding</p>
+          <div class="wrapper"><p>early exit for the empty fill</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( maxLength &lt;= iLength || !padding ) <span class="hljs-keyword">return</span> input;
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( max_len &lt;= input_len || !fill ) <span class="hljs-keyword">return</span> input;
 
-    <span class="hljs-keyword">var</span> pLength = padding.length;
+    <span class="hljs-keyword">while</span> ( input.length + fill_len &lt;= max_len ) {
+      input = fill + input + fill;
+    }
 
-    <span class="hljs-keyword">while</span> ( input.length + pLength &lt;= maxLength ) {
-      input = padding + input;
+    <span class="hljs-keyword">return</span> input;
+  },
+</pre></div>
+      
+      </div>
+    
+      <div class="segment">
+      
+        <div class="comments doc-section">
+          <div class="wrapper"><p><span class='doc-section-header'>
+ see Stryng#justRight, Stryng#just
+</span></p>
+<p>Parameters:</p>
+<ul>
+<li><strong><code>max_len</code> must be a number.</strong></li>
+<li><strong><code>fill</code> must be a string.</strong></li>
+</ul>
+<p><strong>Returns a string</strong><br/>(- the <code>input</code> with <code>fill</code> prepended as often as needed for <code>input</code> to reach but not exceed a length of <code>max_len</code>. this&#39; string is never truncated.)</p>
+</div>
+        </div>
+      
+      
+        <div class="code"><pre class="wrapper">  justLeft: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, max_len, fill )</span> {</span>
+    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || max_len &lt;= -<span class="hljs-number">1</span> || max_len == INFINITY ) exit();
+
+    input = <span class="hljs-built_in">String</span>( input );
+    fill = <span class="hljs-built_in">String</span>( fill );
+    max_len = max_len &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( max_len ) || <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">var</span> input_len = input.length;
+</pre></div>
+      
+      </div>
+    
+      <div class="segment">
+      
+        <div class="comments ">
+          <div class="wrapper"><p>early exit for the empty fill</p>
+</div>
+        </div>
+      
+      
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( max_len &lt;= input_len || !fill ) <span class="hljs-keyword">return</span> input;
+
+    <span class="hljs-keyword">var</span> fill_len = fill.length;
+
+    <span class="hljs-keyword">while</span> ( input.length + fill_len &lt;= max_len ) {
+      input = fill + input;
     }
 
     <span class="hljs-keyword">return</span> input;
@@ -1764,40 +1747,28 @@ called on this&#39; string with <code>delimiter</code></li>
 </span></p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>maxLength</code> must be a number.</strong></li>
-<li><strong><code>padding</code> must be a string.</strong></li>
+<li><strong><code>max_len</code> must be a number.</strong></li>
+<li><strong><code>fill</code> must be a string.</strong></li>
 </ul>
-<p><strong>Returns a string</strong><br/>(the <code>input</code> with <code>padding</code> appended as often as needed for <code>input</code> to reach but not exceed a length of <code>maxLength</code>)</p>
+<p><strong>Returns a string</strong><br/>(the <code>input</code> with <code>fill</code> appended as often as needed for <code>input</code> to reach but not exceed a length of <code>max_len</code>. this&#39; string is never truncated.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  justRight: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, maxLength, padding )</span> {</span>
-    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || maxLength &lt;= -<span class="hljs-number">1</span> || maxLength == INFINITY ) exit();
+        <div class="code"><pre class="wrapper">  justRight: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, max_len, fill )</span> {</span>
+    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || max_len &lt;= -<span class="hljs-number">1</span> || max_len == INFINITY ) exit();
 
     input = <span class="hljs-built_in">String</span>( input );
-    padding = <span class="hljs-built_in">String</span>( padding );
-    maxLength = toInteger( maxLength );
+    fill = <span class="hljs-built_in">String</span>( fill );
+    max_len = max_len &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( max_len ) || <span class="hljs-number">0</span>;
 
-    <span class="hljs-keyword">var</span> iLength = input.length;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>early exit for the empty padding</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( maxLength &lt;= iLength || !padding ) <span class="hljs-keyword">return</span> input;
+    <span class="hljs-keyword">var</span> input_len = input.length
+    fill_len = fill.length;
 
-    <span class="hljs-keyword">var</span> pLength = padding.length;
+    <span class="hljs-keyword">if</span> ( max_len &lt;= input_len || !fill ) <span class="hljs-keyword">return</span> input;
 
-    <span class="hljs-keyword">while</span> ( input.length + pLength &lt;= maxLength ) {
-      input += padding;
+    <span class="hljs-keyword">while</span> ( input.length + fill_len &lt;= max_len ) {
+      input += fill;
     }
 
     <span class="hljs-keyword">return</span> input;
@@ -1809,59 +1780,7 @@ called on this&#39; string with <code>delimiter</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><span class='doc-section-header'>
- see Stryng.justLeft, Stryng.justRight
-</span></p>
-<p>Parameters:</p>
-<ul>
-<li><strong><code>maxLength</code> must be a number.</strong></li>
-<li><strong><code>padding</code> must be a string.</strong></li>
-</ul>
-<p><strong>Returns a string</strong><br/>(the <code>input</code> with <code>padding</code> appended as often as needed for <code>input</code> to reach but not exceed a length of <code>maxLength</code>)</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  just: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, maxLength, padding )</span> {</span>
-    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || maxLength &lt;= -<span class="hljs-number">1</span> || maxLength == INFINITY ) exit();
-
-    input = <span class="hljs-built_in">String</span>( input );
-    padding = <span class="hljs-built_in">String</span>( padding );
-    maxLength = toInteger( maxLength );
-
-    <span class="hljs-keyword">var</span> iLength = input.length;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>early exit for the empty padding</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( maxLength &lt;= iLength || !padding ) <span class="hljs-keyword">return</span> input;
-
-    <span class="hljs-keyword">var</span> pLength = padding.length &lt;&lt; <span class="hljs-number">1</span>; <span class="hljs-comment">// fast double</span>
-
-    <span class="hljs-keyword">while</span> ( input.length + pLength &lt;= maxLength ) {
-      input = padding + input + padding;
-    }
-
-    <span class="hljs-keyword">return</span> input;
-  },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
-          <div class="wrapper"><p>strips <code>prefix</code> from the left of <code>input</code>
-<code>n</code> times. to strip <code>prefix</code> as long
-as it remains a prefix to the result, pass <code>Infinity</code> or <code>INFINITY</code>.</p>
+          <div class="wrapper"><p>strips <code>prefix</code> from the left of <code>input</code> <code>n</code> times.</p>
 <p>Parameters:</p>
 <ul>
 <li><strong><code>prefix</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong><br/>(string to remove)</li>
@@ -1870,9 +1789,9 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>INFINI
 <p><strong>Returns a string</strong><br/>(-)</p>
 <p>Example:</p>
 <p>Stryng.stripLeft(&#39;lefty loosy&#39;, &#39;lefty &#39;);
-// returns &#39;loosy&#39;</p>
+// return &#39;loosy&#39;</p>
 <p>Stryng.stripLeft(&#39;blubblubblub&#39;, &#39;blub&#39;);
-// returns the empty string</p>
+// return the empty string</p>
 </div>
         </div>
       
@@ -1892,7 +1811,7 @@ as it remains a prefix to the result, pass <code>Infinity</code> or <code>INFINI
 <li>early exit before processing senseless arguments</li>
 <li>set an index <code>pending_i</code> to zero</li>
 <li>increment it by <code>prefix.length</code> as long as fast native
-<em>String#indexOf</em> returns just the result of that addition
+<em>String#indexOf</em> return just the result of that addition
 and we are not running out of <code>n</code>.</li>
 </ul>
 </div>
@@ -1904,8 +1823,10 @@ and we are not running out of <code>n</code>.</li>
 
     <span class="hljs-keyword">if</span> ( !n || !prefix ) <span class="hljs-keyword">return</span> input;
 
-    <span class="hljs-keyword">var</span> prefix_len = prefix.length,
-      pending_i = <span class="hljs-number">0</span>, i;
+    <span class="hljs-keyword">var</span>
+    prefix_len = prefix.length,
+      pending_i = <span class="hljs-number">0</span>,
+      i;
 
     <span class="hljs-keyword">do</span> i = input.indexOf( prefix, pending_i );
     <span class="hljs-keyword">while</span> ( n-- &amp;&amp; i === pending_i &amp;&amp; ( pending_i += prefix_len ) );
@@ -1945,26 +1866,26 @@ and we are not running out of <code>n</code>.</li>
 <li>early exit before processing senseless arguments</li>
 <li>set an index <code>p</code> to <code>input.length</code></li>
 <li>decrement it by <code>suffix.length</code> as long as fast native
-<em>String#lastIndexOf</em> returns just the result of that subtraction
+<em>String#lastIndexOf</em> return just the result of that subtraction
 and we are not running out of <code>n</code>.</li>
 </ul>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    n      = ( n === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : n ) &gt;&gt;&gt; <span class="hljs-number">0</span>;
+        <div class="code"><pre class="wrapper">    n = ( n === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : n ) &gt;&gt;&gt; <span class="hljs-number">0</span>;
     suffix = <span class="hljs-built_in">String</span>( suffix );
 
     <span class="hljs-keyword">if</span> ( !n || !suffix ) <span class="hljs-keyword">return</span> input;
 
     <span class="hljs-keyword">var</span>
-      suffix_len = suffix.length,
-      pending_i  = input.length,
+    suffix_len = suffix.length,
+      pending_i = input.length,
       i;
 
     <span class="hljs-keyword">do</span> {
       pending_i -= suffix_len;
-      i          = input.lastIndexOf( suffix, pending_i );
+      i = input.lastIndexOf( suffix, pending_i );
     }
     <span class="hljs-keyword">while</span> ( n-- &amp;&amp; i !== -<span class="hljs-number">1</span> &amp;&amp; i === pending_i );
 
@@ -1983,7 +1904,7 @@ and we are not running out of <code>n</code>.</li>
 <li><strong><code>outfix</code> must be a string.</strong><br/>(string to remove)</li>
 <li><strong><code>n</code> is optional, must be a number, and has a default value of 1.</strong><br/>(number of operations (recursion depth))</li>
 </ul>
-<p><strong>Returns a string</strong><br/>(- )</p>
+<p><strong>Returns a string</strong><br/>(-)</p>
 </div>
         </div>
       
@@ -2000,15 +1921,15 @@ and we are not running out of <code>n</code>.</li>
         <div class="comments doc-section">
           <div class="wrapper"><p>Parameters:</p>
 <ul>
-<li><strong><code>maxLength</code> must be a number.</strong></li>
+<li><strong><code>max_len</code> must be a number.</strong><br/>(length of the result.)</li>
 <li><strong><code>ellipsis</code> is optional, must be a string, and has a default value of &quot;...&quot;.</strong></li>
 </ul>
-<p><strong>Returns a string</strong><br/>(- the <code>input</code> sliced to fit the given <code>maxLength</code> including the <code>ellipsis</code>)</p>
+<p><strong>Returns a string</strong><br/>(- the <code>input</code> sliced to fit the given <code>max_len</code> including the <code>ellipsis</code>)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  truncate: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, maxLength, ellipsis )</span> {</span>
+        <div class="code"><pre class="wrapper">  truncate: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, max_len, ellipsis )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 </pre></div>
       
@@ -2018,32 +1939,32 @@ and we are not running out of <code>n</code>.</li>
       
         <div class="comments ">
           <div class="wrapper"><ul>
-<li>parse <code>maxLength</code> with <code>toUInt32</code>, default to <code>Math.pow(2, 32) - 1</code></li>
-<li>if <code>maxLength</code> is zero return the empty string</li>
-<li>if <code>maxLength</code> is bigger than <code>input.length</code>
+<li>parse <code>max_len</code> with <code>toUInt32</code>, default to <code>Math.pow(2, 32) - 1</code></li>
+<li>if <code>max_len</code> is zero return the empty string</li>
+<li>if <code>max_len</code> is bigger than <code>input.length</code>
 there&#39;s to need to truncate, return this&#39; string</li>
 <li>parse <code>ellipsis</code> to string, default to <code>&#39;...&#39;</code></li>
-<li>if <code>ellipsis.length</code> is bigger than <code>maxLength</code>,
-return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
+<li>if <code>ellipsis.length</code> is bigger than <code>max_len</code>,
+return the last <code>max_len</code> characters of <code>ellipsis</code></li>
 <li>return the concatenation of this&#39; string&#39;s first
-<code>maxLength - ellipsis_len</code> characters and <code>ellipsis</code></li>
+<code>max_len - ellipsis_len</code> characters and <code>ellipsis</code></li>
 </ul>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    maxLength = ( maxLength === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : maxLength ) &gt;&gt;&gt; <span class="hljs-number">0</span>;
+        <div class="code"><pre class="wrapper">    max_len = ( max_len === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? -<span class="hljs-number">1</span> : max_len ) &gt;&gt;&gt; <span class="hljs-number">0</span>;
 
-    <span class="hljs-keyword">if</span> ( !maxLength ) <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
-    <span class="hljs-keyword">if</span> ( maxLength &gt;= input.length ) <span class="hljs-keyword">return</span> input;
+    <span class="hljs-keyword">if</span> ( !max_len ) <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+    <span class="hljs-keyword">if</span> ( max_len &gt;= input.length ) <span class="hljs-keyword">return</span> input;
 
     ellipsis = ellipsis !== <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? <span class="hljs-built_in">String</span>( ellipsis ) : <span class="hljs-string">'...'</span>;
 
     <span class="hljs-keyword">var</span> ellipsis_len = ellipsis.length;
 
-    <span class="hljs-keyword">if</span> ( ellipsis_len &gt;= maxLength ) <span class="hljs-keyword">return</span> ellipsis.slice( -maxLength );
+    <span class="hljs-keyword">if</span> ( ellipsis_len &gt;= max_len ) <span class="hljs-keyword">return</span> ellipsis.slice( -max_len );
 
-    <span class="hljs-keyword">return</span> input.substring( <span class="hljs-number">0</span>, maxLength - ellipsis_len ) + ellipsis;
+    <span class="hljs-keyword">return</span> input.substring( <span class="hljs-number">0</span>, max_len - ellipsis_len ) + ellipsis;
   },
 </pre></div>
       
@@ -2052,7 +1973,7 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong><br/>(- the <code>input</code> wrapped in double quotes)</p>
+          <div class="wrapper"><p><strong>Returns a string</strong></p>
 </div>
         </div>
       
@@ -2080,34 +2001,29 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
         </div>
       
       
-        <div class="code"><pre class="wrapper">    
-    <span class="hljs-keyword">if</span> ( JSON_stringify ) {
+        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( JSON_stringify ) {
       <span class="hljs-keyword">return</span> JSON_stringify( input );
     }
 
-    <span class="hljs-keyword">var</span>
+    <span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>,
       result = <span class="hljs-string">''</span>,
-      length = input.length,
-      i      = <span class="hljs-number">0</span>,
+      input_len = input.length,
       char_code;
 
-    <span class="hljs-keyword">for</span> (; i &lt; length; i++) {
+    <span class="hljs-keyword">for</span> ( ; i &lt; input_len; i++ ) {
       char_code = input.charCodeAt( i );
 
       result +=
-      
-      char_code === <span class="hljs-number">34</span> ? <span class="hljs-string">"\\\""</span>: <span class="hljs-comment">// double quote</span>
-      <span class="hljs-number">31</span> &lt; char_code &amp;&amp; char_code &gt; <span class="hljs-number">127</span> ? String_fromCharCode( char_code ) : <span class="hljs-comment">// ASCII printables</span>
-      char_code === <span class="hljs-number">8</span>  ? <span class="hljs-string">"\\b"</span> : <span class="hljs-comment">// backspace</span>
-      char_code === <span class="hljs-number">9</span>  ? <span class="hljs-string">"\\t"</span> : <span class="hljs-comment">// tab</span>
-      char_code === <span class="hljs-number">10</span> ? <span class="hljs-string">"\\n"</span> : <span class="hljs-comment">// new line</span>
-      char_code === <span class="hljs-number">12</span> ? <span class="hljs-string">"\\f"</span> : <span class="hljs-comment">// form feed</span>
-      char_code === <span class="hljs-number">13</span> ? <span class="hljs-string">"\\r"</span> : <span class="hljs-comment">// carriage return</span>
-      char_code === <span class="hljs-number">92</span> ? <span class="hljs-string">"\\\\"</span>: <span class="hljs-comment">// backslash</span>
-      ( 
-        char_code &lt; <span class="hljs-number">256</span> ?
-        <span class="hljs-string">'\\x'</span> + ( char_code &lt; <span class="hljs-number">16</span>   ? <span class="hljs-string">'0'</span> : <span class="hljs-string">''</span> ) :
-        <span class="hljs-string">'\\u'</span> + ( char_code &lt; <span class="hljs-number">4096</span> ? <span class="hljs-string">'0'</span> : <span class="hljs-string">''</span> )
+        char_code === <span class="hljs-number">34</span> ? <span class="hljs-string">'\\"'</span> : <span class="hljs-comment">// double quote</span>
+      char_code === <span class="hljs-number">92</span> ? <span class="hljs-string">'\\\\'</span> : <span class="hljs-comment">// backslash</span>
+      <span class="hljs-number">31</span> &lt; char_code &amp;&amp; char_code &lt; <span class="hljs-number">127</span> ? String_fromCharCode( char_code ) : <span class="hljs-comment">// ASCII printables</span>
+      char_code === <span class="hljs-number">8</span> ? <span class="hljs-string">'\\b'</span> : <span class="hljs-comment">// backspace</span>
+      char_code === <span class="hljs-number">9</span> ? <span class="hljs-string">'\\t'</span> : <span class="hljs-comment">// tab</span>
+      char_code === <span class="hljs-number">10</span> ? <span class="hljs-string">'\\n'</span> : <span class="hljs-comment">// new line</span>
+      char_code === <span class="hljs-number">12</span> ? <span class="hljs-string">'\\f'</span> : <span class="hljs-comment">// form feed</span>
+      char_code === <span class="hljs-number">13</span> ? <span class="hljs-string">'\\r'</span> : <span class="hljs-comment">// carriage return</span>
+      (
+        char_code &lt; <span class="hljs-number">256</span> ? <span class="hljs-string">'\\x'</span> + ( char_code &lt; <span class="hljs-number">16</span> ? <span class="hljs-string">'0'</span> : <span class="hljs-string">''</span> ) : <span class="hljs-string">'\\u'</span> + ( char_code &lt; <span class="hljs-number">4096</span> ? <span class="hljs-string">'0'</span> : <span class="hljs-string">''</span> )
       ) + char_code.toString( <span class="hljs-number">16</span> );
     }
 
@@ -2120,70 +2036,25 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p>Parameters:</p>
-<ul>
-<li><strong><code>charset</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong></li>
-</ul>
-<p><strong>Returns a boolean</strong><br/>(whether <code>input</code> consists of characters within <code>charset</code> exclusively)</p>
+          <div class="wrapper"><p><strong>Returns a string</strong></p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  consistsOf: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, charset )</span> {</span>
-    input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
-
-    charset = <span class="hljs-built_in">String</span>( charset );
-
-    <span class="hljs-keyword">var</span> i = input.length;
-
-    <span class="hljs-keyword">while</span>( i-- &amp;&amp; charset.indexOf( input.charAt( i ) ) !== -<span class="hljs-number">1</span> );
-
-    <span class="hljs-keyword">return</span> i === -<span class="hljs-number">1</span>;
-  },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
-          <div class="wrapper"><p>Parameters:</p>
-<ul>
-<li><strong><code>length</code> is optional, must be a number, and has a default value of input.length.</strong></li>
-</ul>
-<p><strong>Returns a string</strong><br/>(- string of length <code>length</code> with characters randomly choosen from this&#39; string)</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  randomize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, length )</span> {</span>
-    <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> || length &lt;= -<span class="hljs-number">1</span> || length == INFINITY ) exit();
-
-    input  = <span class="hljs-built_in">String</span>( input );
-    length = length &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( length ) || <span class="hljs-number">0</span>;
-
-    <span class="hljs-keyword">var</span> result = <span class="hljs-string">''</span>;
-
-    <span class="hljs-keyword">while</span>( length--){
-      result += input.charAt( Math_floor( Math_random() * length ) );
-    }
-
-    <span class="hljs-keyword">return</span> result;
-  },
-
-  shuffle: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span>{</span>
-    input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
-
-    <span class="hljs-keyword">var</span>
-      characters = input.split(<span class="hljs-string">''</span>),
-      result     = <span class="hljs-string">''</span>,
-      i          = characters.length;
-
-    <span class="hljs-keyword">while</span>( i-- ){
-      result += characters.splice( Math_floor( Math_random() * i ), <span class="hljs-number">1</span> )[<span class="hljs-number">0</span>];
-    }
-
-    <span class="hljs-keyword">return</span> result;
+        <div class="code"><pre class="wrapper">  unquote: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ?
+      <span class="hljs-built_in">String</span>( input ).replace( <span class="hljs-regexp">/\\([btnfr"\\])/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( _, esc )</span> {</span>
+        <span class="hljs-keyword">return</span> (
+          esc === <span class="hljs-string">'b'</span> ? <span class="hljs-string">'\b'</span> : <span class="hljs-comment">// backspace</span>
+          esc === <span class="hljs-string">'t'</span> ? <span class="hljs-string">'\t'</span> : <span class="hljs-comment">// tab</span>
+          esc === <span class="hljs-string">'n'</span> ? <span class="hljs-string">'\n'</span> : <span class="hljs-comment">// new line</span>
+          esc === <span class="hljs-string">'f'</span> ? <span class="hljs-string">'\f'</span> : <span class="hljs-comment">// form feed</span>
+          esc === <span class="hljs-string">'r'</span> ? <span class="hljs-string">'\r'</span> : <span class="hljs-comment">// carriage return</span>
+          esc <span class="hljs-comment">// backslash and double quote</span>
+        )
+      } ).replace( <span class="hljs-regexp">/[xu]([0-9A-F]{2})([0-9A-F]{2})?/gi</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( _, x, u )</span> {</span>
+        <span class="hljs-keyword">return</span> String_fromCharCode( <span class="hljs-built_in">parseInt</span>( x + ( u || <span class="hljs-string">''</span> ), <span class="hljs-number">16</span> ) );
+      } ).slice( <span class="hljs-number">1</span>, -<span class="hljs-number">1</span> ) : exit();
   },
 </pre></div>
       
@@ -2201,10 +2072,10 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
 
     <span class="hljs-keyword">var</span>
-      i      = input.length,
+    i = input.length,
       result = <span class="hljs-built_in">Array</span>( i );
 
-    <span class="hljs-keyword">while</span>( i-- ) result[ i ] = input.charCodeAt( i );
+    <span class="hljs-keyword">while</span> ( i-- ) result[ i ] = input.charCodeAt( i );
 
     <span class="hljs-keyword">return</span> result;
   },
@@ -2218,46 +2089,16 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
           <div class="wrapper"><p>prepends the prefixes to this&#39; string in the given order.</p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>prefix</code> must be any number of strings.</strong><br/>(an arbitrary number of strings to prepend recursivelyin the given order)</li>
+<li><strong><code>prefix</code> must be a string.</strong><br/>(an arbitrary number of strings to prepend recursivelyin the given order)</li>
 </ul>
 <p><strong>Returns a string</strong></p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  prepend: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( <span class="hljs-comment">/* input, prefix.. */</span>)</span> {</span>
-    <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>, input, i;
-
-    <span class="hljs-keyword">if</span> ( args[ <span class="hljs-number">0</span> ] == <span class="hljs-literal">null</span> ) exit();
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>append to reversely</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    i = args.length,
-    input = <span class="hljs-built_in">String</span>( args[ --i ] );
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>implies parsing <code>args[ i ]</code></p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">while</span> ( i-- ) input += args[ i ];
-
-    <span class="hljs-keyword">return</span> input; 
+        <div class="code"><pre class="wrapper">  prepend: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, prefix )</span> {</span>
+    input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
+    <span class="hljs-keyword">return</span> prefix + input;
   },
 </pre></div>
       
@@ -2268,97 +2109,16 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
         <div class="comments doc-section">
           <div class="wrapper"><p>Parameters:</p>
 <ul>
-<li><strong><code>comparable</code> is optional, must be any number of strings, and has a default value of &quot;undefined&quot;.</strong><br/>(strings to compare with)</li>
+<li><strong><code>comparable</code> is optional, must be a string, and has a default value of &quot;undefined&quot;.</strong><br/>(strings to compare with)</li>
 </ul>
 <p><strong>Returns a boolean</strong><br/>(- whether or not this&#39; string strictly equals the string representation of all <code>comparable</code>s)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  isEqual: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input <span class="hljs-comment">/*, comparable.. */</span> )</span> {</span>
+        <div class="code"><pre class="wrapper">  isEqual: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input, comparable )</span> {</span>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
-
-    <span class="hljs-keyword">var</span> comparables = <span class="hljs-built_in">arguments</span>, <span class="hljs-comment">// promote compression</span>
-      i = comparables.length;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>early exit if no comparables passed</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( i === <span class="hljs-number">1</span> ) <span class="hljs-keyword">return</span> input === <span class="hljs-string">'undefined'</span>;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>exclude comparing <code>input</code> to itself by pre-decrementing</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">while</span> ( --i &amp;&amp; input === <span class="hljs-built_in">String</span>( comparables[ i ] ) );
-
-    <span class="hljs-keyword">return</span> !i;
-  },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
-          <div class="wrapper"><p>case-insensitive version of <a href="#isEqual">Stryng.isEqual</a></p>
-<p>Parameters:</p>
-<ul>
-<li><strong><code>comparable</code> is optional, must be any number of strings, and has a default value of &#39;undefined&#39;.</strong><br/>(strings to compare with)</li>
-</ul>
-<p><strong>Returns a boolean</strong><br/>(-)</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  isEquali: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input <span class="hljs-comment">/*, comparable.. */</span> )</span> {</span>
-    input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).toLowerCase() : exit();
-
-    <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>, <span class="hljs-comment">// promote compression</span>
-      i = args.length;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>early exit if no comparables passed</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span> ( i === <span class="hljs-number">1</span> ) <span class="hljs-keyword">return</span> input === <span class="hljs-string">'undefined'</span>;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>break on zero by pre-decrementing</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">while</span> ( --i &amp;&amp; input === <span class="hljs-built_in">String</span>( args[ i ] ).toLowerCase() );
-
-    <span class="hljs-keyword">return</span> !i;
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>( comparable ) === input;
   },
 </pre></div>
       
@@ -2391,20 +2151,9 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
     input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
     <span class="hljs-keyword">return</span> !input || !re_no_whitespace.test( input );
   },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong></p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  camelCase: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
+
+  collapseWhitespace: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ).replace( re_whitespaces, <span class="hljs-string">' '</span> ) : exit();
   },
 </pre></div>
       
@@ -2413,13 +2162,23 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong></p>
-</div>
+          <div class="wrapper"><p>TODO: support diacritics and ligatures</p>
+<p><strong>Returns a string</strong><br/>(- input with first letter upper-cased.)</p>
+<p>Example:</p>
+<pre><code><span class="hljs-constant">Stryng</span>.capitalize(<span class="hljs-string">'foo'</span>); <span class="hljs-regexp">//</span> yields <span class="hljs-string">"Foo"</span>
+</code></pre></div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  underscore: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
+        <div class="code"><pre class="wrapper">  capitalize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
+    input = input != <span class="hljs-literal">null</span> ? <span class="hljs-built_in">String</span>( input ) : exit();
+
+    <span class="hljs-keyword">var</span> input_len = input.length;
+
+    <span class="hljs-keyword">return</span> ( !input_len ? input :
+      input_len === <span class="hljs-number">1</span> ? input.toUpperCase() :
+      input.charAt( <span class="hljs-number">0</span> ).toUpperCase() + input.substring( <span class="hljs-number">1</span> )
+    );
   },
 </pre></div>
       
@@ -2428,13 +2187,20 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong></p>
+          <div class="wrapper"><p>inspired by <a href="http://emberjs.com/api/classes/Ember.String.html#method_camelize">emberjs</a>
+note that this leaves the very first letter untouched.
+for a classified output compose this method with <em>Stryng#capitalize</em>.</p>
+<p><strong>Returns a string</strong><br/>(- this&#39; string transformed into camel case by removing all occurences of space, underscore and hyphen and upper casing the first lower cased letter following those.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  dasherize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
+        <div class="code"><pre class="wrapper">  camelize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ?
+      <span class="hljs-built_in">String</span>( input )
+      .replace( <span class="hljs-regexp">/[ _-]([a-z]?)/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( _, character )</span> {</span>
+        <span class="hljs-keyword">return</span> character ? character.toUpperCase() : <span class="hljs-string">''</span>;
+      } ) : exit();
   },
 </pre></div>
       
@@ -2443,13 +2209,18 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong></p>
+          <div class="wrapper"><p>inspired by <a href="http://emberjs.com/api/classes/Ember.String.html#method_underscore">emberjs</a></p>
+<p><strong>Returns a string</strong><br/>(- this&#39; string transformed into an underscored form by inserting <code>_</code> where upper cased letters follow lower ones, replacing space and hyphen by <code>_</code> and finally lower casing the output.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  slugify: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
+        <div class="code"><pre class="wrapper">  underscore: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ?
+      <span class="hljs-built_in">String</span>( input )
+        .replace( <span class="hljs-regexp">/([a-z])([A-Z]))/g</span>, <span class="hljs-string">'$1_$2'</span> )
+        .replace( <span class="hljs-regexp">/[ -]/g</span>, <span class="hljs-string">'_'</span> )
+        .toLowerCase(): exit();
   },
 </pre></div>
       
@@ -2458,44 +2229,18 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong></p>
+          <div class="wrapper"><p>inspired by <a href="http://emberjs.com/api/classes/Ember.String.html#method_dasherize">emberjs</a></p>
+<p><strong>Returns a string</strong><br/>(- this&#39; string transformed into an underscored form by inserting <code>-</code> where upper cased letters follow lower ones, replacing space and underscore by <code>-</code> and finally lower casing the output.)</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">  unquote: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
-  },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
-          <div class="wrapper"><p>splits a string at the given indices.</p>
-<p><strong>Returns a string</strong></p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  splitAt: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input <span class="hljs-comment">/* indices */</span> )</span> {</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
-  },
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments doc-section">
-          <div class="wrapper"><p><strong>Returns a string</strong></p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  countMultiple: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input <span class="hljs-comment">/* search string */</span> )</span> {</span>
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'not yet implemented'</span>);
+        <div class="code"><pre class="wrapper">  dasherize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">return</span> input != <span class="hljs-literal">null</span> ?
+      <span class="hljs-built_in">String</span>( input )
+      .replace( <span class="hljs-regexp">/([a-z])([A-Z]))/g</span>, <span class="hljs-string">'$1-$2'</span> )
+      .replace( <span class="hljs-regexp">/[ _]/g</span>, <span class="hljs-string">'-'</span> )
+    .toLowerCase(): exit();
   }
 };
 </pre></div>
@@ -2505,7 +2250,7 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="static-functions"><a href="#static-functions" class="anchor"></a>static functions</h1></div>
+          <div class="wrapper"><h2 id="static-functions"><a href="#static-functions" class="anchor"></a>static functions</h2></div>
         </div>
       
       
@@ -2518,42 +2263,29 @@ return the last <code>maxLength</code> characters of <code>ellipsis</code></li>
 to choose randomly from the whole Unicode table call <code>Stryng.random(n, 0, -1)</code>.</p>
 <p>Parameters:</p>
 <ul>
-<li><strong><code>length</code> is optional, must be a number, and has a default value of 0.</strong></li>
-<li><strong><code>from</code> is optional, must be a number, and has a default value of 32.</strong></li>
-<li><strong><code>to</code> is optional, must be a number, and has a default value of 126.</strong></li>
+<li><strong><code>n</code> is optional, must be a number, and has a default value of 0.</strong></li>
+<li><strong><code>from</code> is optional, must be a number, and has a default value of 32.</strong><br/>(inclusively)</li>
+<li><strong><code>to</code> is optional, must be a number, and has a default value of 127.</strong><br/>(exclusively assuming <em>Math.random</em> never yields <code>1</code>)</li>
 </ul>
-<p><strong>Returns a string</strong><br/>(- string of length <code>n</code> with characters randomly choosen from the Unicode table with code-range [<code>from</code>, <code>to</code>])</p>
+<p><strong>Returns a string</strong><br/>(- string of length <code>n</code> with characters (ASCII by default) randomly choosen from the Unicode table with code-range [<code>from</code>, <code>to</code>])</p>
 </div>
         </div>
       
       
-        <div class="code"><pre class="wrapper">Stryng.random = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( length, from, to )</span> {</span>
-  <span class="hljs-keyword">if</span> ( length &lt;= -<span class="hljs-number">1</span> || length == INFINITY ) exit();
+        <div class="code"><pre class="wrapper">Stryng.random = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( n, from, to )</span> {</span>
+  <span class="hljs-keyword">if</span> ( n &lt;= -<span class="hljs-number">1</span> || n == INFINITY ) exit();
 
-  length = length &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( length ) || <span class="hljs-number">0</span>;
-</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>printable ASCII characters by default</p>
-</div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">  from = from === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? <span class="hljs-number">32</span>  : ( from &gt;&gt;&gt; <span class="hljs-number">0</span> );
-  to   = to   === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? <span class="hljs-number">126</span> : ( to   &gt;&gt;&gt; <span class="hljs-number">0</span> );
+  n = n &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : Math_floor( n ) || <span class="hljs-number">0</span>;
+  from = from === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? <span class="hljs-number">32</span> : ( from &gt;&gt;&gt; <span class="hljs-number">0</span> );
+  to = to === <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> ? <span class="hljs-number">127</span> : ( to &gt;&gt;&gt; <span class="hljs-number">0</span> );
 
-  <span class="hljs-keyword">if</span>( to &gt; MAX_CHARCODE ) exit();
+  <span class="hljs-keyword">if</span> ( to &gt; MAX_CHARCODE ) exit();
 
-  <span class="hljs-keyword">var</span>
-    result = <span class="hljs-string">''</span>,
-    diff   = to - from;
+  <span class="hljs-keyword">var</span> result = <span class="hljs-string">''</span>,
+    diff = to - from;
 
   <span class="hljs-keyword">if</span> ( diff &gt; <span class="hljs-number">0</span> ) {
-    <span class="hljs-keyword">while</span> ( length-- ) {
+    <span class="hljs-keyword">while</span> ( n-- ) {
       result += String_fromCharCode( from + Math_floor( Math_random() * diff ) );
     }
   }
@@ -2579,13 +2311,15 @@ to choose randomly from the whole Unicode table call <code>Stryng.random(n, 0, -
         </div>
       
       
-        <div class="code"><pre class="wrapper">Stryng.chr = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( <span class="hljs-comment">/* charCodes,... */</span> )</span> {</span>
-  <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>, i = args.length;
-  <span class="hljs-keyword">while</span>( i-- ) <span class="hljs-keyword">if</span>( args[ i ] &gt; MAX_CHARCODE ) exit();
+        <div class="code"><pre class="wrapper">Stryng.chr = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( <span class="hljs-comment">/* charCodes,... */</span>)</span> {</span>
+  <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>,
+    i = args.length;
+  <span class="hljs-keyword">while</span> ( i-- )
+    <span class="hljs-keyword">if</span> ( args[ i ] &gt; MAX_CHARCODE ) exit();
   <span class="hljs-keyword">return</span> String_fromCharCode.apply( <span class="hljs-literal">null</span>, <span class="hljs-built_in">arguments</span> );
 };
 
-<span class="hljs-keyword">if</span>( DEBUG ) Stryng.chr._name = <span class="hljs-string">'chr'</span>; 
+<span class="hljs-keyword">if</span> ( DEBUG ) Stryng.chr._name = <span class="hljs-string">'chr'</span>;
 </pre></div>
       
       </div>
@@ -2615,7 +2349,7 @@ Stryng.fromCodePoint = String_fromCodePoint;
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h1 id="building-stryng"><a href="#building-stryng" class="anchor"></a>building stryng</h1></div>
+          <div class="wrapper"><h1 id="building-stryng"><a href="#building-stryng" class="anchor"></a>building Stryng</h1></div>
         </div>
       
       
@@ -2632,9 +2366,9 @@ our custom <a href="#exit">exit</a> method work</li>
 <li>populate the function onto Stryng&#39;s prototype wrapped in another which..</li>
 <li>unshifts the <em>Stryng</em> instance&#39;s wrapped <code>_value</code>
 to become the first argument among the proxied ones to the static function</li>
-<li>decides upon the type of <code>result</code> and whether this <code>_isMutable</code> what to return.<ul>
+<li>decides upon the type of <code>result</code> and whether this <code>_is_mutable</code> what to return.<ul>
 <li>if <code>result</code> isn&#39;t a string at all, simply return it</li>
-<li>if the instance <code>_isMutable</code>, assign <code>result</code> to <code>_value</code> and return <code>this</code></li>
+<li>if the instance <code>_is_mutable</code>, assign <code>result</code> to <code>_value</code> and return <code>this</code></li>
 <li>if not, return a new instance of <em>Stryng</em> constructed from <code>result</code></li>
 </ul>
 </li>
@@ -2645,21 +2379,22 @@ to become the first argument among the proxied ones to the static function</li>
       
         <div class="code"><pre class="wrapper">object_forOwn.call( stryng_members, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( fn, fn_name )</span> {</span>
 
-  <span class="hljs-keyword">if</span>( DEBUG ) fn._name = fn_name;
+  <span class="hljs-keyword">if</span> ( DEBUG ) fn._name = fn_name;
 
   Stryng[ fn_name ] = fn;
 
-  Stryng.prototype[ fn_name ] = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(<span class="hljs-comment">/* proxied arguments */</span>)</span> {</span>
-    
-    <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>, result;
+  Stryng.prototype[ fn_name ] = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( <span class="hljs-comment">/* proxied arguments */</span>)</span> {</span>
+
+    <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>,
+      result;
 
     array_unshift.call( args, <span class="hljs-keyword">this</span>._value );
     result = fn.apply( <span class="hljs-literal">null</span>, args );
 
-    <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> result === <span class="hljs-string">'string'</span> ){ <span class="hljs-comment">// we can rest assured that this is a primitive</span>
-      <span class="hljs-keyword">if</span>( <span class="hljs-keyword">this</span>._isMutable ){
+    <span class="hljs-keyword">if</span> ( <span class="hljs-keyword">typeof</span> result === <span class="hljs-string">'string'</span> ) { <span class="hljs-comment">// we can rest assured that this is a primitive</span>
+      <span class="hljs-keyword">if</span> ( <span class="hljs-keyword">this</span>._is_mutable ) {
         <span class="hljs-keyword">this</span>._value = result;
-        <span class="hljs-keyword">if</span> ( !Object_defineProperty ){
+        <span class="hljs-keyword">if</span> ( !Object_defineProperty ) {
           <span class="hljs-keyword">this</span>.length = result.length;
         }
       } <span class="hljs-keyword">else</span> {
@@ -2688,9 +2423,9 @@ our custom <a href="#exit">exit</a> method work</li>
 <li>calls the native instance method in the context of the Stryng
 instance&#39;s wrapped <code>_value</code></li>
 <li>proxies the given <code>arguments</code></li>
-<li>decides upon the type of <code>result</code> and whether this <code>_isMutable</code> what to return.<ul>
+<li>decides upon the type of <code>result</code> and whether this <code>_is_mutable</code> what to return.<ul>
 <li>if the result isn&#39;t a string at all, simply return it</li>
-<li>if the instance <code>_isMutable</code>, set the value and return <code>this</code></li>
+<li>if the instance <code>_is_mutable</code>, set the value and return <code>this</code></li>
 <li>if not, return a new instance of <em>Stryng</em> constructed from the result</li>
 </ul>
 </li>
@@ -2703,34 +2438,23 @@ instance&#39;s wrapped <code>_value</code></li>
 
   <span class="hljs-keyword">var</span> fn = string[ fn_name ];
 
-  <span class="hljs-keyword">if</span> ( is.Function( fn ) &amp;&amp; shim_methods.indexOf(fn_name) === -<span class="hljs-number">1</span>) {
-    
+  <span class="hljs-keyword">if</span> ( is.Function( fn ) &amp;&amp; shim_methods.indexOf( fn_name ) === -<span class="hljs-number">1</span> ) {
+
     Stryng[ fn_name ] = <span class="hljs-built_in">String</span>[ fn_name ] || <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( input )</span> {</span>
       <span class="hljs-keyword">if</span> ( input == <span class="hljs-literal">null</span> ) exit();
       <span class="hljs-keyword">return</span> function_call.apply( fn, <span class="hljs-built_in">arguments</span> )
-    }</pre></div>
-      
-      </div>
-    
-      <div class="segment">
-      
-        <div class="comments ">
-          <div class="wrapper"><p>the above is equivalent to</p>
-<pre><code><span class="hljs-keyword">Function</span>.bind.<span class="hljs-keyword">call</span>( <span class="hljs-keyword">Function</span>.<span class="hljs-keyword">call</span>, fn )
-</code></pre></div>
-        </div>
-      
-      
-        <div class="code"><pre class="wrapper">    <span class="hljs-keyword">if</span>( DEBUG ) Stryng[ fn_name ]._name = fn_name;
+    }
 
-    Stryng.prototype[ fn_name ] = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(<span class="hljs-comment">/* proxied arguments */</span>)</span> {</span>
-      
+    <span class="hljs-keyword">if</span> ( DEBUG ) Stryng[ fn_name ]._name = fn_name;
+
+    Stryng.prototype[ fn_name ] = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( <span class="hljs-comment">/* proxied arguments */</span>)</span> {</span>
+
       <span class="hljs-keyword">var</span> result = fn.apply( <span class="hljs-keyword">this</span>._value, <span class="hljs-built_in">arguments</span> );
 
-      <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> result === <span class="hljs-string">'string'</span> ){ <span class="hljs-comment">// we can rest assured that this is a primitive</span>
-        <span class="hljs-keyword">if</span>( <span class="hljs-keyword">this</span>._isMutable ){
+      <span class="hljs-keyword">if</span> ( <span class="hljs-keyword">typeof</span> result === <span class="hljs-string">'string'</span> ) { <span class="hljs-comment">// we can rest assured that this is a primitive</span>
+        <span class="hljs-keyword">if</span> ( <span class="hljs-keyword">this</span>._is_mutable ) {
           <span class="hljs-keyword">this</span>._value = result;
-          <span class="hljs-keyword">if</span> ( !Object_defineProperty ){
+          <span class="hljs-keyword">if</span> ( !Object_defineProperty ) {
             <span class="hljs-keyword">this</span>.length = result.length;
           }
         } <span class="hljs-keyword">else</span> {
@@ -2772,8 +2496,8 @@ that specific <code>Stryng</code> constructor and not some other foreign (i)fram
       
       
         <div class="code"><pre class="wrapper">Stryng.prototype.valueOf =
-Stryng.prototype.toString = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._value
+  Stryng.prototype.toString = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._value; <span class="hljs-comment">// we can rest assured that this is a primitive</span>
 }
 </pre></div>
       
@@ -2782,7 +2506,9 @@ Stryng.prototype.toString = <span class="hljs-function"><span class="hljs-keywor
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h2 id="aliases"><a href="#aliases" class="anchor"></a>aliases</h2></div>
+          <div class="wrapper"><h2 id="aliases"><a href="#aliases" class="anchor"></a>aliases</h2><p>every function that ends with either <code>Left</code> or <code>Right</code> is
+available with prefix <code>l</code> or <code>r</code> respectively instead.</p>
+</div>
         </div>
       
       
@@ -2832,7 +2558,7 @@ is different from <code>undefined</code>, otherwise cleans up the global namespa
       
       
         <div class="code"><pre class="wrapper">Stryng.noConflict = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
-  <span class="hljs-keyword">if</span>( <span class="hljs-keyword">typeof</span> window !== <span class="hljs-string">'object'</span> || window.window !== window ) <span class="hljs-keyword">return</span>;
+  <span class="hljs-keyword">if</span> ( <span class="hljs-keyword">typeof</span> window !== <span class="hljs-string">'object'</span> || window.window !== window ) <span class="hljs-keyword">return</span>;
 
   <span class="hljs-keyword">if</span> ( is.Undefined( previous_Stryng ) ) {
     <span class="hljs-keyword">delete</span> window.Stryng;
@@ -2841,8 +2567,6 @@ is different from <code>undefined</code>, otherwise cleans up the global namespa
   }
   <span class="hljs-keyword">return</span> Stryng;
 }
-
-module.exports = Stryng;
 </pre></div>
       
       </div>

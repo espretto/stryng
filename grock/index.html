@@ -25,7 +25,7 @@
       <div class="segment">
       
         <div class="comments ">
-          <div class="wrapper"><h2 id="stryng"><a href="#stryng" class="anchor"></a>Stryng</h2><p>The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
+          <div class="wrapper"><h2 id="stryng"><a href="#stryng" class="anchor"></a>Stryng</h2><p>If the necessity of manipulating strings correctly in JavaScript arises you will find yourself dealing with weird native behaviors, constructing even weirder workarounds to tweak them into being consistent and easy to handle. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
 <p><a href="https://ci.testling.com/espretto/Stryng"><img src="https://ci.testling.com/espretto/stryng.png" alt="browser support"></a></p>
 <h2 id="let-me-introduce"><a href="#let-me-introduce" class="anchor"></a>Let me introduce</h2><pre><code><span class="hljs-built_in">String</span>.prototype.toStryng = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
   <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Stryng( <span class="hljs-keyword">this</span> );
@@ -79,6 +79,36 @@ new <span class="hljs-constant">RegExp</span>().test(<span class="hljs-string">'
 <li>renew testling setup</li>
 <li>extend with plugin <code>Stryng.esc</code> for encoding conversions related to url parsing and slugifying</li>
 </ul>
+<h2 id="about-tointeger"><a href="#about-tointeger" class="anchor"></a>About toInteger</h2><p>from the <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.4">spec</a>:</p>
+<ol>
+<li>let number be the result of calling <code>toNumber</code> on the input argument.</li>
+<li>if number is <code>NaN</code>, return <code>+0</code>.</li>
+<li>if number is <code>+0</code>, <code>−0</code>, <code>+Infinity</code>, or <code>−Infinity</code>, return number i.e. leave zeros and infinites untouched</li>
+<li>Rireturn the result of computing <code>sign(number) × floor(abs(number))</code> i.e. ceil negatives, floor positives</li>
+</ol>
+<p>in the following scenarios calling <code>Number.toInteger</code> can be replaced with faster inline comparisons:</p>
+<h3 id="isnegative"><a href="#isnegative" class="anchor"></a>isNegative</h3><pre><code>var x = -<span class="hljs-number">0</span>.<span class="hljs-number">5</span>;
+x &lt; <span class="hljs-number">0</span>; <span class="hljs-regexp">//</span> yields <span class="hljs-keyword">true</span>
+<span class="hljs-constant">Number_toInteger</span>( x ) &lt; <span class="hljs-number">0</span>; <span class="hljs-regexp">//</span> yields <span class="hljs-keyword">false</span> because it ceils negative values <span class="hljs-keyword">and</span> hence compares <span class="hljs-number">0</span> &lt; <span class="hljs-number">0</span>
+</code></pre><p>the faster equivalent of the above <code>Number_toInteger</code> call and comparison is</p>
+<pre><code><span class="hljs-attribute">x &lt;</span>=<span class="hljs-string"> -1;</span>
+</code></pre><h3 id="isnotfinite"><a href="#isnotfinite" class="anchor"></a>isNotFinite</h3><pre><code>Number_toInteger( <span class="hljs-string">'Infinity'</span> ) == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
+Number_toInteger( <span class="hljs-literal">Infinity</span> ) == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
+Number_toInteger( <span class="hljs-number">1</span>/<span class="hljs-number">0</span> ) == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
+</code></pre><p>the above expressions are the only ones evaluated to <code>Infinity</code>.
+However, since <code>Number_toInteger</code> uses <code>toNumber</code> internally and simply return
+results <code>+0</code>, <code>−0</code>, <code>+Infinity</code> and <code>−Infinity</code> of <code>toNumber</code> you may equally use</p>
+<pre><code><span class="hljs-string">'Infinity'</span> == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
+<span class="hljs-literal">Infinity</span> == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
+<span class="hljs-number">1</span>/<span class="hljs-number">0</span> == <span class="hljs-literal">Infinity</span>; <span class="hljs-comment">// true</span>
+</code></pre><p>to spare another function call. same goes for <code>-Infinity</code>.</p>
+<h3 id="apply-zero-as-minimum"><a href="#apply-zero-as-minimum" class="anchor"></a>apply zero as minimum</h3><p>instead of</p>
+<pre><code><span class="hljs-setting">x = <span class="hljs-value">Number_toInteger( x );</span></span>
+<span class="hljs-setting">x = <span class="hljs-value">Math.max( <span class="hljs-number">0</span>, x );</span></span>
+</code></pre><p>you may equally do</p>
+<pre><code><span class="hljs-attribute">x </span>=<span class="hljs-string"> x &lt; 0 ? 0 : Math.floor( x ) || 0;</span>
+</code></pre><p>where the last bit zeros <code>NaN</code>.</p>
+<p>worth a zealot&#39;s blog post..</p>
 </div>
         </div>
       

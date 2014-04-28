@@ -40,6 +40,18 @@
       <div class="heading h2">
         <a href="#roadmap">Roadmap</a>
       </div>
+      <div class="heading h2">
+        <a href="#about%20tointeger">About toInteger</a>
+      </div>
+      <div class="heading h3">
+        <a href="#isnegative">isNegative</a>
+      </div>
+      <div class="heading h3">
+        <a href="#isnotfinite">isNotFinite</a>
+      </div>
+      <div class="heading h3">
+        <a href="#apply%20zero%20as%20minimum">apply zero as minimum</a>
+      </div>
     </div>
   </div>
   <div id="sidebar-toggle"></div>
@@ -52,7 +64,7 @@
 </div>
 
 
-<p>The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
+<p>If the necessity of manipulating strings correctly in JavaScript arises you will find yourself dealing with weird native behaviors, constructing even weirder workarounds to tweak them into being consistent and easy to handle. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
 
 <p><a href="https://ci.testling.com/espretto/Stryng"><img src="https://ci.testling.com/espretto/stryng.png" alt="browser support" title="" /></a></p>
 
@@ -165,7 +177,95 @@ new String(); // luckily just the same as above
 <li>integrate them into docs</li>
 <li>renew testling setup</li>
 <li>extend with plugin <code>Stryng.esc</code> for encoding conversions related to url parsing and slugifying</li>
-</ul></div>
+</ul>
+
+
+<div class="pilwrap" id="about%20tointeger">
+  <h2>
+    <a href="#about%20tointeger" name="about%20tointeger" class="pilcrow">&#182;</a>
+    About toInteger
+  </h2>
+</div>
+
+
+<p>from the <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.4">spec</a>:</p>
+
+<ol>
+<li>let number be the result of calling <code>toNumber</code> on the input argument.</li>
+<li>if number is <code>NaN</code>, return <code>+0</code>.</li>
+<li>if number is <code>+0</code>, <code>−0</code>, <code>+Infinity</code>, or <code>−Infinity</code>, return number i.e. leave zeros and infinites untouched</li>
+<li>Rireturn the result of computing <code>sign(number) × floor(abs(number))</code> i.e. ceil negatives, floor positives</li>
+</ol>
+
+<p>in the following scenarios calling <code>Number.toInteger</code> can be replaced with faster inline comparisons:</p>
+
+
+<div class="pilwrap" id="isnegative">
+  <h3>
+    <a href="#isnegative" name="isnegative" class="pilcrow">&#182;</a>
+    isNegative
+  </h3>
+</div>
+
+
+<div class='highlight'><pre><code language=''>var x = -0.5;
+x &lt; 0; // yields true
+Number_toInteger( x ) &lt; 0; // yields false because it ceils negative values and hence compares 0 &lt; 0
+</code></pre></div>
+
+<p>the faster equivalent of the above <code>Number_toInteger</code> call and comparison is</p>
+
+<div class='highlight'><pre><code language=''>x &lt;= -1;
+</code></pre></div>
+
+
+<div class="pilwrap" id="isnotfinite">
+  <h3>
+    <a href="#isnotfinite" name="isnotfinite" class="pilcrow">&#182;</a>
+    isNotFinite
+  </h3>
+</div>
+
+
+<div class='highlight'><pre><code language=''>Number_toInteger( 'Infinity' ) == Infinity; // true
+Number_toInteger( Infinity ) == Infinity; // true
+Number_toInteger( 1/0 ) == Infinity; // true
+</code></pre></div>
+
+<p>the above expressions are the only ones evaluated to <code>Infinity</code>.
+However, since <code>Number_toInteger</code> uses <code>toNumber</code> internally and simply return
+results <code>+0</code>, <code>−0</code>, <code>+Infinity</code> and <code>−Infinity</code> of <code>toNumber</code> you may equally use</p>
+
+<div class='highlight'><pre><code language=''>'Infinity' == Infinity; // true
+Infinity == Infinity; // true
+1/0 == Infinity; // true
+</code></pre></div>
+
+<p>to spare another function call. same goes for <code>-Infinity</code>.</p>
+
+
+<div class="pilwrap" id="apply%20zero%20as%20minimum">
+  <h3>
+    <a href="#apply%20zero%20as%20minimum" name="apply%20zero%20as%20minimum" class="pilcrow">&#182;</a>
+    apply zero as minimum
+  </h3>
+</div>
+
+
+<p>instead of</p>
+
+<div class='highlight'><pre><code language=''>x = Number_toInteger( x );
+x = Math.max( 0, x );
+</code></pre></div>
+
+<p>you may equally do</p>
+
+<div class='highlight'><pre><code language=''>x = x &lt; 0 ? 0 : Math.floor( x ) || 0;
+</code></pre></div>
+
+<p>where the last bit zeros <code>NaN</code>.</p>
+
+<p>worth a zealot's blog post..</p></div>
   </div>
 </body>
 </html>

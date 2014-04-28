@@ -51,7 +51,7 @@
             
                 <li data-name="Stryng#length"><a href="Stryng.html#length">length</a></li>
             
-                <li data-name="Stryng~_isMutable"><a href="Stryng.html#_isMutable">_isMutable</a></li>
+                <li data-name="Stryng~_is_mutable"><a href="Stryng.html#_is_mutable">_is_mutable</a></li>
             
                 <li data-name="Stryng~_value"><a href="Stryng.html#_value">_value</a></li>
             
@@ -71,19 +71,15 @@
             
                 <li data-name="Stryng.random"><a href="Stryng.html#random">random</a></li>
             
-                <li data-name="Stryng#camelCase"><a href="Stryng.html#camelCase">camelCase</a></li>
+                <li data-name="Stryng#camelize"><a href="Stryng.html#camelize">camelize</a></li>
             
                 <li data-name="Stryng#capitalize"><a href="Stryng.html#capitalize">capitalize</a></li>
             
                 <li data-name="Stryng#clone"><a href="Stryng.html#clone">clone</a></li>
             
-                <li data-name="Stryng#consistsOf"><a href="Stryng.html#consistsOf">consistsOf</a></li>
-            
                 <li data-name="Stryng#contains"><a href="Stryng.html#contains">contains</a></li>
             
                 <li data-name="Stryng#count"><a href="Stryng.html#count">count</a></li>
-            
-                <li data-name="Stryng#countMultiple"><a href="Stryng.html#countMultiple">countMultiple</a></li>
             
                 <li data-name="Stryng#dasherize"><a href="Stryng.html#dasherize">dasherize</a></li>
             
@@ -95,8 +91,6 @@
             
                 <li data-name="Stryng#exchangeRight"><a href="Stryng.html#exchangeRight">exchangeRight</a></li>
             
-                <li data-name="Stryng#head"><a href="Stryng.html#head">head</a></li>
-            
                 <li data-name="Stryng#insert"><a href="Stryng.html#insert">insert</a></li>
             
                 <li data-name="Stryng#isBlank"><a href="Stryng.html#isBlank">isBlank</a></li>
@@ -104,8 +98,6 @@
                 <li data-name="Stryng#isEmpty"><a href="Stryng.html#isEmpty">isEmpty</a></li>
             
                 <li data-name="Stryng#isEqual"><a href="Stryng.html#isEqual">isEqual</a></li>
-            
-                <li data-name="Stryng#isEquali"><a href="Stryng.html#isEquali">isEquali</a></li>
             
                 <li data-name="Stryng#join"><a href="Stryng.html#join">join</a></li>
             
@@ -121,13 +113,9 @@
             
                 <li data-name="Stryng#quote"><a href="Stryng.html#quote">quote</a></li>
             
-                <li data-name="Stryng#randomize"><a href="Stryng.html#randomize">randomize</a></li>
-            
                 <li data-name="Stryng#repeat"><a href="Stryng.html#repeat">repeat</a></li>
             
                 <li data-name="Stryng#reverse"><a href="Stryng.html#reverse">reverse</a></li>
-            
-                <li data-name="Stryng#slugify"><a href="Stryng.html#slugify">slugify</a></li>
             
                 <li data-name="Stryng#splitAt"><a href="Stryng.html#splitAt">splitAt</a></li>
             
@@ -146,8 +134,6 @@
                 <li data-name="Stryng#stripRight"><a href="Stryng.html#stripRight">stripRight</a></li>
             
                 <li data-name="Stryng#substr"><a href="Stryng.html#substr">substr</a></li>
-            
-                <li data-name="Stryng#tail"><a href="Stryng.html#tail">tail</a></li>
             
                 <li data-name="Stryng#trim"><a href="Stryng.html#trim">trim</a></li>
             
@@ -195,7 +181,7 @@
 
     <section>
         <article class="readme"><h2>Stryng</h2>
-<p>The methods available for string manipulation in javascript are scarce. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
+<p>If the necessity of manipulating strings correctly in JavaScript arises you will find yourself dealing with weird native behaviors, constructing even weirder workarounds to tweak them into being consistent and easy to handle. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
 <p><a href="https://ci.testling.com/espretto/Stryng"><img src="https://ci.testling.com/espretto/stryng.png" alt="browser support"></a></p>
 <h2>Let me introduce</h2>
 <pre><code>String.prototype.toStryng = function() {
@@ -253,7 +239,41 @@ new String(); // luckily just the same as above
 <li>integrate them into docs</li>
 <li>renew testling setup</li>
 <li>extend with plugin <code>Stryng.esc</code> for encoding conversions related to url parsing and slugifying</li>
-</ul></article>
+</ul>
+<h2>About toInteger</h2>
+<p>from the <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.4">spec</a>:</p>
+<ol>
+<li>let number be the result of calling <code>toNumber</code> on the input argument.</li>
+<li>if number is <code>NaN</code>, return <code>+0</code>.</li>
+<li>if number is <code>+0</code>, <code>−0</code>, <code>+Infinity</code>, or <code>−Infinity</code>, return number i.e. leave zeros and infinites untouched</li>
+<li>Rireturn the result of computing <code>sign(number) × floor(abs(number))</code> i.e. ceil negatives, floor positives</li>
+</ol>
+<p>in the following scenarios calling <code>Number.toInteger</code> can be replaced with faster inline comparisons:</p>
+<h3>isNegative</h3>
+<pre><code>var x = -0.5;
+x &lt; 0; // yields true
+Number_toInteger( x ) &lt; 0; // yields false because it ceils negative values and hence compares 0 &lt; 0</code></pre>
+<p>the faster equivalent of the above <code>Number_toInteger</code> call and comparison is</p>
+<pre><code>x &lt;= -1;</code></pre>
+<h3>isNotFinite</h3>
+<pre><code>Number_toInteger( 'Infinity' ) == Infinity; // true
+Number_toInteger( Infinity ) == Infinity; // true
+Number_toInteger( 1/0 ) == Infinity; // true</code></pre>
+<p>the above expressions are the only ones evaluated to <code>Infinity</code>.
+However, since <code>Number_toInteger</code> uses <code>toNumber</code> internally and simply return
+results <code>+0</code>, <code>−0</code>, <code>+Infinity</code> and <code>−Infinity</code> of <code>toNumber</code> you may equally use</p>
+<pre><code>'Infinity' == Infinity; // true
+Infinity == Infinity; // true
+1/0 == Infinity; // true</code></pre>
+<p>to spare another function call. same goes for <code>-Infinity</code>.</p>
+<h3>apply zero as minimum</h3>
+<p>instead of</p>
+<pre><code>x = Number_toInteger( x );
+x = Math.max( 0, x );</code></pre>
+<p>you may equally do</p>
+<pre><code>x = x &lt; 0 ? 0 : Math.floor( x ) || 0;</code></pre>
+<p>where the last bit zeros <code>NaN</code>.</p>
+<p>worth a zealot's blog post..</p></article>
     </section>
 
 
@@ -264,7 +284,7 @@ new String(); // luckily just the same as above
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Apr 25 2014 02:41:19 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Apr 28 2014 14:58:10 GMT+0200 (CEST)
         </footer>
     </div>
 </div>

@@ -34,6 +34,26 @@ window.files = [
       "level": 2,
       "slug": "roadmap",
       "title": "Roadmap"
+    },
+    {
+      "level": 2,
+      "slug": "about-tointeger",
+      "title": "About toInteger"
+    },
+    {
+      "level": 3,
+      "slug": "isnegative",
+      "title": "isNegative"
+    },
+    {
+      "level": 3,
+      "slug": "isnotfinite",
+      "title": "isNotFinite"
+    },
+    {
+      "level": 3,
+      "slug": "apply-zero-as-minimum",
+      "title": "apply zero as minimum"
     }
   ]
 },
@@ -51,27 +71,27 @@ window.files = [
       "title": "baseline setup"
     },
     {
-      "level": 1,
+      "level": 2,
       "slug": "method-shortcuts",
       "title": "method shortcuts"
     },
     {
-      "level": 2,
+      "level": 3,
       "slug": "static-methods",
       "title": "static methods"
     },
     {
-      "level": 2,
+      "level": 3,
       "slug": "instance-methods",
       "title": "instance methods"
     },
     {
-      "level": 1,
+      "level": 2,
       "slug": "regular-expressions",
       "title": "regular expressions"
     },
     {
-      "level": 2,
+      "level": 3,
       "slug": "the-whitespace-shim",
       "title": "the whitespace shim"
     },
@@ -81,64 +101,44 @@ window.files = [
       "title": "the substr check"
     },
     {
-      "level": 1,
+      "level": 2,
+      "slug": "custom-exit",
+      "title": "custom exit"
+    },
+    {
+      "level": 2,
       "slug": "type-safety",
       "title": "type safety"
     },
     {
       "level": 1,
-      "slug": "utility-functions",
-      "title": "utility functions"
+      "slug": "defining-stryng",
+      "title": "defining Stryng"
     },
     {
       "level": 2,
-      "slug": "tointeger",
-      "title": "toInteger"
-    },
-    {
-      "level": 3,
-      "slug": "isnegative",
-      "title": "isNegative"
-    },
-    {
-      "level": 3,
-      "slug": "isnotfinite",
-      "title": "isNotFinite"
-    },
-    {
-      "level": 3,
-      "slug": "apply-zero-as-minimum",
-      "title": "apply zero as minimum"
+      "slug": "constructor",
+      "title": "constructor"
     },
     {
       "level": 2,
-      "slug": "exit",
-      "title": "exit"
-    },
-    {
-      "level": 1,
-      "slug": "class-constructor",
-      "title": "class constructor"
-    },
-    {
-      "level": 1,
       "slug": "cloning-mutables",
       "title": "cloning mutables"
     },
     {
-      "level": 1,
-      "slug": "instance-amp-static-functions",
-      "title": "instance &amp; static functions"
+      "level": 2,
+      "slug": "instance-methods-amp-static-functions",
+      "title": "instance methods &amp; static functions"
     },
     {
-      "level": 1,
+      "level": 2,
       "slug": "static-functions",
       "title": "static functions"
     },
     {
       "level": 1,
       "slug": "building-stryng",
-      "title": "building stryng"
+      "title": "building Stryng"
     },
     {
       "level": 2,
