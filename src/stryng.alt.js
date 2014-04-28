@@ -136,5 +136,73 @@ var stryng_challengers = {
 
       return input.substring( length );
     }
+  ],
+
+  // iterate
+  // -------
+  iterate: [
+    function( input, delimiter, iterator, context ) {
+      input = input != null ? String( input ) : exit();
+
+      var delimiter_len,
+        matches,
+        match,
+        groups = null,
+        head,
+        tail = input,
+        index,
+        lastIndex = 0,
+        global_index = 0;
+
+      // - let `tail` be this's string
+      // - try to find/match argument `delimiter` in/on `tail`
+      // - let `match` either be the `delimiter` or the
+      //   substring matched by the regular expression
+      // - if found, call argument `iterator` on `context` and pass arguments
+      //   - the substring of this' string head `match`
+      //   - `match` itself
+      //   - the captured groups if any, null otherwise
+      //   - `match`'s start index
+      //   - the substring of this' string following `match`
+      // - otherwise let `lastIndex` be `match`'s start index plus `match`'s length
+      //   and front-cut `tail` by that.
+      // - if not found call argument `iterator` within the context
+      //   of argument `context` and pass arguments
+      //   [`tail`, `null`, `null`, `-1`, `''`]
+
+      if ( is.RegExp( delimiter ) ) {
+
+        while ( matches = tail.match( delimiter ) ) {
+          global_index += lastIndex;
+
+          index = matches.index;
+          head = tail.substring( 0, index );
+          match = matches.shift();
+          groups = matches.length ? matches : null;
+          lastIndex = index + match.length;
+          if ( lastIndex <= index ) lastIndex = index + 1;
+          tail = tail.substring( lastIndex );
+
+          if ( false === iterator.call( context, head, match, groups, global_index, tail ) ) break;
+        }
+
+      } else {
+
+        delimiter = String( delimiter );
+        delimiter_len = delimiter.length;
+
+        while ( ( index = tail.indexOf( delimiter ) ) !== -1 ) {
+          global_index += lastIndex;
+
+          head = tail.substring( 0, index );
+          lastIndex = index + delimiter_len;
+          if ( lastIndex <= index ) lastIndex = index + 1;
+          tail = tail.substring( lastIndex );
+
+          if ( false === iterator.call( context, head, delimiter, groups, global_index, tail ) ) break;
+        }
+      }
+      iterator.call( context, rest, null, null, -1, '' );
+    }
   ]
 };

@@ -60,6 +60,24 @@ module.exports = function( grunt ) {
       }
     },
 
+    uglify: {
+      options: {
+        // beautify: true,
+        preserveComments: 'some',
+        compress: {
+          global_defs: {
+            "DEBUG": false
+          },
+          dead_code: true
+        }
+      },
+      all: {
+        files: {
+          'src/stryng.min.js': ['src/stryng.js']
+        }
+      }
+    },
+
     connect: {
       docs: {
         options: {
@@ -91,6 +109,7 @@ module.exports = function( grunt ) {
     'grunt-contrib-connect',
     'grunt-contrib-watch',
     'grunt-contrib-clean',
+    'grunt-contrib-uglify',
     'grunt-docker',
     'grunt-grock',
     'grunt-jsdoc',
