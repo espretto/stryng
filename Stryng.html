@@ -63,19 +63,11 @@
             
             <span class="subtitle">Methods</span>
             
-                <li data-name="Stryng.chr"><a href="Stryng.html#chr">chr</a></li>
-            
                 <li data-name="Stryng.fromCharCode"><a href="Stryng.html#fromCharCode">fromCharCode</a></li>
-            
-                <li data-name="Stryng.noConflict"><a href="Stryng.html#noConflict">noConflict</a></li>
-            
-                <li data-name="Stryng.random"><a href="Stryng.html#random">random</a></li>
             
                 <li data-name="Stryng#camelize"><a href="Stryng.html#camelize">camelize</a></li>
             
                 <li data-name="Stryng#capitalize"><a href="Stryng.html#capitalize">capitalize</a></li>
-            
-                <li data-name="Stryng#clone"><a href="Stryng.html#clone">clone</a></li>
             
                 <li data-name="Stryng#contains"><a href="Stryng.html#contains">contains</a></li>
             
@@ -116,6 +108,8 @@
                 <li data-name="Stryng#repeat"><a href="Stryng.html#repeat">repeat</a></li>
             
                 <li data-name="Stryng#reverse"><a href="Stryng.html#reverse">reverse</a></li>
+            
+                <li data-name="Stryng#slugify"><a href="Stryng.html#slugify">slugify</a></li>
             
                 <li data-name="Stryng#splitAt"><a href="Stryng.html#splitAt">splitAt</a></li>
             
@@ -187,7 +181,7 @@
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line298">line 298</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line339">line 339</a>
         </div>
         
     </div>
@@ -520,139 +514,6 @@ create a new instance from the result of every method call</p>
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="chr">
-            
-            <span class="type-signature static">static</span>Stryng.chr<span class="signature">(charCode)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1391">line 1391</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>delegates to native <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode">String.fromCharCode</a>.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>charCode</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                    
-                    
-                        
-                    
-                        <span class="repeatable">repeatable</span>
-                    
-                
-                </td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-<h5>Returns:</h5>
- the concatenated string representations of the given
-  <code>charCode</code>s from the UTF-16 table. empty if no arguments passed
-<br />
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
         <h4 class="name" id="fromCharCode">
             
             <span class="type-signature static">static</span>Stryng.fromCharCode<span class="signature">(<span class="optional">charCode</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
@@ -660,7 +521,7 @@ create a new instance from the result of every method call</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1401">line 1401</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1402">line 1402</a>
         </div>
         
     </div>
@@ -786,302 +647,6 @@ create a new instance from the result of every method call</p>
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="noConflict">
-            
-            <span class="type-signature static">static</span>Stryng.noConflict<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="Stryng.html">Stryng</a>}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1579">line 1579</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>restores the provious value assigned to <code>window.Stryng</code> if it
-is different from <code>undefined</code>, otherwise cleans up the global namespace with <code>delete</code>.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-<h5>Returns:</h5>
- the inner reference <em>Stryng</em> holds to itself
-<br />
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="random">
-            
-            <span class="type-signature static">static</span>Stryng.random<span class="signature">(<span class="optional">n</span>, <span class="optional">from</span>, <span class="optional">to</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1361">line 1361</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>generates a string of random characters which default to the ASCII printables.
-to choose randomly from the whole Unicode table call <code>Stryng.random(n, 0, -1)</code>.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Default</th>
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>n</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-                <td class="default">
-                
-                    0
-                
-                </td>
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>from</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-                <td class="default">
-                
-                    32
-                
-                </td>
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>inclusively</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>to</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-                <td class="default">
-                
-                    127
-                
-                </td>
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>exclusively assuming <em>Math.random</em> never yields <code>1</code></p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-<h5>Returns:</h5>
- string of length <code>n</code> with characters (ASCII by default)
-  randomly choosen from the Unicode table with
-  code-range [<code>from</code>, <code>to</code>]
-<br />
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
         <h4 class="name" id="camelize">
             
             camelize<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
@@ -1089,7 +654,7 @@ to choose randomly from the whole Unicode table call <code>Stryng.random(n, 0, -
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1308">line 1308</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1285">line 1285</a>
         </div>
         
     </div>
@@ -1173,7 +738,7 @@ for a classified output compose this method with <em>Stryng#capitalize</em>.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1288">line 1288</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1265">line 1265</a>
         </div>
         
     </div>
@@ -1250,148 +815,6 @@ with first letter upper-cased.</li>
             
 <dt>
     <div class="nameContainer">
-        <h4 class="name" id="clone">
-            
-            clone<span class="signature">(<span class="optional">is_mutable</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{<a href="Stryng.html">Stryng</a>}</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line361">line 361</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>in case the instance was not constructed to be mutable
-this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#constructor</a></p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Default</th>
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>is_mutable</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-            
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-            
-            <td class="description last">
-                
-                    
-                        <span class="optional">optional</span>
-                    
-                    
-                        
-                    
-                
-                <p>whether the cloned instance should be mutable or
-  create a new instance from the internal result of every method call</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
-<h5>Returns:</h5>
- a copy of the <em>Stryng</em> instance
-<br />
-
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <div class="nameContainer">
         <h4 class="name" id="contains">
             
             contains<span class="signature">(<span class="optional">search</span>, <span class="optional">index</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{boolean}</span>
@@ -1399,7 +822,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line414">line 414</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line455">line 455</a>
         </div>
         
     </div>
@@ -1575,7 +998,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line577">line 577</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line618">line 618</a>
         </div>
         
     </div>
@@ -1713,7 +1136,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1338">line 1338</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1315">line 1315</a>
         </div>
         
     </div>
@@ -1795,7 +1218,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line467">line 467</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line508">line 508</a>
         </div>
         
     </div>
@@ -1972,7 +1395,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line897">line 897</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line874">line 874</a>
         </div>
         
     </div>
@@ -2145,7 +1568,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line919">line 919</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line896">line 896</a>
         </div>
         
     </div>
@@ -2361,7 +1784,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line942">line 942</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line919">line 919</a>
         </div>
         
     </div>
@@ -2578,7 +2001,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line635">line 635</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line676">line 676</a>
         </div>
         
     </div>
@@ -2750,7 +2173,7 @@ this is the hook to get a copy of it. delegates to <a href="#Stryng">Stryng#cons
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1271">line 1271</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1248">line 1248</a>
         </div>
         
     </div>
@@ -2827,7 +2250,7 @@ the string is empty or consists of whitespace only</li>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1264">line 1264</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1241">line 1241</a>
         </div>
         
     </div>
@@ -2904,7 +2327,7 @@ the string has length <code>0</code></li>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1256">line 1256</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1233">line 1233</a>
         </div>
         
     </div>
@@ -3041,7 +2464,7 @@ the string has length <code>0</code></li>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line606">line 606</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line647">line 647</a>
         </div>
         
     </div>
@@ -3194,7 +2617,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line962">line 962</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line939">line 939</a>
         </div>
         
     </div>
@@ -3346,7 +2769,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line990">line 990</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line967">line 967</a>
         </div>
         
     </div>
@@ -3498,7 +2921,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1019">line 1019</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line996">line 996</a>
         </div>
         
     </div>
@@ -3650,7 +3073,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1226">line 1226</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1203">line 1203</a>
         </div>
         
     </div>
@@ -3726,7 +3149,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1244">line 1244</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1221">line 1221</a>
         </div>
         
     </div>
@@ -3847,7 +3270,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1164">line 1164</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1141">line 1141</a>
         </div>
         
     </div>
@@ -3919,7 +3342,7 @@ Stryng.join(' ', the', ['quick', ['brown', ['fox']]]); // yeilds 'the quick brow
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line519">line 519</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line560">line 560</a>
         </div>
         
     </div>
@@ -4072,7 +3495,7 @@ reduction of concat operations inspired by <a href="https://github.com/mout/mout
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line622">line 622</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line663">line 663</a>
         </div>
         
     </div>
@@ -4147,6 +3570,84 @@ diacritics and accented character use <a href="https://github.com/mathiasbynens/
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="slugify">
+            
+            slugify<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1329">line 1329</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>replaces ligatures and diacritics from the Latin-1 Supplement
+with their nearest plain letter, replaces symbols otherwise being percentescaped.
+compose this method with <em>Stryng#dasherize</em> to produce URL slugs</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="splitAt">
             
             splitAt<span class="signature">(index)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{string[]}</span>
@@ -4154,7 +3655,7 @@ diacritics and accented character use <a href="https://github.com/mathiasbynens/
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line855">line 855</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line831">line 831</a>
         </div>
         
     </div>
@@ -4287,7 +3788,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line721">line 721</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line697">line 697</a>
         </div>
         
     </div>
@@ -4465,7 +3966,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line844">line 844</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line820">line 820</a>
         </div>
         
     </div>
@@ -4548,7 +4049,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line782">line 782</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line758">line 758</a>
         </div>
         
     </div>
@@ -4727,7 +4228,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line426">line 426</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line467">line 467</a>
         </div>
         
     </div>
@@ -4907,7 +4408,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1123">line 1123</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1100">line 1100</a>
         </div>
         
     </div>
@@ -5075,7 +4576,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1052">line 1052</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1029">line 1029</a>
         </div>
         
     </div>
@@ -5259,7 +4760,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1086">line 1086</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1063">line 1063</a>
         </div>
         
     </div>
@@ -5431,7 +4932,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line542">line 542</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line583">line 583</a>
         </div>
         
     </div>
@@ -5603,7 +5104,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line384">line 384</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line425">line 425</a>
         </div>
         
     </div>
@@ -5679,7 +5180,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line395">line 395</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line436">line 436</a>
         </div>
         
     </div>
@@ -5755,7 +5256,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line403">line 403</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line444">line 444</a>
         </div>
         
     </div>
@@ -5831,7 +5332,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1134">line 1134</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1111">line 1111</a>
         </div>
         
     </div>
@@ -6000,7 +5501,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1323">line 1323</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1300">line 1300</a>
         </div>
         
     </div>
@@ -6082,7 +5583,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1206">line 1206</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1183">line 1183</a>
         </div>
         
     </div>
@@ -6154,7 +5655,7 @@ Stryng.stripLeft('blubblubblub', 'blub');
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line562">line 562</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line603">line 603</a>
         </div>
         
     </div>
@@ -6333,7 +5834,7 @@ to do the opposite use <a href="#strip">Stryng.strip</a>.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Apr 28 2014 14:58:10 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon Apr 28 2014 23:43:04 GMT+0200 (CEST)
         </footer>
     </div>
 </div>

@@ -92,6 +92,11 @@ window.files = [
     },
     {
       "level": 3,
+      "slug": "diacritics-amp-liguatures",
+      "title": "diacritics &amp; liguatures"
+    },
+    {
+      "level": 3,
       "slug": "the-whitespace-shim",
       "title": "the whitespace shim"
     },
@@ -159,11 +164,6 @@ window.files = [
       "level": 2,
       "slug": "aliases",
       "title": "aliases"
-    },
-    {
-      "level": 2,
-      "slug": "export",
-      "title": "export"
     }
   ]
 }
