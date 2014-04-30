@@ -86,6 +86,8 @@
       );
     },
 
+    // feature detect native _Object.defineProperty_
+    // 
     // - try to define a dummy property on an object literal which fails
     //   - either in case `defineProperty` isn't available
     //   - or only DOM objects are allowed as first argument
@@ -93,11 +95,11 @@
     // - implicitely return `undefined` otherwise
     Object_defineProperty = ( function( defineProperty ) {
       try {
-        defineProperty( {}, string, {
-          value: 1
-        } );
-        return defineProperty;
-      } catch ( e ) {}
+        defineProperty && defineProperty( object, string, {} );
+      } catch ( e ) {
+        return false;
+      }
+      return defineProperty;
 
     } )( Object.defineProperty ),
 
@@ -224,30 +226,33 @@
     var is_spec_compliant = true,
       re_whitespace = /\s/,
       re_whitespace_source = re_whitespace.source,
-      re_whitespaces_source;
+      re_whitespaces_source,
 
-      whitespace = ( '' + '\t' // '\u0009' tab
-        + '\n' // '\u000A' line feed
-        + '\13' // '\u000B' vertical tab
-        + '\f' // '\u000C' form feed
-        + '\r' // '\u000D' carriage return
-        + ' ' // '\u0020' space
+      whitespace = (''
+        + ',09' // tab
+        + ',0A' // line feed
+        + ',0B' // vertical tab
+        + ',0C' // form feed
+        + ',0D' // carriage return
+        + ',20' // space
+        + ',A0' // nbsp
 
-        + '\xA0' // NBSP
-        + '\u1680\u180E\u2000\u2001' // prevent
-        + '\u2002\u2003\u2004\u2005' // formatter
-        + '\u2006\u2007\u2008\u2009' // from
-        + '\u200A\u202F\u205F\u3000' // mangling
+        + ',1680,180E,2000,2001' // prevent
+        + ',2002,2003,2004,2005' // formatter
+        + ',2006,2007,2008,2009' // from
+        + ',200A,202F,205F,3000' // inlining
 
-        + '\u2028' // line separator
-        + '\u2029' // paragraph separator
-        + '\uFEFF' // BOM - byte order mark
-      );
+        + ',2028' // line separator
+        + ',2029' // paragraph separator
+        + ',FEFF' // byte order mark
+      ).split(',');
 
-    array_forEach.call( whitespace, function( chr ) { // Array#forEach is generic
+    array_forEach.call( whitespace, function( hex_char_code ) {
+
+      var chr = String_fromCharCode( parseInt( hex_char_code, 16 ) )
 
       if ( !re_whitespace.test( chr ) ) {
-        re_whitespace_source += chr;
+        re_whitespace_source += ( hex_char_code.length === 2 ? '\\x' : '\\u') + hex_char_code
         is_spec_compliant = false;
       }
 
@@ -1199,8 +1204,7 @@
      * @return {boolean} - whether the string is empty or consists of whitespace only
      */
     isBlank: function( input ) {
-      input = input != null ? String( input ) : exit();
-      return !input || !re_no_whitespace.test( input );
+      return input != null ? !String( input ) || !re_no_whitespace.test( input ) : exit();
     },
 
     collapseWhitespace: function( input ) {
