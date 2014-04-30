@@ -113,10 +113,13 @@
 
     array_forEach = array.forEach || function( iterator ) {
 
-      var array = this,
-        i = array.length;
+      for( var array = this, i = array.length; i--; iterator( array[ i ] ));
+    },
 
-      while ( i-- ) iterator( array[ i ] );
+    array_contains = array.contains || function( item ){
+
+      for( var array = this, i = array.length; i-- && array[i] !== item;);
+      return i !== -1;
     },
 
     // make this one pretty for the w3c wishlist.
@@ -960,8 +963,8 @@
       fill = String( fill );
       max_len = max_len < 0 ? 0 : Math_floor( max_len ) || 0;
 
-      var input_len = input.length
-      fill_len = fill.length;
+      var input_len = input.length,
+        fill_len = fill.length;
 
       if ( max_len <= input_len || !fill ) return input;
 
@@ -1426,7 +1429,7 @@
 
     var fn = string[ fn_name ];
 
-    if ( is.Function( fn ) && shim_methods.indexOf( fn_name ) === -1 ) {
+    if ( is.Function( fn ) && !array_contains.call(shim_methods, fn_name )) {
 
       Stryng[ fn_name ] = String[ fn_name ] || function( input ) {
         if ( input == null ) exit();
