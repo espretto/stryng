@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "devDependencies": {
     "benchmark": "~1.0.0",
-    "expect.js": "~0.2.0",
+    "expect.js": "latest",
     "mocha": "~1.15.1",
     "browserify": "~3.38.0",
     "grock": "~0.3.2",

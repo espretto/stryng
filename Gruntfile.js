@@ -24,7 +24,29 @@ module.exports = function( grunt ) {
         dest: DOCS_OUT + '/docker',
         options: {
           onlyUpdated: false,
-          colourScheme: 'perldoc',
+          colourScheme: 'tango',
+
+          // 'autumn'
+          // 'borland'
+          // 'bw'
+          // 'colorful'
+          // 'default'
+          // 'emacs'
+          // 'friendly'
+          // 'fruity'
+          // 'manni'
+          // 'monokai'
+          // 'murphy'
+          // 'native'
+          // 'pastie'
+          // 'perldoc'
+          // 'rrt'
+          // 'tango'
+          // 'trac'
+          // 'vim'
+          // 'vs'
+
+
           ignoreHidden: false,
           sidebarState: true,
           exclude: [],
@@ -65,10 +87,10 @@ module.exports = function( grunt ) {
         // beautify: true,
         preserveComments: 'some',
         compress: {
-          global_defs: {
-            "DEBUG": false
-          },
-          dead_code: true
+          // global_defs: {
+          //   "DEBUG": false
+          // },
+          // dead_code: true
         }
       },
       all: {

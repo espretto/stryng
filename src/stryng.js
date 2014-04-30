@@ -1,11 +1,12 @@
 
-// leverage uglifyjs' ability to declare global variables
-if ( typeof DEBUG === 'undefined' ) DEBUG = true;
-
 // baseline setup
 // ==============
+// leverage _uglifyjs_' ability to declare global variables
+// ```
+// if ( typeof DEBUG === 'undefined' ) DEBUG = true;
+// ```
 
-( function() {
+( function( root ) {
 
   var // one to var them all
 
@@ -25,35 +26,37 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     String = func = string.constructor,
 
     // methods _Stryng_ hopes to adopt
-    methods = array = ( 'charAt,' // charAt
-      + 'charCodeAt,' // charCodeAt
-      + 'codePointAt,' // codePointAt
-      + 'concat,' // concat
-      + 'contains,' // contains
-      + 'endsWith' // endsWit
-      + 'indexOf,' // indexOf
-      + 'lastIndexOf,' // lastIndexOf
-      + 'localeCompare,' // localeCompare
-      + 'match,' // match
-      + 'normalize,' // normalize
-      + 'replace,' // replace
-      + 'search,' // search
-      + 'slice,' // slice
-      + 'split,' // split
-      + 'startsWith,' // startsWith
-      + 'substr,' // substr
-      + 'substring,' // substring
-      + 'toLocaleLowerCase,' // toLocaleLowerCase
-      + 'toLocaleUpperCase,' // toLocaleUpperCase
-      + 'toLowerCase,' // toLowerCase
-      + 'toUpperCase,' // toUpperCase
-      + 'trim,' // trim
-      + 'trimLeft,' // trimLeft
-      + 'trimRight' // trimRight
+    methods = array = ('' +
+      + 'charAt,'
+      + 'charCodeAt,'
+      + 'codePointAt,'
+      + 'concat,'
+      + 'contains,'
+      + 'endsWith'
+      + 'indexOf,'
+      + 'lastIndexOf,'
+      + 'localeCompare,'
+      + 'match,'
+      + 'normalize,'
+      + 'replace,'
+      + 'search,'
+      + 'slice,'
+      + 'split,'
+      + 'startsWith,'
+      + 'substr,'
+      + 'substring,'
+      + 'toLocaleLowerCase,'
+      + 'toLocaleUpperCase,'
+      + 'toLowerCase,'
+      + 'toUpperCase,'
+      + 'trim,'
+      + 'trimLeft,'
+      + 'trimRight'
     ).split( ',' ),
 
-    // methods which's native implementations to override if necessary
-    shim_methods = [],
+    // methods which's native implementations to override if necessary.
+    // currently _String#startsWith_ and _String#endsWith_ don't have regex support.
+    shim_methods = ['startsWith', 'endsWith'],
 
     // inner module to hold type/class check functions.
     is = object = {},
@@ -75,7 +78,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
 
     // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
     // implementation of `Number.toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
-    Number_toInteger = Number.toInteger || function( any ) {
+    Number_toInteger = Number.toInteger || function( n ) {
       return (
         ( n = +n ) && isFinite( n ) // toNumber and isFinite
         ? n - ( n % 1 ) // ceil negatives, floor positives
@@ -163,8 +166,8 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     latin_1_supplement = {
       'A': '\\xC0-\\xC5',
       'a': '\\xE0-\\xE5',
-      'AE':'\\xC6',
-      'ae':'\\xE6',
+      'AE': '\\xC6',
+      'ae': '\\xE6',
       'C': '\\xC7',
       'c': '\\xE7',
       'E': '\\xC8-\\xCB',
@@ -221,6 +224,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     var is_spec_compliant = true,
       re_whitespace = /\s/,
       re_whitespace_source = re_whitespace.source,
+      re_whitespaces_source;
 
       whitespace = ( '' + '\t' // '\u0009' tab
         + '\n' // '\u000A' line feed
@@ -253,7 +257,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
 
       shim_methods.push( 'trim', 'trimRight', 'trimLeft' );
 
-      var re_whitespaces_source = '[' + re_whitespace_source + '][' + re_whitespace_source + ']*';
+      re_whitespaces_source = '[' + re_whitespace_source + '][' + re_whitespace_source + ']*';
 
       re_no_whitespace = new RegExp( '[^' + re_whitespace_source + ']' );
       re_whitespaces = new RegExp( re_whitespaces_source, 'g' );
@@ -274,32 +278,8 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
   // custom exit
   // -----------
   // wraps the process of throwing an _Error_.
-  // in _DEBUG_ mode composes the error's message
-  // of the custom _Stryng_ function's `_name` property
-  // and the arguments passed i.e. logs the stacktrace of the level above.
-  // 
-  // - get the `caller` function
-  // - stringify its arguments
-  // - throw the error with the custom message
   function exit( message ) {
-    if ( DEBUG ) {
-
-      var args = '',
-        caller = arguments.callee.caller,
-        caller_args = caller.arguments,
-        caller_args_len = caller_args.length,
-        i = 0,
-        message = 'invalid usage of Stryng.' + caller._name + '() with args [';
-
-      for(; i < caller_args_len; i++ ){
-        args += caller_args[i] + ',';
-      }
-
-      throw new Error( message + ( args ? args.slice( 0, -2 ) : '' ) + ']. ' + ( message || '' ) );
-
-    } else {
-      throw new Error( 'invalid usage of Stryng member. ' + ( message || '' ) );
-    }
+    throw new Error( 'invalid usage of stryng member. ' + ( message || '' ) );
   }
 
   // type safety
@@ -350,7 +330,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
   function Stryng( value, is_mutable ) {
 
     // allow omitting the new operator
-    if ( !( this instanceof Stryng ) ) return new Stryng( value );
+    if ( !( this instanceof Stryng ) ) return new Stryng( value, is_mutable );
 
     /**
      * the wrapped native string primitive
@@ -390,6 +370,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
 
   // cloning mutables
   // ----------------
+  
   /**
    * in case the instance was not constructed to be mutable
    * this is the hook to get a copy of it. delegates to [Stryng#constructor](#Stryng)
@@ -479,18 +460,14 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
       //   - max to `input_len`
       //   - floor if positive parsable, zero if `NaN`
       // - return whether or not `i` equals the above's result
-
       if ( is.RegExp( search ) ) {
         return !input.substring( position ).search( search );
       }
 
       var i = input.indexOf( search, position ),
-        input_len;
+        input_len = input.length;
 
-      if ( i === -1 ) return false;
-
-      input_len = input.length;
-      return i === (
+      return i !== -1 && i === (
         position === void 0 || position < 0 ? 0 :
         position > input_len ? input_len :
         Math_floor( position ) || 0
@@ -623,11 +600,11 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
       // early exit for the empty search
       if ( !search ) return input.length + 1;
 
-      var length = search.length,
+      var search_len = search.length,
         count = 0,
-        i = -length; // prepare first run
+        i = -search_len; // prepare first run
 
-      do i = input.indexOf( search, i + length );
+      do i = input.indexOf( search, i + search_len );
       while ( i !== -1 && ++count )
 
       return count;
@@ -676,7 +653,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     insert: function( input, position, insertion ) {
       input = input != null ? String( input ) : exit();
 
-      // slice's native parsing will apply different
+      // slice's native parsing will apply differenceerent
       // defaults for `undefined` to the first and second argument
       if ( position === void 0 ) position = Number_toInteger( position );
 
@@ -685,14 +662,56 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     },
 
     /**
+     * splits a string at the given indices. negative indices are allowed.
+     * if the resulting substrings overlap, the first one dominates, the latter is front-cut.
+     * @param {...number} index indices to split at. negatives allowed
+     * @return {string[]} -
+     *   the resulting array of substrings.
+     */
+    splitAt: function( input /*, index... */ ) {
+      input = input != null ? String( input ) : exit();
+
+      // - for each index
+      //   - if it is negative, add this' string's length
+      //   - apply `pending_index` of the previous iteration ( initially zero ) as `index`'s minimum
+      //   - let native _String#slice_ apply the maximum
+      //   - push what's within input between `pending_index` and `index` to `result`
+      //   - update `pending_index` for the next iteration
+      // - push what's left to the result and return it.
+
+      var input_len = input.length,
+        args = arguments,
+        args_len = args.length,
+        i = 1, // skip `input`
+        index = 0,
+        pending_index = 0,
+        result = [];
+
+      for ( ; i < args_len; i++ ) {
+        index = Number_toInteger( args[ i ] );
+        if ( index < 0 ) {
+          index += input_len;
+        }
+        if ( index <= pending_index ) {
+          result.push( '' ); // faster than slicing the empty string first
+          index = pending_index;
+        } else {
+          result.push( input.slice( pending_index, index ) );
+          pending_index = index;
+        }
+      }
+      result.push( input.substring( index ) );
+      return result;
+    },
+
+    /**
      * @param {string|RegExp} [delimiter="undefined"]
      * @param {number} [n=Math.pow(2,32)-1]
      *   maximum number of split operations.
      *   as per [ecma-262/5.1](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14)
      * @return {string[]} -
-     *   the `input` split by the given `delimiter`
-     *   with anything past the `n`th occurrence of
-     *   `delimiter` untouched yet included in the array.
+     *   the `input` split `n` times by the given `delimiter` - captured groups
+     *   and the trailing part after the `n`th occurence of `delimiter` included.
      */
     splitLeft: function( input, delimiter, n ) {
       input = input != null ? String( input ) : exit();
@@ -702,8 +721,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
       // - let `result` be the array to return
       // - if `delimiter` is a regular expression
       //   - extract `n` matches using _String#match_ combined with
-      //     subsequently front-cutting this' string. using _RegExp#exec_
-      //     would require the regex's _global_ flag to be set.
+      //     subsequently front-cutting this' string.
       //   - push the substrings between the matches and any captured groups to `result`
       // - otherwise let `result` be the result of _String#split_
       //   called on this' string with `delimiter`
@@ -719,25 +737,25 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
       var result = [],
         match,
         index,
-        lastIndex = 0,
-        diff;
+        last_index = 0,
+        difference;
 
       if ( is.RegExp( delimiter ) ) {
         while ( n-- && ( match = input.match( delimiter ) ) ) {
           index = match.index;
           result.push( input.substring( 0, index ) );
-          lastIndex = index + match.shift().length; // mutates `match`
-          if ( lastIndex <= index ) lastIndex = index + 1; // avoid endless loop
+          last_index = index + match.shift().length; // mutates `match`
+          if ( last_index <= index ) last_index = index + 1; // avoid endless loop
           if ( match.length ) array_push.apply( result, match ); // mutate instead of recreate as concat would
-          input = input.substring( lastIndex );
+          input = input.substring( last_index );
         }
         result.push( input ); // push what's left
       } else {
         delimiter = String( delimiter );
         result = input.split( delimiter );
-        diff = result.length - n;
-        if ( diff > 0 ) {
-          result.push( result.splice( n, diff ).join( delimiter ) ); // implies parsing delimiter
+        difference = result.length - n;
+        if ( difference > 0 ) {
+          result.push( result.splice( n, difference ).join( delimiter ) ); // implies parsing delimiter
         }
       }
 
@@ -773,42 +791,22 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
       //   - unshift them to `result` as one
       // - return `result`
 
+      if ( is.RegExp( delimiter ) ) {
+        exit('no regex support for splitRight');
+      }
+
       n = ( n === void 0 ? -1 : n ) >>> 0;
 
       if ( !n ) return [];
 
-      var result,
-        index,
-        lastIndex,
-        match,
-        diff;
+      delimiter = String( delimiter );
 
-      if ( is.RegExp( delimiter ) ) {
+      var result = input.split( delimiter ),
+        difference = result.length - n;
 
-        if ( !re_source_matches_end.test( delimiter.source ) ) {
-          exit( '"delimiter" must match end i.e. end with "$"' );
-        }
-
-        while ( n-- && ( match = input.match( delimiter ) ) ) {
-          index = match.index;
-          lastIndex = index + match.shift().length; // mutates `match`
-          result.unshift( input.substring( lastIndex ) );
-          if ( index >= lastIndex ) index = lastIndex - 1; // avoid endless loop
-          if ( match.length ) array_unshift.apply( result, match ); // mutate instead of recreate as concat would
-          input = input.substring( 0, index );
-        }
-        result.unshift( input ); // unshift what's right
-      } else {
-
-        delimiter = String( delimiter );
-        result = input.split( delimiter ),
-        diff = result.length - n;
-
-        if ( diff > 0 ) {
-          result.unshift( result.splice( 0, diff ).join( delimiter ) );
-        }
+      if ( difference > 0 ) {
+        result.unshift( result.splice( 0, difference ).join( delimiter ) );
       }
-
       return result;
     },
 
@@ -819,49 +817,6 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
      */
     splitLines: function( input ) {
       return input != null ? String( input ).split( re_linebreaks ) : exit();
-    },
-
-    /**
-     * splits a string at the given indices. negative indices are allowed.
-     * if the resulting substrings overlap, the first one dominates, the latter is front-cut.
-     * @param {...number} index indices to split at. negatives allowed
-     * @return {string[]} -
-     *   the resulting array of substrings.
-     */
-    splitAt: function( input /*, index... */ ) {
-      input = intput != null ? String( input ) : exit();
-
-      // - for each index
-      //   - if it is negative, add this' string's length
-      //   - apply `pending_index` of the previous iteration ( initially zero ) as `index`'s minimum
-      //   - let native _String#slice_ apply the maximum
-      //   - push what's within input between `pending_index` and `index` to `result`
-      //   - update `pending_index` for the next iteration
-      // - push what's left to the result and return it.
-
-      var input_len = input.length,
-        args = arguments,
-        args_len = args.length,
-        i = 1, // skip `input`
-        index = 0,
-        pending_index = 0,
-        result = [];
-
-      for ( ; i < args_len; i++ ) {
-        index = Number_toInteger( args[ i ] );
-        if ( index < 0 ) {
-          index += input_len;
-        }
-        if ( index <= pending_index ) {
-          result.push( '' ); // faster than slicing the empty string first
-          index = pending_index;
-        } else {
-          result.push( input.slice( pending_index, index ) );
-          pending_index = index;
-        }
-      }
-      result.push( input.substring( index ) );
-      return result;
     },
 
     /**
@@ -1041,8 +996,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
 
       if ( !n || !prefix ) return input;
 
-      var
-      prefix_len = prefix.length,
+      var prefix_len = prefix.length,
         pending_i = 0,
         i;
 
@@ -1076,8 +1030,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
 
       if ( !n || !suffix ) return input;
 
-      var
-      suffix_len = suffix.length,
+      var suffix_len = suffix.length,
         pending_i = input.length,
         i;
 
@@ -1359,18 +1312,16 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     if ( to > MAX_CHARCODE ) exit();
 
     var result = '',
-      diff = to - from;
+      difference = to - from;
 
-    if ( diff > 0 ) {
+    if ( difference > 0 ) {
       while ( n-- ) {
-        result += String_fromCharCode( from + Math_floor( Math_random() * diff ) );
+        result += String_fromCharCode( from + Math_floor( Math_random() * difference ) );
       }
     }
 
     return result;
   };
-
-  if ( DEBUG ) Stryng.random._name = 'random';
 
   /**
    * delegates to native [String.fromCharCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode).
@@ -1383,11 +1334,9 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
     var args = arguments,
       i = args.length;
     while ( i-- )
-      if ( args[ i ] > MAX_CHARCODE ) exit('char code ' + args[ i ] + ' is out of range.');
+      if ( args[ i ] > MAX_CHARCODE ) exit( 'char code ' + args[ i ] + ' is out of range.' );
     return String_fromCharCode.apply( null, arguments );
   };
-
-  if ( DEBUG ) Stryng.chr._name = 'chr';
 
   /**
    * restores the previous value assigned to `window.Stryng`.
@@ -1416,8 +1365,6 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
   // custom methods
   // --------------
   // - provide a closure for each wrapper function
-  // - in _DEBUG_ mode assign `_name` property to the function to make
-  //   our custom [exit](#exit) method work
   // - populate the custom static function `fn` onto the _Stryng_ namespace
   // - populate the function onto Stryng's prototype wrapped in another which..
   // - unshifts the _Stryng_ instance's wrapped `_value`
@@ -1428,8 +1375,6 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
   //   - if not, return a new instance of _Stryng_ constructed from `result`
 
   object_forOwn.call( stryng_members, function( fn, fn_name ) {
-
-    if ( DEBUG ) fn._name = fn_name;
 
     Stryng[ fn_name ] = fn;
 
@@ -1447,6 +1392,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
           if ( !Object_defineProperty ) {
             this.length = result.length;
           }
+          return this;
         } else {
           return new Stryng( result );
         }
@@ -1462,8 +1408,6 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
   // - populate the native static function `String[ fn_name ]` onto the
   //   _Stryng_ namespace if it exists, otherwise construct one from the equivalent
   //   instance method `fn` as learned from [javascript garden][1]
-  // - in _DEBUG_ mode assign `_name` property to the function to make
-  //   our custom [exit](#exit) method work
   // - populate the function onto Stryng's prototype wrapped in another which..
   // - calls the native instance method in the context of the Stryng
   //   instance's wrapped `_value`
@@ -1485,8 +1429,6 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
         return function_call.apply( fn, arguments )
       }
 
-      if ( DEBUG ) Stryng[ fn_name ]._name = fn_name;
-
       Stryng.prototype[ fn_name ] = function( /* proxied arguments */) {
 
         var result = fn.apply( this._value, arguments );
@@ -1497,6 +1439,7 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
             if ( !Object_defineProperty ) {
               this.length = result.length;
             }
+            return this;
           } else {
             return new Stryng( result );
           }
@@ -1568,14 +1511,19 @@ if ( typeof DEBUG === 'undefined' ) DEBUG = true;
   Stryng.append = Stryng.concat;
   Stryng.prototype.append = Stryng.prototype.concat;
 
-}() );
+  if ( 'undefined' !== typeof module && module.exports ) {
+    // nodejs support
+    module.exports = Stryng;
+  } else if ( 'function' === typeof define && define.amd ) {
+    // amd support
+    define( function() {
+      return Stryng
+    } );
+  } else {
+    // browser support
+    root.Stryng = Stryng;
+  }
 
-/**
- * @callback contribution
- * @param {string} input the string to work on
- * @param {...*}
- * @return -
- *   string literal ( with `string instanceOf String` yielding false )
- */
+}( this ) );
 
 // <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
