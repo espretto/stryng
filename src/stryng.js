@@ -95,12 +95,9 @@
     // - implicitely return `undefined` otherwise
     Object_defineProperty = ( function( defineProperty ) {
       try {
-        defineProperty && defineProperty( object, string, {} );
-      } catch ( e ) {
-        return false;
-      }
-      return defineProperty;
-
+        defineProperty( object, string, {} );
+        return defineProperty;
+      } catch ( e ) {}
     } )( Object.defineProperty ),
 
     // ### instance methods
@@ -231,14 +228,14 @@
       re_whitespace_source = re_whitespace.source,
       re_whitespaces_source,
 
-      whitespace = (''
-        + ',09' // tab
-        + ',0A' // line feed
-        + ',0B' // vertical tab
-        + ',0C' // form feed
-        + ',0D' // carriage return
-        + ',20' // space
-        + ',A0' // nbsp
+      hex_char_codes = (''
+        + ',0009' // tab
+        + ',000A' // line feed
+        + ',000B' // vertical tab
+        + ',000C' // form feed
+        + ',000D' // carriage return
+        + ',0020' // space
+        + ',00A0' // nbsp
 
         + ',1680,180E,2000,2001' // prevent
         + ',2002,2003,2004,2005' // formatter
@@ -248,14 +245,14 @@
         + ',2028' // line separator
         + ',2029' // paragraph separator
         + ',FEFF' // byte order mark
-      ).split(',');
+      ).split(','), chr;
 
-    array_forEach.call( whitespace, function( hex_char_code ) {
+    array_forEach.call( hex_char_codes, function( hex_char_code ) {
 
-      var chr = String_fromCharCode( parseInt( hex_char_code, 16 ) )
+      chr = String_fromCharCode( parseInt( hex_char_code, 16 ) )
 
       if ( !re_whitespace.test( chr ) ) {
-        re_whitespace_source += ( hex_char_code.length === 2 ? '\\x' : '\\u') + hex_char_code
+        re_whitespace_source += '\\u' + hex_char_code;
         is_spec_compliant = false;
       }
 
@@ -1424,6 +1421,9 @@
   //   - if the instance `_is_mutable`, set the value and return `this`
   //   - if not, return a new instance of _Stryng_ constructed from the result
   //   
+  // Firefox's static _String.substr_ of version 3.0 does not seem to fail
+  // if called with no arguments so we construct a function instead from the native instance method.
+  // 
   // [1]: http://bonsaiden.github.io/JavaScript-Garden/#function.arguments
   array_forEach.call( methods, function( fn_name ) {
 
@@ -1431,7 +1431,7 @@
 
     if ( is.Function( fn ) && !array_contains.call(shim_methods, fn_name )) {
 
-      Stryng[ fn_name ] = String[ fn_name ] || function( input ) {
+      Stryng[ fn_name ] = fn_name !== 'substr' && String[ fn_name ] || function( input ) {
         if ( input == null ) exit();
         return function_call.apply( fn, arguments )
       }

@@ -18,18 +18,14 @@
   },
   "testling": {
     "browsers": [
-      "chrome/4.0",
-      "chrome/canary",
-      "firefox/3.0",
-      "firefox/nightly",
-      "iexplore/6.0",
-      "iexplore/8.0",
-      "iexplore/9.0",
-      "iexplore/10.0",
-      "opera/10.0",
-      "opera/next",
-      "safari/4.0",
-      "safari/6.0"
+      "ie/6..10",
+      "chrome/4.0","chrome/canary",
+      "firefox/3.0","firefox/nightly",
+      "opera/10..latest",
+      "safari/4..latest",
+      "iphone/6.0",
+      "ipad/6.0",
+      "android-browser/4.2"
     ],
     "harness": "mocha",
     "files": "test/*.test.js"
