@@ -24,28 +24,6 @@ describe( 'Stryng()', function() {
     } );
   }
 
-  // describe.skip('.length', function(){
-
-  // 	it('should reflect `input.length`', function () {
-  // 		var primitive = 'test',
-  // 			length = primitive.length;
-
-  // 		expect( Stryng(primitive) ).to.have.length(length);
-  // 	});
-
-  // 	it('should not be writable if defineProperty is available', function () {
-  // 		var primitive = 'test',
-  // 			length = primitive.length,
-  // 			stryng = Stryng(primitive);
-
-  // 		if(Object.defineProperty)
-  // 		{
-  // 			stryng.length = 3;
-  // 			expect( stryng ).to.have.length(length);
-  // 		}
-  // 	});
-  // });
-
   describe( '.constructor()', function() {
 
     it( 'should work without the new operator', function() {
@@ -66,6 +44,35 @@ describe( 'Stryng()', function() {
     } );
   } );
 
+  describe('.length', function(){
+
+  	it('should reflect `input.length`', function () {
+  		var primitive = 'test',
+  			length = primitive.length;
+
+  		expect( Stryng( primitive ) ).to.have.length(length);
+  	});
+
+  	it('should not be writable if `Object.defineProperty` is available for Objects', function () {
+  		var primitive = 'test',
+  			length = primitive.length,
+        nice_try_length = 0,
+  			stryng = Stryng(primitive),
+        Object_defineProperty = ( function( defineProperty ) {
+          try {
+            defineProperty( {}, 'name', {} );
+            return defineProperty;
+          } catch ( e ) {}
+        } )( Object.defineProperty )
+
+  		if(Object_defineProperty)
+  		{
+  			stryng.length = nice_try_length;
+  			expect( stryng ).to.not.have.length(nice_try_length).and.have.length(length);
+  		}
+  	});
+  });
+
   describe( 'mutability', function() {
 
     it( 'should not be mutable by default', function() {
@@ -78,6 +85,17 @@ describe( 'Stryng()', function() {
       expect( stryng.append( 'bar' ) ).to.equal( stryng );
     } );
   } );
+
+  describe('seemlessness', function(){
+
+    it('should be plus-able', function () {
+      expect( Stryng('foo') + 'bar' ).to.equal('foobar');
+    });
+
+    it('should be parsable to number', function () {
+      expect( Number( Stryng( '123' ) ) ).to.equal( 123 );
+    });
+  });
 
   describe( '.trim()', function() {
 
@@ -528,6 +546,17 @@ describe( 'Stryng()', function() {
     // refer to Stryng.splitRight for further tests
   } );
 
+  describe( '.just()', function() {
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.just ).to.throwError();
+    } );
+
+    it( 'should append and prepend to the `input` until its length equals `max_len`', function() {
+      expect( Stryng.just( 'private', 'private'.length + 4, '_' ) ).to.equal( '__private__' )
+    } );
+  } );
+
   describe( '.justLeft()', function() {
 
     it( 'should fail if `input` is missing', function() {
@@ -574,25 +603,22 @@ describe( 'Stryng()', function() {
     // refer to Stryng.justLeft for further tests
   } );
 
-  describe( '.just()', function() {
+  describe( '.strip()', function() {
 
     it( 'should fail if `input` is missing', function() {
-      expect( Stryng.just ).to.throwError();
+      expect( Stryng.strip ).to.throwError();
     } );
 
-    it( 'should append and prepend to the `input` until its length equals `max_len`', function() {
-      expect( Stryng.just( 'private', 'private'.length + 4, '_' ) ).to.equal( '__private__' )
-    } );
-  } );
-
-  describe( '.prepend()', function() {
-
-    it( 'should fail if `input` is missing', function() {
-      expect( Stryng.prepend ).to.throwError();
+    it( 'should strip from the beginning and the end', function() {
+      expect( Stryng.strip( 'maoam', 'm' ) ).to.equal( 'aoa' );
     } );
 
-    it( 'should prepend the given argument', function() {
-      expect( Stryng.prepend( ' World!', 'Hello' ) ).to.equal( 'Hello World!' );
+    it( 'should strip multiple times', function() {
+      expect( Stryng.strip( '"""docstring"""', '"' ) ).to.equal( 'docstring' );
+    } );
+
+    it( 'should strip n times', function() {
+      expect( Stryng.strip( '"""docstring"""', '"', 2 ) ).to.equal( '"docstring"' );
     } );
   } );
 
@@ -631,25 +657,6 @@ describe( 'Stryng()', function() {
 
     it( 'should strip the prefix n times', function() {
       expect( Stryng.stripRight( 'ding dong dong dong', ' dong', 2 ) ).to.equal( 'ding dong' )
-    } );
-  } );
-
-  describe( '.strip()', function() {
-
-    it( 'should fail if `input` is missing', function() {
-      expect( Stryng.strip ).to.throwError();
-    } );
-
-    it( 'should strip from the beginning and the end', function() {
-      expect( Stryng.strip( 'maoam', 'm' ) ).to.equal( 'aoa' );
-    } );
-
-    it( 'should strip multiple times', function() {
-      expect( Stryng.strip( '"""docstring"""', '"' ) ).to.equal( 'docstring' );
-    } );
-
-    it( 'should strip n times', function() {
-      expect( Stryng.strip( '"""docstring"""', '"', 2 ) ).to.equal( '"docstring"' );
     } );
   } );
 
@@ -708,14 +715,66 @@ describe( 'Stryng()', function() {
     } );
   } );
 
-  describe.skip( '.unquote()', function() {
+  describe( '.unquote()', function() {
 
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.unquote ).to.throwError();
     } );
 
-    it( 'unfinished escape issues yet' );
+    it( 'should return the `input` unwrapped from double quotes', function() {
+      expect( Stryng.unquote( '"foo"' ) ).to.equal( 'foo' );
+    } );
+
+    it( 'should unescape backslash-escaped characters', function() {
+      expect( Stryng.unquote( '"\\n\\t\\r\\b\\f\\\\"' ) ).to.equal( '\n\t\r\b\f\\' );
+    } );
+
+    it( 'should decode hex-encoded characters', function() {
+      // native JSON.stringify forces full unicode notation (at least on node it seems)
+      expect( Stryng.unquote( '"\\x01\\u0002"' ) ).to.equal( '\x01\u0002' );
+    } );
   } );
+
+  describe( '.append()', function() {
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.append ).to.throwError();
+    } );
+
+    it( 'should append the given argument', function() {
+      expect( Stryng.append( 'Hello', ' World!' ) ).to.equal( 'Hello World!' );
+    } );
+  } );
+
+  describe( '.prepend()', function() {
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.prepend ).to.throwError();
+    } );
+
+    it( 'should prepend the given argument', function() {
+      expect( Stryng.prepend( ' World!', 'Hello' ) ).to.equal( 'Hello World!' );
+    } );
+  } );
+
+  describe('.equals()', function(){
+
+    it('should fail if `input` is missing', function () {
+      expect( Stryng.equals ).to.throwError();
+    });
+
+    it('should apply "undefined" as the default `comparable`', function () {
+      expect( Stryng.equals('undefined' /*, (undefined).toString() */) ).to.be.ok();
+    });
+
+    it('should return true if equals', function () {
+      expect( Stryng.equals('foo', 'foo') ).to.be.ok();
+    });
+
+    it('should return false if not equals', function () {
+      expect( Stryng.equals('foo', 'bar') ).to.not.be.ok();
+    });
+  });
 
   describe( '.isEmpty()', function() {
 
@@ -743,7 +802,7 @@ describe( 'Stryng()', function() {
     } );
 
     it( 'should return true for whitespace only strings', function() {
-      expect( Stryng([
+      expect( Stryng.isBlank([
         '\u0009\u000A\u000B\u000C',
         '\u00A0\u000D\u0020\u1680',
         '\u180E\u2000\u2001\u2002',
@@ -751,13 +810,52 @@ describe( 'Stryng()', function() {
         '\u2007\u2008\u2009\u200A',
         '\u2028\u2029\u202F\u205F',
         '\u3000\uFEFF'].join('')
-      ).isBlank() ).to.be.ok();
+      )).to.be.ok();
     } );
 
     it( 'should return false for anything else', function() {
       expect( Stryng( {} ).isBlank() ).to.not.be.ok();
     } );
   } );
+
+  describe( '.clean()', function(){
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.clean ).to.throwError();
+    } );
+
+    it('should trim the input', function () {
+      expect( Stryng.clean(' foo ') ).to.equal('foo');
+    });
+
+    it('should leave single spaces untouched', function () {
+      expect( Stryng.clean('the quick brown fox') ).to.equal('the quick brown fox');
+    });
+
+    it('should replace any white space with a space', function () {
+      expect( Stryng.clean([
+        '_\u0009_\u000A_\u000B_\u000C',
+        '_\u00A0_\u000D_\u0020_\u1680',
+        '_\u180E_\u2000_\u2001_\u2002',
+        '_\u2003_\u2004_\u2005_\u2006',
+        '_\u2007_\u2008_\u2009_\u200A',
+        '_\u2028_\u2029_\u202F_\u205F',
+        '_\u3000_\uFEFF'].join('')
+      )).to.equal('_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _');
+    });
+
+    it('should collapse groups of white space to one single space', function () {
+      expect( Stryng.clean([
+        '\u0009\u000A\u000B\u000C',
+        '\u00A0\u000D\u0020\u1680',
+        '\u180E\u2000\u2001\u2002',
+        '\u2003\u2004\u2005\u2006',
+        '\u2007\u2008\u2009\u200A',
+        '\u2028\u2029\u202F\u205F',
+        '\u3000\uFEFF'].join('_')
+      )).to.equal('_ _ _ _ _ _');
+    });
+  });
 
   describe( '.capitalize()', function() {
 
@@ -771,6 +869,68 @@ describe( 'Stryng()', function() {
 
     it( 'should upper case the first letter', function() {
       expect( Stryng.capitalize( 'foo' ) ).to.equal( 'Foo' );
+    } );
+  } );
+
+  describe( '.camelize()', function(){
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.camelize ).to.throwError();
+    } );
+  });
+
+  describe( '.underscore()', function(){
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.underscore ).to.throwError();
+    } );
+  });
+
+  describe( '.hyphenize()', function(){
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.hyphenize ).to.throwError();
+    } );
+  });
+
+  describe( '.simplify()', function(){
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.simplify ).to.throwError();
+    } );
+  });
+
+  describe( '.ord()', function() {
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.ord ).to.throwError();
+    } );
+
+    it( 'should return the empty array given the empty string', function() {
+      expect( Stryng.ord( '' ) ).to.eql( [] );
+    } );
+
+    it( 'should return each character\'s character code', function() {
+      expect(
+        Stryng.ord( 'Hello World' )
+      ).to.eql(
+        [ 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100 ]
+      );
+    } );
+  } );
+
+  describe( '.chr()', function() {
+
+    it( 'should return the empty string if no arguments passed', function() {
+      expect( Stryng.chr().toString() ).to.equal( '' );
+    } );
+
+    it( 'should fail for number greater than Math.pow(2, 16) - 1', function() {
+      expect( Stryng.chr ).withArgs( 1 << 16 ).to.throwError();
+    } );
+
+    it( 'behave just like native String.fromCharCode', function() {
+      expect(
+        Stryng.chr( 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100 ).toString()
+      ).to.equal(
+        'Hello World'
+      );
     } );
   } );
 
@@ -808,44 +968,6 @@ describe( 'Stryng()', function() {
       } )() ).to.be.ok();
 
       expect( result ).to.have.length( length );
-    } );
-  } );
-
-  describe( '.ord()', function() {
-
-    it( 'should fail if `input` is missing', function() {
-      expect( Stryng.ord ).to.throwError();
-    } );
-
-    it( 'should return the empty array given the empty string', function() {
-      expect( Stryng.ord( '' ) ).to.eql( [] );
-    } );
-
-    it( 'should return each character\'s character code', function() {
-      expect(
-      	Stryng.ord( 'Hello World' )
-      ).to.eql(
-      	[ 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100 ]
-      );
-    } );
-  } );
-
-  describe( '.chr()', function() {
-
-    it( 'should return the empty string if no arguments passed', function() {
-      expect( Stryng.chr().toString() ).to.equal( '' );
-    } );
-
-    it( 'should fail for number greater than Math.pow(2, 16) - 1', function() {
-      expect( Stryng.chr ).withArgs( 1 << 16 ).to.throwError();
-    } );
-
-    it( 'behave just like native String.fromCharCode', function() {
-      expect(
-      	Stryng.chr( 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100 ).toString()
-      ).to.equal(
-      	'Hello World'
-      );
     } );
   } );
 } );

@@ -133,7 +133,6 @@ module.exports = function( grunt ) {
     'grunt-contrib-clean',
     'grunt-contrib-uglify',
     'grunt-docker',
-    'grunt-grock',
     'grunt-jsdoc',
   ].forEach( grunt.loadNpmTasks, grunt );
 
@@ -141,7 +140,6 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'default', 'Generate and serve documentation', [
     'clean:docs',
     'jsdoc',
-    'grock',
     'docker',
     'connect:docs'
   ] );

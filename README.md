@@ -1,62 +1,103 @@
 
 Stryng
 ------
-If the necessity of manipulating strings correctly in JavaScript arises you will find yourself dealing with weird native behaviors, constructing even weirder workarounds to tweak them into being consistent and easy to handle. Stryng manually inherits from the built-in `String` object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.
+for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively ( and yes, this will break your tongue if you read aloud ). Stryng to the rescue!
+
+### compat
 
 [![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/Stryng)
 
-Let me introduce
-----------------
+### features
 
-```
-String.prototype.toStryng = function() {
-  return new Stryng( this );
-};
+- manually inherits the native `String` namespace and prototype
+- progressive enhancement to fullfill ECMA-Script 5 & 6 standards
+- every function is available as both
+  - static function for functional programming
+  - instance method for object oriented programming
+- (im-)mutability of Stryng instances
+- seemless integration by overriding `toString` and `valueOf` on Stryng's prototype
+- spec-like failproof type casting mechanisms and default values to prevent unexpected results
 
-'The quick brown fox'.toStryng()
-// now we are ready you may use
-.stripRight( 'fox' )
-// which leaves us with 'The quick brown ' - chaining on
-.truncate( 15 )
-// yields 'The quick...'
-.split(' ')[1]
-.capitalize()
-// you knew "Quick..." was coming
-.count('.')
-// 3 dots 
+design considerations
+---------------------
+
+### constructing stryngs
+
+Stryng instances wrap string primitives
+```
+var stryng = new Stryng(); // > '', wrapped, `new` operator is optional
+stryng.isEmpty();          // > true
+```
+by default Stryng instances are immutable just like native strings.
+```
+stryng = stryng.append('key');  // reassign it, just like we would with natives
+var immutable = stryng.clone(); // delegates to the constructor
+immutable === stryng;           // > false, objects differ
+immutable.equals( stryng )      // > true, contents equal
+```
+you can create mutable instances by either passing `true` to the Stryng constructor as the 2nd argument or call its curried variation on an existing instance.
+```
+var mutable = stryng.clone( true );     // equal to `Stryng( stryng, true )`
+var referer = mutable.append('stroke'); // wrapped 'keystroke'
+referer === mutable;                    // > true, both refer to the same object
+mutable.equals( referer )               // > true, contents could never differ
+```
+to retrieve the wrapped value, take actions that imply a call to Stryng's `toString` or `valueOf` methods or call them directly.
+```
+stryng.toString(); // > 'key', as primitve, same as `stryng.valueOf()`
+stryng + 'stroke'; // > 'keystroke', as primitive
+```
+infact Stryng integration is rather seemless
+```
+var object = {};
+var n = Stryng( 123 );    // > '123', wrapped
+object[ stryng ] = +n;    // parse wrapped '123' to number and assign to `object['key']`
+JSON.stringify( object ); // '{"key":123}'
+```
+type checking however cannot be tricked into recognizing Stryngs as strings
+```
+typeof stryng;                 // > 'object'
+stryng instanceof String;      // not even if it actually did occur along the prototype chain > false
+object.toString.call( stryng ) // reliable as always > '[object Object]'
+
+// for as long as Stryng is not another (iframe's) `window`'s property
+stryng instanceof Stryng;  // > true
+Stryng.isStryng( stryng ); // wraps the above for convenience
 ```
 
-wherever you forget to pass an argument expected to be a string `'undefined'` - as the result of calling `String( undefined )` - will be applied as the default. this derives from javascript's native behaviour.
-```
-'undefined'.contains();   // true
-'undefined'.startsWith(); // true
-'undefined'.endsWith();   // true
-'undefined'.indexOf();    // 0
-'undefined'.lastIndexOf();// same as the above
-'undefined'.search();     // same as the above again
+### type safety
 
-'this is yours'.replace('yours'); // 'this is undefined'
+#### strings
+arguments expected to be strings are cast using `String( arg )`. as a direct consequence `'undefined'` will be applied as the default value. this decision derives from JavaScript's native behaviour:
+```
+var str = String( undefined ); // > 'undefined'
 
-new RegExp().test('undefined'); // true
+str.contains();   // > true
+str.endsWith();   // > true
+str.startsWith(); // > true
+str.search();     // > 0
+str.indexOf();    // > 0
+
+'this is yours'.replace('yours'); // > 'this is undefined'
 ```
-but there are of course exceptions to this
-```
-String(); // the empty string instead of 'undefined'
-new String(); // luckily just the same as above
-'this is '.concat(); // nothing changes, expected 'this is undefined'
-```
-the last example of the above probably derives from _String#concat_ being the gerenic _Array#concat_.
+the only exception to this rule is Stryng's constructor.
+
+#### numbers
+arguments expected to be numbers are cast dependent on the use case. the spec basically follows two different approaches to parsing arguments to numbers which Stryng both applies reasonably.
+
+1. _toUInt32_ where only positive numbers make sense and default to the more or less infinite value `Math.pow(2, 32) - 1`. `str.split(',')` for example applies this value to its 2nd argument as the default number of substrings to return.
+2. _toInteger_ in every other scenario. this will cast with `Number`, apply zero for `NaN`, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives
+
+Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead.
 
 Documentation
 -------------
-please refer to either the [api documentation](http://espretto.github.io/Stryng), [grock's annotated source](http://espretto.github.io/Stryng/grock) or [docker's annotated source](http://espretto.github.io/Stryng/docker/README.md.html).
+please refer to either the [api documentation](http://espretto.github.io/Stryng) or read Stryng's story - the [annotated source](http://espretto.github.io/Stryng/docker/README.md.html).
 
 ### notes on doc notation
 
 - explain code _sections_ - preferrably with step-by-step lists - instead of annotating every single snippet
 - use underscored variable names for privates, camel-case for the api.
-- "this' string" always refers to the string wrapped by Stryng
-- "returns", "results to", "evaluates to" or "yields" - do what you like
 - unfortunately _docker_'s markdown parser doesn't support lists nested deeper than 2 levels
 - read the annotated source and try to stick to its flavour
 
@@ -64,66 +105,5 @@ Credits
 -------
 Many thanks to the authors of
 
-- [jsdoc template](https://github.com/davidshimjs/jaguarjs-jsdoc)
-- [grock](https://github.com/killercup/grock)
+- [jaguarjs-jsdoc](https://github.com/davidshimjs/jaguarjs-jsdoc)
 - [docker](https://github.com/jbt/docker)
-
-Roadmap
--------
-
-- refactor tests
-- integrate them into docs
-- renew testling setup
-- extend with plugin `Stryng.esc` for encoding conversions related to url parsing and slugifying
-
-About toInteger
----------------
-
-from the [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4):
-
-1. let number be the result of calling `toNumber` on the input argument.
-2. if number is `NaN`, return `+0`.
-3. if number is `+0`, `−0`, `+Infinity`, or `−Infinity`, return number i.e. leave zeros and infinites untouched
-4. Rireturn the result of computing `sign(number) × floor(abs(number))` i.e. ceil negatives, floor positives
-
-in the following scenarios calling `Number.toInteger` can be replaced with faster inline comparisons:
-### isNegative
-```
-var x = -0.5;
-x < 0; // yields true
-Number_toInteger( x ) < 0; // yields false because it ceils negative values and hence compares 0 < 0
-```
-the faster equivalent of the above `Number_toInteger` call and comparison is
-```
-x <= -1;
-```
-### isNotFinite
-```
-Number_toInteger( 'Infinity' ) == Infinity; // true
-Number_toInteger( Infinity ) == Infinity; // true
-Number_toInteger( 1/0 ) == Infinity; // true
-```
-the above expressions are the only ones evaluated to `Infinity`.
-However, since `Number_toInteger` uses `toNumber` internally and simply return
-results `+0`, `−0`, `+Infinity` and `−Infinity` of `toNumber` you may equally use
-```
-'Infinity' == Infinity; // true
-Infinity == Infinity; // true
-1/0 == Infinity; // true
-```
-to spare another function call. same goes for `-Infinity`.
-
-### apply zero as minimum
-instead of
-```
-x = Number_toInteger( x );
-x = Math.max( 0, x );
-```
-you may equally do
-```
-x = x < 0 ? 0 : Math.floor( x ) || 0;
-```
-where the last bit zeros `NaN`.
-
-worth a zealot's blog post..
-

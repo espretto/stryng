@@ -20,7 +20,7 @@
 
     </head>
     <body>
-		<script src="/node_modules/mocha/mocha.js" charset="UTF-8"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/mocha/1.18.2/mocha.js" charset="UTF-8"></script>
 		<script>
 
 			mocha.setup({ ui : "bdd", reporter : 'tap' });
@@ -71,8 +71,6 @@
 						;
 							
 					fb_iframe.style.cssText = fb_body.style.cssText = cssText;
-
-					mocha.run();
 				})();
 			})();
 		</script>
