@@ -49,6 +49,8 @@
             
             <span class="subtitle">Members</span>
             
+                <li data-name="Stryng.VERSION"><a href="Stryng.html#VERSION">VERSION</a></li>
+            
                 <li data-name="Stryng#length"><a href="Stryng.html#length">length</a></li>
             
                 <li data-name="Stryng~_is_mutable"><a href="Stryng.html#_is_mutable">_is_mutable</a></li>
@@ -63,19 +65,27 @@
             
             <span class="subtitle">Methods</span>
             
-                <li data-name="Stryng.fromCharCode"><a href="Stryng.html#fromCharCode">fromCharCode</a></li>
+                <li data-name="Stryng.isStryng"><a href="Stryng.html#isStryng">isStryng</a></li>
+            
+                <li data-name="Stryng.noConflict"><a href="Stryng.html#noConflict">noConflict</a></li>
+            
+                <li data-name="Stryng.random"><a href="Stryng.html#random">random</a></li>
+            
+                <li data-name="Stryng#append"><a href="Stryng.html#append">append</a></li>
             
                 <li data-name="Stryng#camelize"><a href="Stryng.html#camelize">camelize</a></li>
             
                 <li data-name="Stryng#capitalize"><a href="Stryng.html#capitalize">capitalize</a></li>
             
+                <li data-name="Stryng#clean"><a href="Stryng.html#clean">clean</a></li>
+            
                 <li data-name="Stryng#contains"><a href="Stryng.html#contains">contains</a></li>
             
                 <li data-name="Stryng#count"><a href="Stryng.html#count">count</a></li>
             
-                <li data-name="Stryng#dasherize"><a href="Stryng.html#dasherize">dasherize</a></li>
-            
                 <li data-name="Stryng#endsWith"><a href="Stryng.html#endsWith">endsWith</a></li>
+            
+                <li data-name="Stryng#equals"><a href="Stryng.html#equals">equals</a></li>
             
                 <li data-name="Stryng#exchange"><a href="Stryng.html#exchange">exchange</a></li>
             
@@ -83,13 +93,15 @@
             
                 <li data-name="Stryng#exchangeRight"><a href="Stryng.html#exchangeRight">exchangeRight</a></li>
             
+                <li data-name="Stryng#hyphenize"><a href="Stryng.html#hyphenize">hyphenize</a></li>
+            
+                <li data-name="Stryng#iequals"><a href="Stryng.html#iequals">iequals</a></li>
+            
                 <li data-name="Stryng#insert"><a href="Stryng.html#insert">insert</a></li>
             
                 <li data-name="Stryng#isBlank"><a href="Stryng.html#isBlank">isBlank</a></li>
             
                 <li data-name="Stryng#isEmpty"><a href="Stryng.html#isEmpty">isEmpty</a></li>
-            
-                <li data-name="Stryng#isEqual"><a href="Stryng.html#isEqual">isEqual</a></li>
             
                 <li data-name="Stryng#join"><a href="Stryng.html#join">join</a></li>
             
@@ -109,7 +121,7 @@
             
                 <li data-name="Stryng#reverse"><a href="Stryng.html#reverse">reverse</a></li>
             
-                <li data-name="Stryng#slugify"><a href="Stryng.html#slugify">slugify</a></li>
+                <li data-name="Stryng#simplify"><a href="Stryng.html#simplify">simplify</a></li>
             
                 <li data-name="Stryng#splitAt"><a href="Stryng.html#splitAt">splitAt</a></li>
             
@@ -175,99 +187,88 @@
 
     <section>
         <article class="readme"><h2>Stryng</h2>
-<p>If the necessity of manipulating strings correctly in JavaScript arises you will find yourself dealing with weird native behaviors, constructing even weirder workarounds to tweak them into being consistent and easy to handle. Stryng manually inherits from the built-in <code>String</code> object, detects and fixes native non-spec compliant implementations, provides polyfills fulfilling ECMA 5 and 6 standards and lastly mixes in its own set of utility functions.</p>
+<p>for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively ( and yes, this will break your tongue if you read aloud ). Stryng to the rescue!</p>
+<h3>compat</h3>
 <p><a href="https://ci.testling.com/espretto/Stryng"><img src="https://ci.testling.com/espretto/stryng.png" alt="browser support"></a></p>
-<h2>Let me introduce</h2>
-<pre><code>String.prototype.toStryng = function() {
-  return new Stryng( this );
-};
+<h3>features</h3>
+<ul>
+<li>manually inherits the native <code>String</code> namespace and prototype</li>
+<li>progressive enhancement to fullfill ECMA-Script 5 &amp; 6 standards</li>
+<li>every function is available as both<ul>
+<li>static function for functional programming</li>
+<li>instance method for object oriented programming</li>
+</ul>
+</li>
+<li>(im-)mutability of Stryng instances</li>
+<li>seemless integration by overriding <code>toString</code> and <code>valueOf</code> on Stryng's prototype</li>
+<li>spec-like failproof type casting mechanisms and default values to prevent unexpected results</li>
+</ul>
+<h2>design considerations</h2>
+<h3>constructing stryngs</h3>
+<p>Stryng instances wrap string primitives</p>
+<pre><code>var stryng = new Stryng(); // &gt; '', wrapped, `new` operator is optional
+stryng.isEmpty();          // &gt; true</code></pre>
+<p>by default Stryng instances are immutable just like native strings.</p>
+<pre><code>stryng = stryng.append('key');  // reassign it, just like we would with natives
+var immutable = stryng.clone(); // delegates to the constructor
+immutable === stryng;           // &gt; false, objects differ
+immutable.equals( stryng )      // &gt; true, contents equal</code></pre>
+<p>you can create mutable instances by either passing <code>true</code> to the Stryng constructor as the 2nd argument or call its curried variation on an existing instance.</p>
+<pre><code>var mutable = stryng.clone( true );     // equal to `Stryng( stryng, true )`
+var referer = mutable.append('stroke'); // wrapped 'keystroke'
+referer === mutable;                    // &gt; true, both refer to the same object
+mutable.equals( referer )               // &gt; true, contents could never differ</code></pre>
+<p>to retrieve the wrapped value, take actions that imply a call to Stryng's <code>toString</code> or <code>valueOf</code> methods or call them directly.</p>
+<pre><code>stryng.toString(); // &gt; 'key', as primitve, same as `stryng.valueOf()`
+stryng + 'stroke'; // &gt; 'keystroke', as primitive</code></pre>
+<p>infact Stryng integration is rather seemless</p>
+<pre><code>var object = {};
+var n = Stryng( 123 );    // &gt; '123', wrapped
+object[ stryng ] = +n;    // parse wrapped '123' to number and assign to `object['key']`
+JSON.stringify( object ); // '{&quot;key&quot;:123}'</code></pre>
+<p>type checking however cannot be tricked into recognizing Stryngs as strings</p>
+<pre><code>typeof stryng;                 // &gt; 'object'
+stryng instanceof String;      // not even if it actually did occur along the prototype chain &gt; false
+object.toString.call( stryng ) // reliable as always &gt; '[object Object]'
 
-'The quick brown fox'.toStryng()
-// now we are ready you may use
-.stripRight( 'fox' )
-// which leaves us with 'The quick brown ' - chaining on
-.truncate( 15 )
-// yields 'The quick...'
-.split(' ')[1]
-.capitalize()
-// you knew &quot;Quick...&quot; was coming
-.count('.')
-// 3 dots</code></pre>
-<p>wherever you forget to pass an argument expected to be a string <code>'undefined'</code> - as the result of calling <code>String( undefined )</code> - will be applied as the default. this derives from javascript's native behaviour.</p>
-<pre><code>'undefined'.contains();   // true
-'undefined'.startsWith(); // true
-'undefined'.endsWith();   // true
-'undefined'.indexOf();    // 0
-'undefined'.lastIndexOf();// same as the above
-'undefined'.search();     // same as the above again
+// for as long as Stryng is not another (iframe's) `window`'s property
+stryng instanceof Stryng;  // &gt; true
+Stryng.isStryng( stryng ); // wraps the above for convenience</code></pre>
+<h3>type safety</h3>
+<h4>strings</h4>
+<p>arguments expected to be strings are cast using <code>String( arg )</code>. as a direct consequence <code>'undefined'</code> will be applied as the default value. this decision derives from JavaScript's native behaviour:</p>
+<pre><code>var str = String( undefined ); // &gt; 'undefined'
 
-'this is yours'.replace('yours'); // 'this is undefined'
+str.contains();   // &gt; true
+str.endsWith();   // &gt; true
+str.startsWith(); // &gt; true
+str.search();     // &gt; 0
+str.indexOf();    // &gt; 0
 
-new RegExp().test('undefined'); // true</code></pre>
-<p>but there are of course exceptions to this</p>
-<pre><code>String(); // the empty string instead of 'undefined'
-new String(); // luckily just the same as above
-'this is '.concat(); // nothing changes, expected 'this is undefined'</code></pre>
-<p>the last example of the above probably derives from <em>String#concat</em> being the gerenic <em>Array#concat</em>.</p>
+'this is yours'.replace('yours'); // &gt; 'this is undefined'</code></pre>
+<p>the only exception to this rule is Stryng's constructor.</p>
+<h4>numbers</h4>
+<p>arguments expected to be numbers are cast dependent on the use case. the spec basically follows two different approaches to parsing arguments to numbers which Stryng both applies reasonably.</p>
+<ol>
+<li><em>toUInt32</em> where only positive numbers make sense and default to the more or less infinite value <code>Math.pow(2, 32) - 1</code>. <code>str.split(',')</code> for example applies this value to its 2nd argument as the default number of substrings to return.</li>
+<li><em>toInteger</em> in every other scenario. this will cast with <code>Number</code>, apply zero for <code>NaN</code>, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives</li>
+</ol>
+<p>Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead.</p>
 <h2>Documentation</h2>
-<p>please refer to either the <a href="http://espretto.github.io/Stryng">api documentation</a>, <a href="http://espretto.github.io/Stryng/grock">grock's annotated source</a> or <a href="http://espretto.github.io/Stryng/docker/README.md.html">docker's annotated source</a>.</p>
+<p>please refer to either the <a href="http://espretto.github.io/Stryng">api documentation</a> or read Stryng's story - the <a href="http://espretto.github.io/Stryng/docker/README.md.html">annotated source</a>.</p>
 <h3>notes on doc notation</h3>
 <ul>
 <li>explain code <em>sections</em> - preferrably with step-by-step lists - instead of annotating every single snippet</li>
 <li>use underscored variable names for privates, camel-case for the api.</li>
-<li>&quot;this' string&quot; always refers to the string wrapped by Stryng</li>
-<li>&quot;returns&quot;, &quot;results to&quot;, &quot;evaluates to&quot; or &quot;yields&quot; - do what you like</li>
 <li>unfortunately <em>docker</em>'s markdown parser doesn't support lists nested deeper than 2 levels</li>
 <li>read the annotated source and try to stick to its flavour</li>
 </ul>
 <h2>Credits</h2>
 <p>Many thanks to the authors of</p>
 <ul>
-<li><a href="https://github.com/davidshimjs/jaguarjs-jsdoc">jsdoc template</a></li>
-<li><a href="https://github.com/killercup/grock">grock</a></li>
+<li><a href="https://github.com/davidshimjs/jaguarjs-jsdoc">jaguarjs-jsdoc</a></li>
 <li><a href="https://github.com/jbt/docker">docker</a></li>
-</ul>
-<h2>Roadmap</h2>
-<ul>
-<li>refactor tests</li>
-<li>integrate them into docs</li>
-<li>renew testling setup</li>
-<li>extend with plugin <code>Stryng.esc</code> for encoding conversions related to url parsing and slugifying</li>
-</ul>
-<h2>About toInteger</h2>
-<p>from the <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-9.4">spec</a>:</p>
-<ol>
-<li>let number be the result of calling <code>toNumber</code> on the input argument.</li>
-<li>if number is <code>NaN</code>, return <code>+0</code>.</li>
-<li>if number is <code>+0</code>, <code>−0</code>, <code>+Infinity</code>, or <code>−Infinity</code>, return number i.e. leave zeros and infinites untouched</li>
-<li>Rireturn the result of computing <code>sign(number) × floor(abs(number))</code> i.e. ceil negatives, floor positives</li>
-</ol>
-<p>in the following scenarios calling <code>Number.toInteger</code> can be replaced with faster inline comparisons:</p>
-<h3>isNegative</h3>
-<pre><code>var x = -0.5;
-x &lt; 0; // yields true
-Number_toInteger( x ) &lt; 0; // yields false because it ceils negative values and hence compares 0 &lt; 0</code></pre>
-<p>the faster equivalent of the above <code>Number_toInteger</code> call and comparison is</p>
-<pre><code>x &lt;= -1;</code></pre>
-<h3>isNotFinite</h3>
-<pre><code>Number_toInteger( 'Infinity' ) == Infinity; // true
-Number_toInteger( Infinity ) == Infinity; // true
-Number_toInteger( 1/0 ) == Infinity; // true</code></pre>
-<p>the above expressions are the only ones evaluated to <code>Infinity</code>.
-However, since <code>Number_toInteger</code> uses <code>toNumber</code> internally and simply return
-results <code>+0</code>, <code>−0</code>, <code>+Infinity</code> and <code>−Infinity</code> of <code>toNumber</code> you may equally use</p>
-<pre><code>'Infinity' == Infinity; // true
-Infinity == Infinity; // true
-1/0 == Infinity; // true</code></pre>
-<p>to spare another function call. same goes for <code>-Infinity</code>.</p>
-<h3>apply zero as minimum</h3>
-<p>instead of</p>
-<pre><code>x = Number_toInteger( x );
-x = Math.max( 0, x );</code></pre>
-<p>you may equally do</p>
-<pre><code>x = x &lt; 0 ? 0 : Math.floor( x ) || 0;</code></pre>
-<p>where the last bit zeros <code>NaN</code>.</p>
-<p>worth a zealot's blog post..</p></article>
+</ul></article>
     </section>
 
 
@@ -278,7 +279,7 @@ x = Math.max( 0, x );</code></pre>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Apr 30 2014 14:02:50 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon May 05 2014 00:43:17 GMT+0200 (CEST)
         </footer>
     </div>
 </div>
