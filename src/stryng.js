@@ -316,19 +316,21 @@
     }
   }
 
+  // check if the native implementation of _String#startsWith_
+  // already knows how to deal with regular expressions.
+  // consider _String#endsWith_ to behave the same on that matter.
+  if(is.Function(string.startswith)){
+    try{
+      VERSION.startsWith(/\d/);
+    } catch( e ){
+      shim_methods.push( 'startsWith', 'endsWith' );
+    }
+  }
+
   // check if the native implementation of _String#substr_
   // correctly deals with negative indices.
   if ( 'xy'.substr( -1 ) !== 'y' ){
     shim_methods.push( 'substr' );
-  }
-
-  // check if the native implementation of _String#startsWith_
-  // already knows how to deal with regular expressions.
-  // consider _String#endsWith_ to behave the same on that matter.
-  try{
-    VERSION.startsWith(/\d/)
-  } catch( e ){
-    shim_methods.push( 'startsWith', 'endsWith' );
   }
 
   // custom exit
@@ -387,6 +389,7 @@
     value_len = that._value.length;
     if ( Object_defineProperty ) {
       Object_defineProperty( that, 'length', {
+        writable: false, // ensure Safari 5 defaults correctly
         get: function() {
           return value_len;
         }
@@ -1318,7 +1321,7 @@
      * inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_underscore)
      * @return {String}
      */
-    underscore: function() {
+    underscore: function( input ) {
       return input != null ?
         String( input )
         .replace( /([a-z])([A-Z])/g, '$1_$2' )
@@ -1338,7 +1341,7 @@
      * inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_dasherize)
      * @return {String}
      */
-    hyphenize: function() {
+    hyphenize: function( input ) {
       return input != null ?
         String( input )
         .replace( /([a-z])([A-Z])/g, '$1-$2' )

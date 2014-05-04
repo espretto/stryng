@@ -107,7 +107,7 @@ module.exports = function( grunt ) {
           hostname: '*',
           keepalive: true,
           port: 8000,
-          base: DOCS_OUT
+          base: [DOCS_OUT, '']
         }
       }
     },
