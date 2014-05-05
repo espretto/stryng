@@ -78,6 +78,7 @@
     Object_defineProperty = ( function( defineProperty ) {
       try {
         defineProperty( Stryng, 'VERSION', {
+          writable: false, // Safari 5 bug
           value: VERSION
         } );
         return defineProperty;
@@ -297,11 +298,11 @@
   }
 
   // check if the native implementation of _String#startsWith_
-  // already knows how to deal with regular expressions.
+  // already knows how to deal with regular expressions or indices.
   // consider _String#endsWith_ to behave the same on that matter.
-  if ( is.Function( string.startswith ) ) {
+  if ( is.Function( string.startsWith ) ) {
     try {
-      if( !'1'.startsWith( /\d/ ) ){
+      if( !'1'.startsWith( /\d/ ) || !'ab'.startsWith('b', 1) ){
         throw string;
       }
     } catch ( e ) {
@@ -371,6 +372,7 @@
      */
     if ( Object_defineProperty ) {
       Object_defineProperty( that, 'length', {
+        writable: false,
         get: function() {
           return that._value.length;
         }
