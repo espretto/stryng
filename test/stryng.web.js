@@ -2679,14 +2679,15 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     // feature detect native _Object.defineProperty_
     // and set _Stryng_'s version simultaneously.
     // 
-    // - try to define a dummy property on an object literal which fails
-    //   - either in case `defineProperty` isn't available
-    //   - or only DOM objects are allowed as first argument
+    // - try/catch when
+    //   - not available at all
+    //   - or only supports DOM objects, IE8
     // - if successful, return the reference to that function
     // - implicitely return `undefined` otherwise
     Object_defineProperty = ( function( defineProperty ) {
       try {
         defineProperty( Stryng, 'VERSION', {
+          writable: false,
           value: VERSION
         } );
         return defineProperty;
@@ -2906,11 +2907,11 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   }
 
   // check if the native implementation of _String#startsWith_
-  // already knows how to deal with regular expressions.
+  // already knows how to deal with regular expressions or indices.
   // consider _String#endsWith_ to behave the same on that matter.
-  if ( is.Function( string.startswith ) ) {
+  if ( is.Function( string.startsWith ) ) {
     try {
-      if( !'1'.startsWith( /\d/ ) ){
+      if( !'1'.startsWith( /\d/ ) || !'ab'.startsWith('b', 1) ){
         throw string;
       }
     } catch ( e ) {
@@ -2982,7 +2983,8 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       Object_defineProperty( that, 'length', {
         get: function() {
           return that._value.length;
-        }
+        },
+        set: function(){} // provide a setter for Safari 5
       } );
     } else {
       that.length = that._value.length;
@@ -4175,16 +4177,17 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 Stryng = require( './../src/stryng.js' );
 expect = require( 'expect.js' );
 
-///////////////////////////////////////////
-// patch missing withArgs in npm version //
-///////////////////////////////////////////
-
-// expect.Assertion.prototype.withArgs = function() {
-//   expect(this.obj).to.be.a('function');
-//   var fn = this.obj;
-//   var args = Array.prototype.slice.call(arguments);
-//   return expect(function() { fn.apply(null, args); });
-// }
+// feature detect
+var Object_defineProperty = ( function( defineProperty ) {
+  try {
+    var object = {}
+    defineProperty( object, 'bool', { value: true} );
+    object.bool = false; // should not be writable by default
+    if(object.bool){
+      return defineProperty;
+    }
+  } catch ( e ) {}
+} )( Object.defineProperty )
 
 describe( 'Stryng()', function() {
 
@@ -4230,18 +4233,14 @@ describe( 'Stryng()', function() {
   		expect( Stryng( primitive ) ).to.have.length(length);
   	});
 
-  	it('should not be writable if `Object.defineProperty` is available for Objects', function () {
+    // conditional tests
+
+  	it('should not be writable, passes if Object.defineProperty is not available or buggy', function () {
   		var primitive = 'test',
   			length = primitive.length,
         nice_try_length = 0,
-  			stryng = Stryng(primitive),
-        Object_defineProperty = ( function( defineProperty ) {
-          try {
-            defineProperty( {}, 'name', {} );
-            return defineProperty;
-          } catch ( e ) {}
-        } )( Object.defineProperty )
-
+  			stryng = Stryng( primitive );
+        
   		if(Object_defineProperty)
   		{
   			stryng.length = nice_try_length;

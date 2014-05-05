@@ -70,15 +70,15 @@
     // feature detect native _Object.defineProperty_
     // and set _Stryng_'s version simultaneously.
     // 
-    // - try to define a dummy property on an object literal which fails
-    //   - either in case `defineProperty` isn't available
-    //   - or only DOM objects are allowed as first argument
+    // - try/catch when
+    //   - not available at all
+    //   - or only supports DOM objects, IE8
     // - if successful, return the reference to that function
     // - implicitely return `undefined` otherwise
     Object_defineProperty = ( function( defineProperty ) {
       try {
         defineProperty( Stryng, 'VERSION', {
-          writable: false, // Safari 5 bug
+          writable: false,
           value: VERSION
         } );
         return defineProperty;
@@ -363,7 +363,7 @@
     that._is_mutable = !! is_mutable;
 
     /**
-     * the [String#_value](#_value)'s length defined via _Object.defineProperty_
+     * this' string's length defined via _Object.defineProperty_
      * if available, simply set onto the instance otherwise.
      * @name Stryng#length
      * @readOnly
@@ -372,10 +372,10 @@
      */
     if ( Object_defineProperty ) {
       Object_defineProperty( that, 'length', {
-        writable: false,
         get: function() {
           return that._value.length;
-        }
+        },
+        set: function(){} // provide a setter for Safari 5/5.1
       } );
     } else {
       that.length = that._value.length;
