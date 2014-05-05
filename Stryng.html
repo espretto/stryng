@@ -87,6 +87,8 @@
             
                 <li data-name="Stryng#equals"><a href="Stryng.html#equals">equals</a></li>
             
+                <li data-name="Stryng#escapeRegExp"><a href="Stryng.html#escapeRegExp">escapeRegExp</a></li>
+            
                 <li data-name="Stryng#exchange"><a href="Stryng.html#exchange">exchange</a></li>
             
                 <li data-name="Stryng#exchangeLeft"><a href="Stryng.html#exchangeLeft">exchangeLeft</a></li>
@@ -102,6 +104,8 @@
                 <li data-name="Stryng#isBlank"><a href="Stryng.html#isBlank">isBlank</a></li>
             
                 <li data-name="Stryng#isEmpty"><a href="Stryng.html#isEmpty">isEmpty</a></li>
+            
+                <li data-name="Stryng#isFloat"><a href="Stryng.html#isFloat">isFloat</a></li>
             
                 <li data-name="Stryng#join"><a href="Stryng.html#join">join</a></li>
             
@@ -140,6 +144,8 @@
                 <li data-name="Stryng#stripRight"><a href="Stryng.html#stripRight">stripRight</a></li>
             
                 <li data-name="Stryng#substr"><a href="Stryng.html#substr">substr</a></li>
+            
+                <li data-name="Stryng#toRegExp"><a href="Stryng.html#toRegExp">toRegExp</a></li>
             
                 <li data-name="Stryng#trim"><a href="Stryng.html#trim">trim</a></li>
             
@@ -193,7 +199,7 @@
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line331">line 331</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line335">line 335</a>
         </div>
         
     </div>
@@ -429,7 +435,7 @@
 <dd>
     
     <div class="description">
-        <p>the <a href="#_value">String#_value</a>'s length defined via <em>Object.defineProperty</em>
+        <p>this' string's length defined via <em>Object.defineProperty</em>
 if available, simply set onto the instance otherwise.</p>
     </div>
     
@@ -578,7 +584,7 @@ create a new instance from the result of every method call</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1374">line 1374</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1404">line 1404</a>
         </div>
         
     </div>
@@ -702,7 +708,7 @@ created with foreign Stryng constructors.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1549">line 1549</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1579">line 1579</a>
         </div>
         
     </div>
@@ -779,7 +785,7 @@ and returns the inner reference Stryng holds to itself.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1387">line 1387</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1417">line 1417</a>
         </div>
         
     </div>
@@ -1001,7 +1007,7 @@ UTF-16 table call <code>Stryng.random(n, 0, 1&gt;&gt;16)</code>.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1210">line 1210</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1214">line 1214</a>
         </div>
         
     </div>
@@ -1138,7 +1144,7 @@ this method applies <code>'undefined'</code> as the default <code>appendix</code
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1289">line 1289</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1305">line 1305</a>
         </div>
         
     </div>
@@ -1221,7 +1227,7 @@ for a <em>classified</em> output compose this method with <a href="#capitalize">
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1273">line 1273</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1289">line 1289</a>
         </div>
         
     </div>
@@ -1297,7 +1303,7 @@ for a <em>classified</em> output compose this method with <a href="#capitalize">
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1265">line 1265</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1281">line 1281</a>
         </div>
         
     </div>
@@ -1374,7 +1380,7 @@ whitespace, line terminators and/or Zs by a single space character.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line484">line 484</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line492">line 492</a>
         </div>
         
     </div>
@@ -1547,7 +1553,7 @@ shim for native <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line648">line 648</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line652">line 652</a>
         </div>
         
     </div>
@@ -1685,7 +1691,7 @@ thus <code>input.length + 1</code> will always be the result for that.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line533">line 533</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line541">line 541</a>
         </div>
         
     </div>
@@ -1874,7 +1880,7 @@ shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#s
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1229">line 1229</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1233">line 1233</a>
         </div>
         
     </div>
@@ -2004,6 +2010,83 @@ string representation of <code>comparable</code></p>
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="escapeRegExp">
+            
+            escapeRegExp<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{String}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1387">line 1387</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>escapes all special characters that have meaning to
+JavaScript regexp parser. taken from <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions">mdn</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="exchange">
             
             exchange<span class="signature">(<span class="optional">replacee</span>, <span class="optional">replacement</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{String}</span>
@@ -2011,7 +2094,7 @@ string representation of <code>comparable</code></p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line878">line 878</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line882">line 882</a>
         </div>
         
     </div>
@@ -2184,7 +2267,7 @@ string representation of <code>comparable</code></p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line899">line 899</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line903">line 903</a>
         </div>
         
     </div>
@@ -2393,7 +2476,7 @@ string representation of <code>comparable</code></p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line920">line 920</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line924">line 924</a>
         </div>
         
     </div>
@@ -2602,7 +2685,7 @@ string representation of <code>comparable</code></p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1327">line 1327</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1343">line 1343</a>
         </div>
         
     </div>
@@ -2686,7 +2769,7 @@ inspired by <a href="http://emberjs.com/api/classes/Ember.String.html#method_das
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1239">line 1239</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1243">line 1243</a>
         </div>
         
     </div>
@@ -2823,7 +2906,7 @@ returning whether or not their are strictly equal.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line701">line 701</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line705">line 705</a>
         </div>
         
     </div>
@@ -2996,7 +3079,7 @@ returning whether or not their are strictly equal.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1256">line 1256</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1260">line 1260</a>
         </div>
         
     </div>
@@ -3073,7 +3156,7 @@ whitespace, line terminators and/or Zs only.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1247">line 1247</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1251">line 1251</a>
         </div>
         
     </div>
@@ -3142,6 +3225,86 @@ whitespace, line terminators and/or Zs only.</p>
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="isFloat">
+            
+            isFloat<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Boolean}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1272">line 1272</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>return whether or not this' string matches the
+floating point number format from the beginning
+<strong>until the end</strong> in contrast to native <em>parseFloat</em>.
+note that it won't throw if the actual number exceeds
+JavaScript's float range.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="join">
             
             join<span class="signature">(<span class="optional">joinees</span>)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{String}</span>
@@ -3149,7 +3312,7 @@ whitespace, line terminators and/or Zs only.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line671">line 671</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line675">line 675</a>
         </div>
         
     </div>
@@ -3287,7 +3450,7 @@ whitespace, line terminators and/or Zs only.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line940">line 940</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line944">line 944</a>
         </div>
         
     </div>
@@ -3461,7 +3624,7 @@ lesser than this' string's length has no effect. it is never truncated.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line968">line 968</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line972">line 972</a>
         </div>
         
     </div>
@@ -3635,7 +3798,7 @@ lesser than this' string's length has no effect. it is never truncated.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line996">line 996</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1000">line 1000</a>
         </div>
         
     </div>
@@ -3809,7 +3972,7 @@ lesser than this' string's length has no effect. it is never truncated.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1354">line 1354</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1370">line 1370</a>
         </div>
         
     </div>
@@ -3885,7 +4048,7 @@ lesser than this' string's length has no effect. it is never truncated.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1219">line 1219</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1223">line 1223</a>
         </div>
         
     </div>
@@ -4021,7 +4184,7 @@ lesser than this' string's length has no effect. it is never truncated.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1138">line 1138</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1142">line 1142</a>
         </div>
         
     </div>
@@ -4102,7 +4265,7 @@ shallow version of the native <em>JSON#stringify</em>. shim for non-standard
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line585">line 585</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line593">line 593</a>
         </div>
         
     </div>
@@ -4252,7 +4415,7 @@ reduction of concat operations inspired by <a href="https://github.com/mout/mout
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line687">line 687</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line691">line 691</a>
         </div>
         
     </div>
@@ -4331,7 +4494,7 @@ diacritics and accented characters use <a href="https://github.com/mathiasbynens
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1342">line 1342</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1358">line 1358</a>
         </div>
         
     </div>
@@ -4343,7 +4506,7 @@ diacritics and accented characters use <a href="https://github.com/mathiasbynens
     
     <div class="description">
         <p>replaces ligatures and diacritics from the Latin-1 Supplement
-with their nearest ASCII equivalent
+with their nearest ASCII equivalent.
 compose this method with <a href="#hyphenize">Stryng#hyphenize</a> to produce URL slugs</p>
     </div>
     
@@ -4416,7 +4579,7 @@ compose this method with <a href="#hyphenize">Stryng#hyphenize</a> to produce UR
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line718">line 718</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line722">line 722</a>
         </div>
         
     </div>
@@ -4545,7 +4708,7 @@ if the resulting substrings overlap, the first one dominates, the latter is fron
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line764">line 764</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line768">line 768</a>
         </div>
         
     </div>
@@ -4723,7 +4886,7 @@ in the returned array.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line867">line 867</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line871">line 871</a>
         </div>
         
     </div>
@@ -4800,7 +4963,7 @@ in the returned array.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line825">line 825</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line829">line 829</a>
         </div>
         
     </div>
@@ -4988,7 +5151,7 @@ is included in the returned array. currently has no regex support</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line495">line 495</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line503">line 503</a>
         </div>
         
     </div>
@@ -5164,7 +5327,7 @@ shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#s
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1024">line 1024</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1028">line 1028</a>
         </div>
         
     </div>
@@ -5337,7 +5500,7 @@ removes <code>outfix</code> <code>n</code> times from the both ends of this' str
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1034">line 1034</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1038">line 1038</a>
         </div>
         
     </div>
@@ -5509,7 +5672,7 @@ removes <code>outfix</code> <code>n</code> times from the both ends of this' str
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1066">line 1066</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1070">line 1070</a>
         </div>
         
     </div>
@@ -5682,7 +5845,7 @@ removes <code>prefix</code> <code>n</code> times from the end of this' string.</
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line610">line 610</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line618">line 618</a>
         </div>
         
     </div>
@@ -5849,6 +6012,127 @@ shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#s
             
 <dt>
     <div class="nameContainer">
+        <h4 class="name" id="toRegExp">
+            
+            toRegExp<span class="signature">(flags)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{RegExp}</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1396">line 1396</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>convenience wrapper for native <em>RegExp</em> constructor.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>flags</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            <td class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <div class="nameContainer">
         <h4 class="name" id="trim">
             
             trim<span class="signature">()</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{String}</span>
@@ -5856,7 +6140,7 @@ shim for native <a href="https://people.mozilla.org/~jorendorff/es6-draft.html#s
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line452">line 452</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line460">line 460</a>
         </div>
         
     </div>
@@ -5933,7 +6217,7 @@ shim for native <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line464">line 464</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line472">line 472</a>
         </div>
         
     </div>
@@ -6010,7 +6294,7 @@ shim for non-standard <a href="https://developer.mozilla.org/en-US/docs/Web/Java
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line473">line 473</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line481">line 481</a>
         </div>
         
     </div>
@@ -6087,7 +6371,7 @@ shim for non-standard <a href="https://developer.mozilla.org/en-US/docs/Web/Java
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1102">line 1102</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1106">line 1106</a>
         </div>
         
     </div>
@@ -6260,7 +6544,7 @@ while including the <code>ellipsis</code> at its end ( enforced ).</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1307">line 1307</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1323">line 1323</a>
         </div>
         
     </div>
@@ -6342,7 +6626,7 @@ while including the <code>ellipsis</code> at its end ( enforced ).</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1185">line 1185</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line1189">line 1189</a>
         </div>
         
     </div>
@@ -6421,7 +6705,7 @@ characters and removes surrounding double quotes once.</p>
     
         
         <div class="tag-source">
-            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line634">line 634</a>
+            <a href="stryng.js.html">stryng.js</a>, <a href="stryng.js.html#line638">line 638</a>
         </div>
         
     </div>
@@ -6600,7 +6884,7 @@ to do the opposite use <a href="#strip">Stryng.strip</a>.</p>
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon May 05 2014 20:34:26 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue May 06 2014 01:40:51 GMT+0200 (CEST)
         </footer>
     </div>
 </div>
