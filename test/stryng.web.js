@@ -2698,7 +2698,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
     Object_keys = Object.keys || function() {
       var object = this,
-        keys = [],
+        keys = [], key,
         i = 0;
 
       for ( key in object ) {
