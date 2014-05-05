@@ -206,7 +206,7 @@
 <h2>design considerations</h2>
 <h3>constructing stryngs</h3>
 <p>Stryng instances wrap string primitives</p>
-<pre><code>var stryng = new Stryng(); // &gt; '', wrapped, `new` operator is optional
+<pre><code>var stryng = new Stryng(); // wrapped empty string, `new` operator is optional
 stryng.isEmpty();          // &gt; true</code></pre>
 <p>by default Stryng instances are immutable just like native strings.</p>
 <pre><code>stryng = stryng.append('key');  // reassign it, just like we would with natives
@@ -217,27 +217,27 @@ immutable.equals( stryng )      // &gt; true, contents equal</code></pre>
 <pre><code>var mutable = stryng.clone( true );     // equal to `Stryng( stryng, true )`
 var referer = mutable.append('stroke'); // wrapped 'keystroke'
 referer === mutable;                    // &gt; true, both refer to the same object
-mutable.equals( referer )               // &gt; true, contents could never differ</code></pre>
+mutable.equals( referer );              // &gt; true, contents could never differ</code></pre>
 <p>to retrieve the wrapped value, take actions that imply a call to Stryng's <code>toString</code> or <code>valueOf</code> methods or call them directly.</p>
 <pre><code>stryng.toString(); // &gt; 'key', as primitve, same as `stryng.valueOf()`
 stryng + 'stroke'; // &gt; 'keystroke', as primitive</code></pre>
 <p>infact Stryng integration is rather seemless</p>
 <pre><code>var object = {};
-var n = Stryng( 123 );    // &gt; '123', wrapped
+var n = Stryng( 123 );    // wrapped '123'
 object[ stryng ] = +n;    // parse wrapped '123' to number and assign to `object['key']`
-JSON.stringify( object ); // '{&quot;key&quot;:123}'</code></pre>
+JSON.stringify( object ); // &gt; '{&quot;key&quot;:123}'</code></pre>
 <p>type checking however cannot be tricked into recognizing Stryngs as strings</p>
 <pre><code>typeof stryng;                 // &gt; 'object'
-stryng instanceof String;      // not even if it actually did occur along the prototype chain &gt; false
-object.toString.call( stryng ) // reliable as always &gt; '[object Object]'
+stryng instanceof String;      // &gt; false, not even if it actually did occur along the prototype chain
+object.toString.call( stryng ) // &gt; '[object Object]', reliable as always
 
-// for as long as Stryng is not another (iframe's) `window`'s property
+// for as long as Stryng is not another ( iframe's ) `window`'s property
 stryng instanceof Stryng;  // &gt; true
-Stryng.isStryng( stryng ); // wraps the above for convenience</code></pre>
+Stryng.isStryng( stryng ); // &gt; true, wraps the above for convenience</code></pre>
 <h3>type safety</h3>
 <h4>strings</h4>
 <p>arguments expected to be strings are cast using <code>String( arg )</code>. as a direct consequence <code>'undefined'</code> will be applied as the default value. this decision derives from JavaScript's native behaviour:</p>
-<pre><code>var str = String( undefined ); // &gt; 'undefined'
+<pre><code>var str = String( undefined ); // primitive 'undefined'
 
 str.contains();   // &gt; true
 str.endsWith();   // &gt; true
@@ -253,8 +253,24 @@ str.indexOf();    // &gt; 0
 <li><em>toUInt32</em> where only positive numbers make sense and default to the more or less infinite value <code>Math.pow(2, 32) - 1</code>. <code>str.split(',')</code> for example applies this value to its 2nd argument as the default number of substrings to return.</li>
 <li><em>toInteger</em> in every other scenario. this will cast with <code>Number</code>, apply zero for <code>NaN</code>, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives</li>
 </ol>
-<p>Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead.</p>
-<h2>Documentation</h2>
+<p>Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.</p>
+<h2>show cases</h2>
+<p>produce URL slugs</p>
+<pre><code>Stryng( headline, true ) // we are only interested in the last function's output
+  .clean()     // reduce groups of whitespace to a single space
+  .trim()      // cut off arbitrary leading and trailing whitespace
+  .simplify()  // replace ligatures and diacritics from the Latin-1 Supplement with ASCII printables
+  .hyphenize() // apply hyphen as the word separator and lower-case</code></pre>
+<p>varying the format</p>
+<pre><code>var headline     = Stryng('the quick brown fox', false ), // though immutable by default
+    hyphenized   = headline.hyphenize(),     // wrapped 'the-quick-brown-fox'
+    camelCased   = hyphenized.camelize(),    // wrapped 'theQuickBrownFox'
+    under_scored = camelCased.underscore(),  // wrapped 'the_quick_brown_fox'
+    rotated      = under_scored.hyphenize(), // wrapped 'the-quick-brown-fox'
+
+    classified   = camelCased.capitalize();  // wrapped 'TheQuickBrownFox'</code></pre>
+<p>please refer to the tests for more examples.</p>
+<h2>documentation</h2>
 <p>please refer to either the <a href="http://espretto.github.io/Stryng">api documentation</a> or read Stryng's story - the <a href="http://espretto.github.io/Stryng/docker/README.md.html">annotated source</a>.</p>
 <h3>notes on doc notation</h3>
 <ul>
@@ -279,7 +295,7 @@ str.indexOf();    // &gt; 0
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon May 05 2014 00:43:17 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Mon May 05 2014 19:55:36 GMT+0200 (CEST)
         </footer>
     </div>
 </div>

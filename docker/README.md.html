@@ -47,7 +47,10 @@
         <a href="#numbers">numbers</a>
       </div>
       <div class="heading h2">
-        <a href="#documentation">Documentation</a>
+        <a href="#show%20cases">show cases</a>
+      </div>
+      <div class="heading h2">
+        <a href="#documentation">documentation</a>
       </div>
       <div class="heading h3">
         <a href="#notes%20on%20doc%20notation">notes on doc notation</a>
@@ -120,7 +123,7 @@
 
 <p>Stryng instances wrap string primitives</p>
 
-<div class='highlight'><pre><code language=''>var stryng = new Stryng(); // &gt; '', wrapped, `new` operator is optional
+<div class='highlight'><pre><code language=''>var stryng = new Stryng(); // wrapped empty string, `new` operator is optional
 stryng.isEmpty();          // &gt; true
 </code></pre></div>
 
@@ -137,7 +140,7 @@ immutable.equals( stryng )      // &gt; true, contents equal
 <div class='highlight'><pre><code language=''>var mutable = stryng.clone( true );     // equal to `Stryng( stryng, true )`
 var referer = mutable.append('stroke'); // wrapped 'keystroke'
 referer === mutable;                    // &gt; true, both refer to the same object
-mutable.equals( referer )               // &gt; true, contents could never differ
+mutable.equals( referer );              // &gt; true, contents could never differ
 </code></pre></div>
 
 <p>to retrieve the wrapped value, take actions that imply a call to Stryng's <code>toString</code> or <code>valueOf</code> methods or call them directly.</p>
@@ -149,20 +152,20 @@ stryng + 'stroke'; // &gt; 'keystroke', as primitive
 <p>infact Stryng integration is rather seemless</p>
 
 <div class='highlight'><pre><code language=''>var object = {};
-var n = Stryng( 123 );    // &gt; '123', wrapped
+var n = Stryng( 123 );    // wrapped '123'
 object[ stryng ] = +n;    // parse wrapped '123' to number and assign to `object['key']`
-JSON.stringify( object ); // '{"key":123}'
+JSON.stringify( object ); // &gt; '{"key":123}'
 </code></pre></div>
 
 <p>type checking however cannot be tricked into recognizing Stryngs as strings</p>
 
 <div class='highlight'><pre><code language=''>typeof stryng;                 // &gt; 'object'
-stryng instanceof String;      // not even if it actually did occur along the prototype chain &gt; false
-object.toString.call( stryng ) // reliable as always &gt; '[object Object]'
+stryng instanceof String;      // &gt; false, not even if it actually did occur along the prototype chain
+object.toString.call( stryng ) // &gt; '[object Object]', reliable as always
 
-// for as long as Stryng is not another (iframe's) `window`'s property
+// for as long as Stryng is not another ( iframe's ) `window`'s property
 stryng instanceof Stryng;  // &gt; true
-Stryng.isStryng( stryng ); // wraps the above for convenience
+Stryng.isStryng( stryng ); // &gt; true, wraps the above for convenience
 </code></pre></div>
 
 
@@ -185,7 +188,7 @@ Stryng.isStryng( stryng ); // wraps the above for convenience
 
 <p>arguments expected to be strings are cast using <code>String( arg )</code>. as a direct consequence <code>'undefined'</code> will be applied as the default value. this decision derives from JavaScript's native behaviour:</p>
 
-<div class='highlight'><pre><code language=''>var str = String( undefined ); // &gt; 'undefined'
+<div class='highlight'><pre><code language=''>var str = String( undefined ); // primitive 'undefined'
 
 str.contains();   // &gt; true
 str.endsWith();   // &gt; true
@@ -214,13 +217,44 @@ str.indexOf();    // &gt; 0
 <li><em>toInteger</em> in every other scenario. this will cast with <code>Number</code>, apply zero for <code>NaN</code>, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives</li>
 </ol>
 
-<p>Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead.</p>
+<p>Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.</p>
+
+
+<div class="pilwrap" id="show%20cases">
+  <h2>
+    <a href="#show%20cases" name="show%20cases" class="pilcrow">&#182;</a>
+    show cases
+  </h2>
+</div>
+
+
+<p>produce URL slugs</p>
+
+<div class='highlight'><pre><code language=''>Stryng( headline, true ) // we are only interested in the last function's output
+  .clean()     // reduce groups of whitespace to a single space
+  .trim()      // cut off arbitrary leading and trailing whitespace
+  .simplify()  // replace ligatures and diacritics from the Latin-1 Supplement with ASCII printables
+  .hyphenize() // apply hyphen as the word separator and lower-case
+</code></pre></div>
+
+<p>varying the format</p>
+
+<div class='highlight'><pre><code language=''>var headline     = Stryng('the quick brown fox', false ), // though immutable by default
+    hyphenized   = headline.hyphenize(),     // wrapped 'the-quick-brown-fox'
+    camelCased   = hyphenized.camelize(),    // wrapped 'theQuickBrownFox'
+    under_scored = camelCased.underscore(),  // wrapped 'the_quick_brown_fox'
+    rotated      = under_scored.hyphenize(), // wrapped 'the-quick-brown-fox'
+
+    classified   = camelCased.capitalize();  // wrapped 'TheQuickBrownFox'
+</code></pre></div>
+
+<p>please refer to the tests for more examples.</p>
 
 
 <div class="pilwrap" id="documentation">
   <h2>
     <a href="#documentation" name="documentation" class="pilcrow">&#182;</a>
-    Documentation
+    documentation
   </h2>
 </div>
 
