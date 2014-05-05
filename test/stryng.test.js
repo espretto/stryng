@@ -30,13 +30,16 @@ describe( 'Stryng()', function() {
       expect( Stryng( '' ) ).to.be.a( Stryng );
     } );
 
-    it( 'should return the wrapped empty string if passed null', function() {
-      expect( Stryng( null ).toString() ).to.equal( '' );
+    it('should wrap the empty string if no arguments passed', function () {
+      expect( Stryng() ).to.have.length(0);
+    });
+
+    it( 'should wrap "null" passed `null`', function() {
+      expect( Stryng( null ).toString() ).to.equal( 'null' );
     } );
 
-    it( 'should return the wrapped empty string if passed no arguments or undefined', function() {
-      expect( Stryng().toString() ).to.equal( '' );
-      expect( Stryng( void 0 ).toString() ).to.equal( '' );
+    it( 'should wrap "undefined" passed `undefined`', function() {
+      expect( Stryng( void 0 ).toString() ).to.equal( 'undefined' );
     } );
 
     it( 'should return the wrapped empty string if passed the empty array', function() {
@@ -873,27 +876,60 @@ describe( 'Stryng()', function() {
   } );
 
   describe( '.camelize()', function(){
+
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.camelize ).to.throwError();
     } );
+
+    it('should not capitalize the first character', function () {
+      expect( Stryng.camelize('foo') ).to.equal('foo');
+    });
+
+    it('should recognize hyphens, spaces and underscores as boundaries', function () {
+      expect( Stryng.camelize('the-quick_brown fox') ).to.equal('theQuickBrownFox');
+    });
   });
 
   describe( '.underscore()', function(){
+    
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.underscore ).to.throwError();
     } );
+
+    it('should lower-case the output', function () {
+      expect( Stryng.underscore('SHOUT') ).to.equal('shout');
+    });
+
+    it('should recognize hyphens, spaces and uppercase following lowercase as boundaries', function () {
+      expect( Stryng.underscore('the quick-brownFox') ).to.equal('the_quick_brown_fox');
+    });
   });
 
   describe( '.hyphenize()', function(){
+
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.hyphenize ).to.throwError();
     } );
+
+     it('should lower-case the output', function () {
+      expect( Stryng.underscore('SHOUT') ).to.equal('shout');
+    });
+
+     it('should recognize underscores, spaces and uppercase following lowercase as boundaries', function () {
+      expect( Stryng.underscore('the quick_brownFox') ).to.equal('the_quick_brown_fox');
+    });
   });
 
   describe( '.simplify()', function(){
+
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.simplify ).to.throwError();
     } );
+
+    it('should replace characters from the latin 1 supplement with their nearest ASCII equivalent', function () {
+      expect( Stryng.simplify('größer Häuser über') ).to.equal('groesser Haeuser ueber');
+      expect( Stryng.simplify('ambiguë préfèrer île') ).to.equal('ambigue preferer ile');
+    });
   });
 
   describe( '.ord()', function() {

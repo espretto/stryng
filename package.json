@@ -4,7 +4,7 @@
   "devDependencies": {
     "benchmark": "~1.0.0",
     "expect.js": "latest",
-    "mocha": "~1.18.2",
+    "mocha": "~1.15.1",
     "browserify": "~3.38.0",
     "grunt": "~0.4.4",
     "grunt-contrib-watch": "~0.6.1",
@@ -17,8 +17,10 @@
   "testling": {
     "browsers": [
       "ie/6..10",
-      "chrome/4.0","chrome/canary",
-      "firefox/3.0","firefox/nightly",
+      "chrome/4.0",
+      "chrome/canary",
+      "firefox/3.0",
+      "firefox/nightly",
       "opera/10..latest",
       "safari/4..latest",
       "iphone/6.0",

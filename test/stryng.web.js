@@ -2607,7 +2607,6 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
 }).call(this,require("buffer").Buffer)
 },{"buffer":1}],5:[function(require,module,exports){
-
 // baseline setup
 // ==============
 // leverage _uglifyjs_' ability to declare global variables
@@ -2623,7 +2622,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   array, object, string, regex, func,
 
     /**
-     * _Stryng_'s version.
+     * Stryng's version.
      * @name Stryng.VERSION
      * @readOnly
      * @type {String}
@@ -2640,33 +2639,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     String = func = string.constructor,
 
     // methods _Stryng_ hopes to adopt
-    methods = array = ('' +
-      + 'charAt,'
-      + 'charCodeAt,'
-      + 'codePointAt,'
-      + 'concat,'
-      + 'contains,'
-      + 'endsWith'
-      + 'indexOf,'
-      + 'lastIndexOf,'
-      + 'localeCompare,'
-      + 'match,'
-      + 'normalize,'
-      + 'replace,'
-      + 'search,'
-      + 'slice,'
-      + 'split,'
-      + 'startsWith,'
-      + 'substr,'
-      + 'substring,'
-      + 'toLocaleLowerCase,'
-      + 'toLocaleUpperCase,'
-      + 'toLowerCase,'
-      + 'toUpperCase,'
-      + 'trim,'
-      + 'trimLeft,'
-      + 'trimRight'
-    ).split( ',' ),
+    methods = array = 'charAt,charCodeAt,codePointAt,concat,contains,endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,replace,search,slice,split,startsWith,substr,substring,toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,trim,trimLeft,trimRight'.split( ',' ),
 
     // methods which's native implementations to override if necessary
     shim_methods = [],
@@ -2688,6 +2661,8 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
     JSON_stringify = typeof JSON !== 'undefined' && JSON.stringify,
     Math_floor = Math.floor,
+    Math_max = Math.max,
+    Math_min = Math.min,
     Math_random = Math.random,
     String_fromCharCode = String.fromCharCode,
 
@@ -2711,12 +2686,28 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     // - implicitely return `undefined` otherwise
     Object_defineProperty = ( function( defineProperty ) {
       try {
-        defineProperty( Stryng, 'VERSION', { value: VERSION } );
+        defineProperty( Stryng, 'VERSION', {
+          value: VERSION
+        } );
         return defineProperty;
       } catch ( e ) {
         Stryng.VERSION = VERSION;
       }
     } )( Object.defineProperty ),
+
+    // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
+    Object_keys = Object.keys || function() {
+      var object = this,
+        keys = [],
+        i = 0;
+
+      for ( key in object ) {
+        if ( object.hasOwnProperty( key ) ) {
+          keys[ i++ ] = key;
+        }
+      }
+      return keys;
+    },
 
     // ### native instance methods
 
@@ -2727,35 +2718,20 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     object_toString = object.toString,
 
     array_forEach = array.forEach || function( iterator ) {
-      for( var array = this, i = array.length; i--; iterator( array[ i ] ));
+      for ( var array = this, i = array.length; i-- && iterator.call( context, array[ i ], i, array ) !== false; );
     },
 
-    array_contains = array.contains || function( item ){
-      for( var array = this, i = array.length; i-- && array[i] !== item;);
+    array_contains = array.contains || function( item ) {
+      for ( var array = this, i = array.length; i-- && array[ i ] !== item; );
       return i !== -1;
     },
 
-    // make this one pretty for the w3c-wishlist. used in favor of
-    // the composition of _Array#forEach_ and _Object.keys_.
+    // for the w3c-wishlist: composition of _Array#forEach_ and _Object.keys_.
     object_forOwn = function( iterator, context ) {
-
-      var object = this,
-        key, return_value;
-
-      if ( object == null ) {
-        throw new TypeError( 'can\'t convert ' + object + ' to object' );
-      }
-
-      object = Object( object );
-
-      for ( key in object ) {
-        if ( object.hasOwnProperty( key ) ) {
-          return_value = iterator.call( context, object[ key ], key, object );
-          if ( return_value === false ) {
-            break;
-          }
-        }
-      }
+      var object = this;
+      array_forEach.call( Object_keys( object ), function( key ) {
+        return iterator.call( context, object[ key ], key, object );
+      } )
     },
 
     // regular expressions
@@ -2776,10 +2752,11 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     // we also rely on native _String#toLowerCase_ and _String#toUpperCase_
     // to properly convert characters - <a href="javascript:alert('give me the link!')">which they don't</a>
     latin_1_supplement = {
-      'A': '\\xC0-\\xC5',
-      'a': '\\xE0-\\xE5',
+      'A': '\\xC0-\\xC3\\xC5',
+      'Ae': '\\xC4',
+      'a': '\\xE0-\\xE3\\xE5',
       'AE': '\\xC6',
-      'ae': '\\xE6',
+      'ae': '\\xE6\\xE4', // liguature and german umlaut
       'C': '\\xC7',
       'c': '\\xE7',
       'E': '\\xC8-\\xCB',
@@ -2790,13 +2767,17 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       'd': '\\xF0',
       'N': '\\xD1',
       'n': '\\xF1',
-      'O': '\\xD2-\\xD6\\xD8',
-      'o': '\\xF2-\\xF6\\xF8',
-      'U': '\\xD9-\\xDC',
-      'u': '\\xF9-\\xFC',
+      'O': '\\xD2-\\xD5\\xD8',
+      'Oe': '\\xD6',
+      'o': '\\xF2-\\xF5\\xF8',
+      'oe': '\\xF6',
+      'U': '\\xD9-\\xDB',
+      'Ue': '\\xDC',
+      'u': '\\xF9-\\xFB',
+      'ue': '\\xFC',
       'Y': '\\xDD',
       'y': '\\xFD\\xFF',
-      'sz': '\\xDF'
+      'ss': '\\xDF'
     };
 
   // compile the character ranges to regular expressions to match and replace later
@@ -2809,15 +2790,14 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // on some of the more exotic characters considered [whitespace][1],
   // [line terminators][2] or the mysterious [Zs][3].
   // this section detects those flaws and constructs the regular expressions used
-  // in the polyfills and others - [Stryng#splitLines](#splitLines) in particular.
-  // Many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
+  // in the polyfills. Many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
   // 
   // - let `re_whitespace` be the native white space matcher.
   // - iterate over our white space characters
   // - add all whitespace characters not recognized
   //   as such to the matcher's source.
   // - if the native implementation is not `is_spec_compliant`,
-  //   reconstruct the above regular expressions and mark
+  //   reconstruct the regular expressions and mark
   //   their associated methods as _to be shimmed_
   //   
   // [1]: http://www.ecma-international.org/ecma-262/5.1/#sec-7.2
@@ -2837,10 +2817,11 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     var is_spec_compliant = true,
       re_whitespace = /\s/,
       re_whitespace_source = re_whitespace.source,
+      re_whitespace_source_len = re_whitespace_source.length,
       re_whitespaces_source,
 
-      hex_char_codes = (''
-        + '0009,' // tab
+      hex_char_codes = (
+        '0009,' // tab
         + '000A,' // line feed
         + '000B,' // vertical tab
         + '000C,' // form feed
@@ -2856,7 +2837,8 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
         + '2028,' // line separator
         + '2029,' // paragraph separator
         + 'FEFF' // byte order mark
-      ).split(','), chr;
+      ).split( ',' ),
+      chr;
 
     array_forEach.call( hex_char_codes, function( hex_char_code ) {
 
@@ -2913,14 +2895,14 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
   // feature detection
   // -----------------
-  
+
   // check whether or not native static functions exist on the global
-  // _String_ namespace __and__ throw an error if no arguments passed
+  // _String_ namespace __and__ do throw an error if no arguments passed
   // as required for static functions on _Stryng_.
-  if(is.Function(String.slice)){
+  if ( is.Function( String.slice ) ) {
     try {
       String.slice();
-    } catch( e ){
+    } catch ( e ) {
       adopt_native_statics = true;
     }
   }
@@ -2928,17 +2910,17 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // check if the native implementation of _String#startsWith_
   // already knows how to deal with regular expressions.
   // consider _String#endsWith_ to behave the same on that matter.
-  if(is.Function(string.startswith)){
-    try{
-      VERSION.startsWith(/\d/);
-    } catch( e ){
+  if ( is.Function( string.startswith ) ) {
+    try {
+      string.startsWith( regex );
+    } catch ( e ) {
       shim_methods.push( 'startsWith', 'endsWith' );
     }
   }
 
   // check if the native implementation of _String#substr_
   // correctly deals with negative indices.
-  if ( 'xy'.substr( -1 ) !== 'y' ){
+  if ( 'ab'.substr( -1 ) !== 'b' ) {
     shim_methods.push( 'substr' );
   }
 
@@ -2967,17 +2949,18 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
    *   in the instance returned.
    */
   function Stryng( value, is_mutable ) {
-    var that = this, value_len;
+    var that = this,
+      args_len = arguments.length;
 
     // allow omitting the new operator
-    if ( !( that instanceof Stryng ) ) return new Stryng( value, is_mutable );
+    if ( !( that instanceof Stryng ) ) return args_len ? new Stryng( value, is_mutable ) : new Stryng();
 
     /**
      * the wrapped native string primitive
      * @name Stryng~_value
      * @type {String}
      */
-    that._value = value != null ? String( value ) : '';
+    that._value = args_len ? String( value ) : '';
 
     /**
      * whether the created instance should be mutable or
@@ -2995,21 +2978,20 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * @type {Number}
      * @todo further [reading](http://www.2ality.com/2012/08/property-definition-assignment.html)
      */
-    value_len = that._value.length;
     if ( Object_defineProperty ) {
       Object_defineProperty( that, 'length', {
         get: function() {
-          return value_len;
+          return that._value.length;
         }
       } );
     } else {
-      that.length = value_len;
+      that.length = that._value.length;
     }
   }
 
   // cloning mutables
   // ----------------
-  
+
   /**
    * in case the instance was not constructed to be mutable
    * this is the hook to get a copy of it. delegates to [Stryng#constructor](#Stryng)
@@ -3017,7 +2999,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
    *   whether the cloned instance should be mutable or
    *   create a new instance from the internal result of every method call
    * @return {Stryng} -
-   *   a copy of the _Stryng_ instance
+   *   a copy of the Stryng instance
    */
   Stryng.prototype.clone = function( is_mutable ) {
     return new Stryng( this._value, is_mutable );
@@ -3053,10 +3035,10 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // but only for as long as `stryng` was actually constructed using
   // that specific `Stryng` constructor and not some other foreign (i)frame's one.
   Stryng.prototype.valueOf =
-  Stryng.prototype.toString = function() {
+    Stryng.prototype.toString = function() {
       return this._value; // we can rest assured that this is a primitive
   };
-  
+
   // instance methods
   // ----------------
   // the herein defined methods will be available as both
@@ -3065,7 +3047,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // instance methods__, which makes it a lot shorter, less verbose and
   // easier to highlight the fact that all instance methods are available
   // as static ones but __not vice versa__.
-  
+
   /**
    * @lends Stryng.prototype
    */
@@ -3210,10 +3192,9 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * @throws if `n` is either negative or infinite.
      */
     repeat: function( input, n ) {
-      n = +n;
-      if ( input == null || n <= -1 || n == INFINITY ) exit();
-
-      n = n < 0 ? 0 : Math_floor( n ) || 0;
+      n = +n || 0;
+      if ( input == null || n < 0 || n == INFINITY ) exit();
+      n = Math_floor( n );
 
       var result = '';
 
@@ -3240,10 +3221,18 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
       // parse the `position` argument.
       // 
-      // - if `Number.toInteger( position )` is negative, add `input.length`
-      // - if it still is negative, set it to zero
+      // - if the would-be result of `Number.toInteger( position )` is negative, add `input.length`
+      // - if it still is negative, apply zero
       // - leave it up to `substr`'s implicit parsing any otherwise
-      position = position <= -1 ? ( position = Number_toInteger( position ) + input.length ) < 0 ? 0 : position : position;
+      position = +position || 0;
+      if ( position < 0 ) {
+        position += input.length;
+        if ( position < 0 ) {
+          position = 0;
+        } else {
+          position = Math_floor( position );
+        }
+      }
 
       return input.substr( position, length );
     },
@@ -3325,9 +3314,9 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     insert: function( input, position, insertion ) {
       input = input != null ? String( input ) : exit();
 
-      // slice's native parsing will apply differenceerent
+      // help out _String#slice_'s implicit parsing which will apply different
       // defaults for `undefined` to the first and second argument
-      if ( position === void 0 ) position = Number_toInteger( position );
+      position = +position || 0;
 
       // implies parsing `insertion`
       return input.slice( 0, position ) + insertion + input.slice( position );
@@ -3345,7 +3334,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       // - for each index
       //   - if it is negative, add this' string's length
       //   - apply `pending_index` of the previous iteration ( initially zero ) as `index`'s minimum
-      //   - let native _String#slice_ apply the maximum
+      //   - let native _String#substring_ apply the maximum
       //   - push what's within input between `pending_index` and `index` to `result`
       //   - update `pending_index` for the next iteration
       // - push what's left to the result and return it.
@@ -3367,7 +3356,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
           result.push( '' ); // faster than slicing the empty string first
           index = pending_index;
         } else {
-          result.push( input.slice( pending_index, index ) );
+          result.push( input.substring( pending_index, index ) );
           pending_index = index;
         }
       }
@@ -3465,7 +3454,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       // - return `result`
 
       if ( is.RegExp( delimiter ) ) {
-        exit('no regex support for splitRight');
+        exit( 'no regex support for splitRight' );
       }
 
       n = ( n === void 0 ? -1 : n ) >>> 0;
@@ -3516,7 +3505,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * `replacee` with `replacement`.
      * @param {String} [replacee="undefined"] string to replace
      * @param {String} [replacement="undefined"] replacement
-     * @param {Number} [n=Math.pow(2, 32) - 1]
+     * @param {Number} [n=Math.pow(2,32)-1]
      *   number of replacement operations.
      * @return {String}
      */
@@ -3537,7 +3526,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * `replacee` with `replacement`.
      * @param {String} [replacee="undefined"] string to replace
      * @param {String} [replacement="undefined"] replacement
-     * @param {Number} [n=Math.pow(2, 32) - 1]
+     * @param {Number} [n=Math.pow(2,32)-1]
      *   number of replacement operations.
      * @return {String}
      */
@@ -3562,15 +3551,15 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * @return {String}
      */
     just: function( input, max_len, fill ) {
-      max_len = +max_len;
-      if ( input == null || max_len <= -1 || max_len == INFINITY ) exit();
+      max_len = +max_len || 0;
+      if ( input == null || max_len < 0 || max_len == INFINITY ) exit();
+      max_len = Math_floor( max_len );
 
       input = String( input );
       fill = String( fill );
-      max_len = max_len < 0 ? 0 : Math_floor( max_len ) || 0;
 
       var input_len = input.length,
-        fill_len = fill.length * 2; // safe, `<< 1` isn't
+        fill_len = fill.length * 2; // safe, `<< 1` converts to 32-Bit Integer
 
       if ( max_len <= input_len || !fill ) return input;
 
@@ -3590,19 +3579,17 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * @return {String}
      */
     justLeft: function( input, max_len, fill ) {
-      max_len = +max_len;
-      if ( input == null || max_len <= -1 || max_len == INFINITY ) exit();
+      max_len = +max_len || 0;
+      if ( input == null || max_len < 0 || max_len == INFINITY ) exit();
+      max_len = Math_floor( max_len );
 
       input = String( input );
       fill = String( fill );
-      max_len = max_len < 0 ? 0 : Math_floor( max_len ) || 0;
 
-      var input_len = input.length;
+      var input_len = input.length,
+        fill_len = fill.length;
 
-      // early exit for the empty fill
       if ( max_len <= input_len || !fill ) return input;
-
-      var fill_len = fill.length;
 
       while ( input.length + fill_len <= max_len ) {
         input = fill + input;
@@ -3620,12 +3607,12 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * @return {String}
      */
     justRight: function( input, max_len, fill ) {
-      max_len = +max_len;
-      if ( input == null || max_len <= -1 || max_len == INFINITY ) exit();
+      max_len = +max_len || 0;
+      if ( input == null || max_len < 0 || max_len == INFINITY ) exit();
+      max_len = Math_floor( max_len );
 
       input = String( input );
       fill = String( fill );
-      max_len = max_len < 0 ? 0 : Math_floor( max_len ) || 0;
 
       var input_len = input.length,
         fill_len = fill.length;
@@ -3812,27 +3799,28 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       return input != null ?
         Stryng.strip( String( input )
 
-        .replace( /\\[xu]([0-9A-F]{2})([0-9A-F]{2})?/gi, function( _, x, u ) {
-          return String_fromCharCode( parseInt( x + ( u || '' ), 16 ) );
-        })
-        .replace( /\\([btnfr"\\])/g, function( _, esc ) {
-          return (
-            esc === 'b' ? '\b' : // backspace
-            esc === 't' ? '\t' : // tab
-            esc === 'n' ? '\n' : // new line
-            esc === 'f' ? '\f' : // form feed
-            esc === 'r' ? '\r' : // carriage return
-            esc // backslash, double quote and any other
-          )
-        }), '"', 1) : exit();
+          .replace( /\\[xu]([0-9A-F]{2})([0-9A-F]{2})?/gi, function( _, x, u ) {
+            return String_fromCharCode( parseInt( x + ( u || '' ), 16 ) );
+          } )
+          .replace( /\\([btnfr"\\])/g, function( _, esc ) {
+            return (
+              esc === 'b' ? '\b' : // backspace
+              esc === 't' ? '\t' : // tab
+              esc === 'n' ? '\n' : // new line
+              esc === 'f' ? '\f' : // form feed
+              esc === 'r' ? '\r' : // carriage return
+              esc // backslash, double quote and any other
+            )
+          } ), '"', 1 ) : exit();
     },
 
     /**
-     * appends the given `appendix` to this' string.
+     * appends the given `appendix` to this' string. unlike native _String#concat_
+     * this method applies `'undefined'` as the default `appendix`.
      * @param {String} [appendix="undefined"]
      * @return {String}
      */
-    append: function( input, appendix ){
+    append: function( input, appendix ) {
       return input != null ? String( input ) + appendix : exit();
     },
 
@@ -3902,10 +3890,10 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
     /**
      * transforms this' string into camel-case by
-     * 
+     *
      * - removing all occurences of space, underscore and hyphen
      * - upper-casing the first letter directly following those.
-     * 
+     *
      * inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_camelize)
      * note that this leaves the very first letter untouched.
      * for a _classified_ output compose this method with [Stryng#capitalize](#capitalize).
@@ -3925,7 +3913,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      * - inserting `_` where upper-cased letters follow lower-cased ones
      * - replacing space and hyphen by `_`
      * - lower-casing the final output
-     * 
+     *
      * inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_underscore)
      * @return {String}
      */
@@ -3939,7 +3927,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
     /**
      * transforms this' string into an underscored form by
-     * 
+     *
      * - inserting `-` where upper-cased letters follow lower-cased ones
      * - replacing space and underscore by `-`
      * - lower casing the final output.
@@ -3959,9 +3947,10 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
     /**
      * replaces ligatures and diacritics from the Latin-1 Supplement
-     * with their nearest ASCII equivalent, replaces symbols otherwise being percent-escaped.
+     * with their nearest ASCII equivalent
      * compose this method with [Stryng#hyphenize](#hyphenize) to produce URL slugs
      * @return {String} [description]
+     * @todo replace symbols otherwise being percent-escaped
      */
     simplify: function( input ) {
       input = input != null ? String( input ) : exit();
@@ -3985,6 +3974,10 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       while ( i-- ) result[ i ] = input.charCodeAt( i );
 
       return result;
+    },
+
+    toRegExp: function( input, flags ){
+      return input != null ? new RegExp( input, flags ) : exit();
     }
   };
 
@@ -3992,16 +3985,16 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // ----------------
 
   /**
-   * returns whether or not `any` is an instance of _Stryng_.
-   * beware of _Stryng_ classes hosted by other HTML frames inside
-   * browser windows. this method won't recognize _Stryng_s
-   * created with foreign _Stryng_ constructors.
+   * returns whether or not `any` is an instance of Stryng.
+   * beware of Stryng classes hosted by other HTML frames inside
+   * browser windows. this method won't recognize Stryngs
+   * created with foreign Stryng constructors.
    * @function Stryng.isStryng
    * @param {*} any
    * @return {Boolean}
    */
-  Stryng.isStryng = function(any){
-    return (any instanceof Stryng);
+  Stryng.isStryng = function( any ) {
+    return ( any instanceof Stryng );
   };
 
   /**
@@ -4013,13 +4006,13 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
    * @param {Number} [from=32] inclusively
    * @param {Number} [to=127] exclusively assuming _Math.random_ never yields `1`
    * @return {String}
-   * @throws if `to` exceeds `Math.pow( 2, 16 )`
+   * @throws if `n` is negative or not finite or `to` exceeds `Math.pow( 2, 16 )`
    */
   Stryng.random = function( n, from, to ) {
-    n = +n;
-    if ( n <= -1 || n == INFINITY ) exit();
+    n = +n || 0;
+    if ( n < 0 || n == INFINITY ) exit();
+    n = Math_floor( n );
 
-    n = n < 0 ? 0 : Math_floor( n ) || 0;
     from = from === void 0 ? 32 : ( from >>> 0 );
     to = to === void 0 ? 127 : ( to >>> 0 );
 
@@ -4049,8 +4042,8 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   Stryng.chr = function( /* char_codes,... */) {
     var char_codes = arguments,
       i = char_codes.length;
-    while ( i-- ){
-      if ( char_codes[ i ] > MAX_CHARCODE ){
+    while ( i-- ) {
+      if ( char_codes[ i ] > MAX_CHARCODE ) {
         exit();
       }
     }
@@ -4123,14 +4116,14 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
     var fn = string[ fn_name ];
 
-    if ( is.Function( fn ) && !array_contains.call( shim_methods, fn_name )) {
+    if ( is.Function( fn ) && !array_contains.call( shim_methods, fn_name ) ) {
 
-      Stryng[ fn_name ] = adopt_native_statics && String[fn_name] || function( input /*, proxied argments */ ) {
+      Stryng[ fn_name ] = adopt_native_statics && String[ fn_name ] || function( input /*, proxied argments */ ) {
         if ( input == null ) exit();
         return function_call.apply( fn, arguments );
       }
 
-      Stryng.prototype[ fn_name ] = function(/* proxied arguments */) {
+      Stryng.prototype[ fn_name ] = function( /* proxied arguments */) {
 
         var that = this, // promote compression
           result = fn.apply( that._value, arguments );
@@ -4168,7 +4161,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
     /**
      * restores the previous value assigned to `window.Stryng`
-     * and returns the inner reference _Stryng_ holds to itself.
+     * and returns the inner reference Stryng holds to itself.
      * @function Stryng.noConflict
      * @return {Stryng}
      */
@@ -4215,13 +4208,16 @@ describe( 'Stryng()', function() {
       expect( Stryng( '' ) ).to.be.a( Stryng );
     } );
 
-    it( 'should return the wrapped empty string if passed null', function() {
-      expect( Stryng( null ).toString() ).to.equal( '' );
+    it('should wrap the empty string if no arguments passed', function () {
+      expect( Stryng() ).to.have.length(0);
+    });
+
+    it( 'should wrap "null" passed `null`', function() {
+      expect( Stryng( null ).toString() ).to.equal( 'null' );
     } );
 
-    it( 'should return the wrapped empty string if passed no arguments or undefined', function() {
-      expect( Stryng().toString() ).to.equal( '' );
-      expect( Stryng( void 0 ).toString() ).to.equal( '' );
+    it( 'should wrap "undefined" passed `undefined`', function() {
+      expect( Stryng( void 0 ).toString() ).to.equal( 'undefined' );
     } );
 
     it( 'should return the wrapped empty string if passed the empty array', function() {
@@ -5058,27 +5054,60 @@ describe( 'Stryng()', function() {
   } );
 
   describe( '.camelize()', function(){
+
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.camelize ).to.throwError();
     } );
+
+    it('should not capitalize the first character', function () {
+      expect( Stryng.camelize('foo') ).to.equal('foo');
+    });
+
+    it('should recognize hyphens, spaces and underscores as boundaries', function () {
+      expect( Stryng.camelize('the-quick_brown fox') ).to.equal('theQuickBrownFox');
+    });
   });
 
   describe( '.underscore()', function(){
+    
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.underscore ).to.throwError();
     } );
+
+    it('should lower-case the output', function () {
+      expect( Stryng.underscore('SHOUT') ).to.equal('shout');
+    });
+
+    it('should recognize hyphens, spaces and uppercase following lowercase as boundaries', function () {
+      expect( Stryng.underscore('the quick-brownFox') ).to.equal('the_quick_brown_fox');
+    });
   });
 
   describe( '.hyphenize()', function(){
+
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.hyphenize ).to.throwError();
     } );
+
+     it('should lower-case the output', function () {
+      expect( Stryng.underscore('SHOUT') ).to.equal('shout');
+    });
+
+     it('should recognize underscores, spaces and uppercase following lowercase as boundaries', function () {
+      expect( Stryng.underscore('the quick_brownFox') ).to.equal('the_quick_brown_fox');
+    });
   });
 
   describe( '.simplify()', function(){
+
     it( 'should fail if `input` is missing', function() {
       expect( Stryng.simplify ).to.throwError();
     } );
+
+    it('should replace characters from the latin 1 supplement with their nearest ASCII equivalent', function () {
+      expect( Stryng.simplify('größer Häuser über') ).to.equal('groesser Haeuser ueber');
+      expect( Stryng.simplify('ambiguë préfèrer île') ).to.equal('ambigue preferer ile');
+    });
   });
 
   describe( '.ord()', function() {

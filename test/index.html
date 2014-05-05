@@ -1,80 +1,67 @@
 <!DOCTYPE html>
 <html class="no-js">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="content-type" content="text/html; charset=utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Stryng - Tests</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-			html, body
-			{
-				display:block;
-				height:100%;
-				width:100%;
-				margin:0;
-				padding:0;
-			}
-        </style>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Stryng - Tests</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body
+        {
+        display:block;
+        height:100%;
+        width:100%;
+        margin:0;
+        padding:0;
+        }
+    </style>
+  </head>
+  <body>
+    <script src="https://getfirebug.com/releases/lite/1.4/firebug-lite.js" charset="UTF-8">
+      {
+        saveCookies : false,
+        startOpened : true, //false,
+        startInNewWindow : false,
+        showIconWhenHidden : true,
+        overrideConsole : true,
+        ignoreFirebugElements : true,
+        disableXHRListener : false,
+        disableWhenFirebugActive : false, //true,
+        enableTrace : false,
+        enablePersistent : false
+      }
+    </script>
+    <script src="/node_modules/mocha/mocha.js" charset="UTF-8"></script>
+    <script>mocha.setup({ ui : "bdd", reporter : 'tap' });</script>
+    <script src="/test/stryng.web.js" charset="UTF-8"></script>
+    <script>
+      (function poll(){
+        var fb_iframe, fb_window, fb_document, fb_bodies, fb_body, cssText;
 
-    </head>
-    <body>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/mocha/1.15.1/mocha.js" charset="UTF-8"></script>
-		<script>
+        fb_iframe = document.getElementById('FirebugUI');
 
-			mocha.setup({ ui : "bdd", reporter : 'tap' });
+        if(!fb_iframe) return setTimeout(poll, 500);
+        
+        fb_window   = fb_iframe.contentWindow;
+        fb_document = fb_iframe.contentDocument || fb_window && fb_window.document;
+        fb_bodies   = fb_document.getElementsByTagName('body');
 
-		</script>
-		<script src="http://getfirebug.com/firebug-lite.js" charset="UTF-8">
-		{
-		    saveCookies : false,
-		    startOpened : true, //false,
-		    startInNewWindow : false,
-		    showIconWhenHidden : true,
-		    overrideConsole : true,
-		    ignoreFirebugElements : false,//true,
-		    disableXHRListener : false,
-		    disableWhenFirebugActive : false, //true,
-		    enableTrace : false,
-    		enablePersistent : false
-		}
-		</script>
-		<script src="/test/stryng.web.js" charset="UTF-8"></script>
-		<script>
-			(function poll(){
+        (function poll(){
 
-				var fb_iframe = document.getElementById('FirebugUI');
+          if(!fb_bodies.length) return setTimeout(poll, 500);
 
-				if(!fb_iframe)
-				{
-					return setTimeout(poll, 500);
-				}
-
-				var fb_window = fb_iframe.contentWindow;
-
-				var fb_document = fb_iframe.contentDocument || fb_window && fb_window.document;
-
-				var fb_bodies = fb_document.getElementsByTagName('body');
-
-				(function poll(){
-
-					if(!fb_bodies.length)
-					{
-						return setTimeout(poll, 500);
-					}
-
-					var fb_body = fb_bodies[0],
-						cssText = 'display:block;'
-							+ 'width:'  + (window.innerWidth  || document.documentElement.clientWidth  || fb_body.clientWidth ) + 'px;'
-							+ 'height:' + (window.innerHeight || document.documentElement.clientHeight || fb_body.clientHeight) + 'px;'
-						;
-							
-					fb_iframe.style.cssText = fb_body.style.cssText = cssText;
+          fb_body = fb_bodies[0];
+          cssText = 'display:block;'
+            + 'width:'  + (window.innerWidth  || document.documentElement.clientWidth  || fb_body.clientWidth ) + 'px;'
+            + 'height:' + (window.innerHeight || document.documentElement.clientHeight || fb_body.clientHeight) + 'px;'
+          ;
+          fb_iframe.style.cssText = fb_body.style.cssText = cssText;
 
           mocha.run()
-				})();
-			})();
-		</script>
-    </body>
+        })();
+      })();
+    </script>
+  </body>
 </html>

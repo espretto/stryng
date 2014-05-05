@@ -25,7 +25,7 @@ design considerations
 
 Stryng instances wrap string primitives
 ```
-var stryng = new Stryng(); // > '', wrapped, `new` operator is optional
+var stryng = new Stryng(); // wrapped empty string, `new` operator is optional
 stryng.isEmpty();          // > true
 ```
 by default Stryng instances are immutable just like native strings.
@@ -40,7 +40,7 @@ you can create mutable instances by either passing `true` to the Stryng construc
 var mutable = stryng.clone( true );     // equal to `Stryng( stryng, true )`
 var referer = mutable.append('stroke'); // wrapped 'keystroke'
 referer === mutable;                    // > true, both refer to the same object
-mutable.equals( referer )               // > true, contents could never differ
+mutable.equals( referer );              // > true, contents could never differ
 ```
 to retrieve the wrapped value, take actions that imply a call to Stryng's `toString` or `valueOf` methods or call them directly.
 ```
@@ -50,19 +50,19 @@ stryng + 'stroke'; // > 'keystroke', as primitive
 infact Stryng integration is rather seemless
 ```
 var object = {};
-var n = Stryng( 123 );    // > '123', wrapped
+var n = Stryng( 123 );    // wrapped '123'
 object[ stryng ] = +n;    // parse wrapped '123' to number and assign to `object['key']`
-JSON.stringify( object ); // '{"key":123}'
+JSON.stringify( object ); // > '{"key":123}'
 ```
 type checking however cannot be tricked into recognizing Stryngs as strings
 ```
 typeof stryng;                 // > 'object'
-stryng instanceof String;      // not even if it actually did occur along the prototype chain > false
-object.toString.call( stryng ) // reliable as always > '[object Object]'
+stryng instanceof String;      // > false, not even if it actually did occur along the prototype chain
+object.toString.call( stryng ) // > '[object Object]', reliable as always
 
-// for as long as Stryng is not another (iframe's) `window`'s property
+// for as long as Stryng is not another ( iframe's ) `window`'s property
 stryng instanceof Stryng;  // > true
-Stryng.isStryng( stryng ); // wraps the above for convenience
+Stryng.isStryng( stryng ); // > true, wraps the above for convenience
 ```
 
 ### type safety
@@ -70,7 +70,7 @@ Stryng.isStryng( stryng ); // wraps the above for convenience
 #### strings
 arguments expected to be strings are cast using `String( arg )`. as a direct consequence `'undefined'` will be applied as the default value. this decision derives from JavaScript's native behaviour:
 ```
-var str = String( undefined ); // > 'undefined'
+var str = String( undefined ); // primitive 'undefined'
 
 str.contains();   // > true
 str.endsWith();   // > true
@@ -90,7 +90,30 @@ arguments expected to be numbers are cast dependent on the use case. the spec ba
 
 Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.
 
-Documentation
+show cases
+----------
+produce URL slugs
+```
+Stryng( headline, true ) // we are only interested in the last function's output
+  .clean()     // reduce groups of whitespace to a single space
+  .trim()      // cut off arbitrary leading and trailing whitespace
+  .simplify()  // replace ligatures and diacritics from the Latin-1 Supplement with ASCII printables
+  .hyphenize() // apply hyphen as the word separator and lower-case
+```
+varying the format
+```
+var headline     = Stryng('the quick brown fox', false ), // though immutable by default
+    hyphenized   = headline.hyphenize(),     // wrapped 'the-quick-brown-fox'
+    camelCased   = hyphenized.camelize(),    // wrapped 'theQuickBrownFox'
+    under_scored = camelCased.underscore(),  // wrapped 'the_quick_brown_fox'
+    rotated      = under_scored.hyphenize(), // wrapped 'the-quick-brown-fox'
+
+    classified   = camelCased.capitalize();  // wrapped 'TheQuickBrownFox'
+```
+
+please refer to the tests for more examples.
+
+documentation
 -------------
 please refer to either the [api documentation](http://espretto.github.io/Stryng) or read Stryng's story - the [annotated source](http://espretto.github.io/Stryng/docker/README.md.html).
 
