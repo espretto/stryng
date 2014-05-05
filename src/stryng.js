@@ -200,15 +200,14 @@
   // on some of the more exotic characters considered [whitespace][1],
   // [line terminators][2] or the mysterious [Zs][3].
   // this section detects those flaws and constructs the regular expressions used
-  // in the polyfills and others - [Stryng#splitLines](#splitLines) in particular.
-  // Many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
+  // in the polyfills. Many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
   // 
   // - let `re_whitespace` be the native white space matcher.
   // - iterate over our white space characters
   // - add all whitespace characters not recognized
   //   as such to the matcher's source.
   // - if the native implementation is not `is_spec_compliant`,
-  //   reconstruct the above regular expressions and mark
+  //   reconstruct the regular expressions and mark
   //   their associated methods as _to be shimmed_
   //   
   // [1]: http://www.ecma-international.org/ecma-262/5.1/#sec-7.2
@@ -306,7 +305,7 @@
   // -----------------
   
   // check whether or not native static functions exist on the global
-  // _String_ namespace __and__ throw an error if no arguments passed
+  // _String_ namespace __and__ do throw an error if no arguments passed
   // as required for static functions on _Stryng_.
   if(is.Function(String.slice)){
     try {
@@ -321,7 +320,7 @@
   // consider _String#endsWith_ to behave the same on that matter.
   if(is.Function(string.startswith)){
     try{
-      VERSION.startsWith(/\d/);
+      string.startsWith(regex);
     } catch( e ){
       shim_methods.push( 'startsWith', 'endsWith' );
     }
@@ -737,7 +736,7 @@
       // - for each index
       //   - if it is negative, add this' string's length
       //   - apply `pending_index` of the previous iteration ( initially zero ) as `index`'s minimum
-      //   - let native _String#slice_ apply the maximum
+      //   - let native _String#substring_ apply the maximum
       //   - push what's within input between `pending_index` and `index` to `result`
       //   - update `pending_index` for the next iteration
       // - push what's left to the result and return it.
@@ -759,7 +758,7 @@
           result.push( '' ); // faster than slicing the empty string first
           index = pending_index;
         } else {
-          result.push( input.slice( pending_index, index ) );
+          result.push( input.substring( pending_index, index ) );
           pending_index = index;
         }
       }
@@ -1220,7 +1219,8 @@
     },
 
     /**
-     * appends the given `appendix` to this' string.
+     * appends the given `appendix` to this' string. unlike native _String#concat_
+     * this method applies `'undefined'` as the default `appendix`
      * @param {String} [appendix="undefined"]
      * @return {String}
      */
@@ -1351,9 +1351,10 @@
 
     /**
      * replaces ligatures and diacritics from the Latin-1 Supplement
-     * with their nearest ASCII equivalent, replaces symbols otherwise being percent-escaped.
+     * with their nearest ASCII equivalent
      * compose this method with [Stryng#hyphenize](#hyphenize) to produce URL slugs
      * @return {String} [description]
+     * @todo replace symbols otherwise being percent-escaped
      */
     simplify: function( input ) {
       input = input != null ? String( input ) : exit();
