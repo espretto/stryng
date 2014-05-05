@@ -87,10 +87,8 @@
     } )( Object.defineProperty ),
 
     // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
-    Object_keys = Object.keys || function() {
-      var object = this,
-        keys = [],
-        i = 0;
+    Object_keys = Object.keys || function( object ) {
+      var keys = [], key, i = 0;
 
       for ( key in object ) {
         if ( object.hasOwnProperty( key ) ) {
