@@ -95,6 +95,10 @@ describe( 'Stryng()', function() {
     it('should be parsable to number', function () {
       expect( Number( Stryng( '123' ) ) ).to.equal( 123 );
     });
+
+    it('should unwrap `new String` objects', function () {
+      expect( Stryng( new String() ).toString() ).to.be.a('string');
+    });
   });
 
   describe( '.trim()', function() {
@@ -818,6 +822,21 @@ describe( 'Stryng()', function() {
     } );
   } );
 
+  describe( '.isFloat()', function(){
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.isFloat ).to.throwError();
+    } );
+
+    it('should return false where parseFloat returns a number', function () {
+      expect( Stryng.isFloat('123.123 not numeric') ).to.not.be.ok();
+    });
+
+    it('should return true if the string is a float', function () {
+      expect( Stryng.isFloat('123.123e-123') ).to.be.ok();
+    });
+  });
+
   describe( '.clean()', function(){
 
     it( 'should fail if `input` is missing', function() {
@@ -966,6 +985,32 @@ describe( 'Stryng()', function() {
       );
     } );
   } );
+
+  describe( '.escapeRegExp()', function(){
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.escapeRegExp ).to.throwError();
+    } );
+
+    it('should escape meaningful characters', function () {
+      expect(
+        Stryng.escapeRegExp('.*+?^=!:${}()|[]/\\')
+      ).to.equal(
+        '\\.\\*\\+\\?\\^\\=\\!\\:\\$\\{\\}\\(\\)\\|\\[\\]\\/\\\\'
+      );
+    });
+  });
+
+  describe( '.toRegExp()', function(){
+
+    it( 'should fail if `input` is missing', function() {
+      expect( Stryng.toRegExp ).to.throwError();
+    } );
+
+    it( 'should delegate to native `new RegExp()`', function() {
+      expect( Stryng.toRegExp('abc', 'g') ).to.be.a(RegExp).and.to.have.property('global', true);
+    } );
+  });
 
   describe( '.random()', function() {
 

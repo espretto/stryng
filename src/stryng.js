@@ -89,7 +89,8 @@
 
     // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
     Object_keys = Object.keys || function( object ) {
-      var keys = [], key, i = 0;
+      var keys = [],
+        key, i = 0;
 
       for ( key in object ) {
         if ( object.hasOwnProperty( key ) ) {
@@ -127,10 +128,12 @@
     // regular expressions
     // -------------------
 
-    // used to check whether a regular expression's `source`
-    // is suitable for reverse search. see _Stryng#endsWith_ or _Stryng#splitRight_.
     re_source_matches_end = regex = /[^\\]\$$/,
-
+    re_lower_upper_boundary = /([a-z])([A-Z])/g, // callback '$1-$2' or '$1_$2'
+    re_lower_boundary = /[ _-]([a-z]?)/g, // callback toUpperCase 1st group
+    re_space_underscore = /[ _]/g, // callback '-'
+    re_space_hyphen = /[ -]/g, // callback '_'
+    re_regexp_chars = /([.*+?^=!:${}()|\[\]\/\\])/g, // callback '\\$1'
     re_is_float = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
 
     // ### diacritics & liguatures
@@ -146,7 +149,7 @@
       'Ae': '\\xC4',
       'a': '\\xE0-\\xE3\\xE5',
       'AE': '\\xC6',
-      'ae': '\\xE6\\xE4', // liguature and german umlaut
+      'ae': '\\xE6\\xE4', // ligature and german umlaut
       'C': '\\xC7',
       'c': '\\xE7',
       'E': '\\xC8-\\xCB',
@@ -302,7 +305,7 @@
   // consider _String#endsWith_ to behave the same on that matter.
   if ( is.Function( string.startsWith ) ) {
     try {
-      if( !'1'.startsWith( /\d/ ) || !'ab'.startsWith('b', 1) ){
+      if ( !'1'.startsWith( /\d/ ) || !'ab'.startsWith( 'b', 1 ) ) {
         throw string;
       }
     } catch ( e ) {
@@ -370,12 +373,15 @@
      * @type {Number}
      * @todo further [reading](http://www.2ality.com/2012/08/property-definition-assignment.html)
      */
+
+    // provide noop setter for Safari 5/5.1
+    // which otherwise assigns to simple `length` porperty
     if ( Object_defineProperty ) {
       Object_defineProperty( that, 'length', {
         get: function() {
           return that._value.length;
         },
-        set: function(){} // provide a setter for Safari 5/5.1
+        set: function() {}
       } );
     } else {
       that.length = that._value.length;
@@ -617,11 +623,7 @@
       // - if the would-be result of `Number.toInteger( position )` is negative, add `input.length`
       // - if it still is negative, apply zero
       // - leave it up to `substr`'s implicit parsing any otherwise
-      position = position <= -1
-        ? ( position = Number_toInteger( position ) + input.length ) < 0
-        ? 0
-        : position
-        : position;
+      position = position <= -1 ? ( position = Number_toInteger( position ) + input.length ) < 0 ? 0 : position : position;
 
       return input.substr( position, length );
     },
@@ -1260,6 +1262,18 @@
     },
 
     /**
+     * return whether or not this' string matches the
+     * floating point number format from the beginning
+     * __until the end__ in contrast to native _parseFloat_.
+     * note that it won't throw if the actual number exceeds
+     * JavaScript's float range.
+     * @return {Boolean}
+     */
+    isFloat: function( input ) {
+      return input != null ? re_is_float.test( input ) : exit();
+    },
+
+    /**
      * delegates to [Stryng#trim](#trim) and replaces groups of
      * whitespace, line terminators and/or Zs by a single space character.
      * @return {String}
@@ -1291,7 +1305,7 @@
     camelize: function( input ) {
       return input != null ?
         String( input )
-        .replace( /[ _-]([a-z]?)/g, function( _, character ) {
+        .replace( re_lower_boundary, function( _, character ) {
           return character ? character.toUpperCase() : '';
         } ) : exit();
     },
@@ -1309,8 +1323,8 @@
     underscore: function( input ) {
       return input != null ?
         String( input )
-        .replace( /([a-z])([A-Z])/g, '$1_$2' )
-        .replace( /[ -]/g, '_' )
+        .replace( re_lower_upper_boundary, '$1_$2' )
+        .replace( re_space_hyphen, '_' )
         .toLowerCase() : exit();
     },
 
@@ -1329,14 +1343,14 @@
     hyphenize: function( input ) {
       return input != null ?
         String( input )
-        .replace( /([a-z])([A-Z])/g, '$1-$2' )
-        .replace( /[ _]/g, '-' )
+        .replace( re_lower_upper_boundary, '$1-$2' )
+        .replace( re_space_underscore, '-' )
         .toLowerCase() : exit();
     },
 
     /**
      * replaces ligatures and diacritics from the Latin-1 Supplement
-     * with their nearest ASCII equivalent
+     * with their nearest ASCII equivalent.
      * compose this method with [Stryng#hyphenize](#hyphenize) to produce URL slugs
      * @return {String} [description]
      * @todo replace symbols otherwise being percent-escaped
@@ -1365,7 +1379,21 @@
       return result;
     },
 
-    toRegExp: function( input, flags ){
+    /**
+     * escapes all special characters that have meaning to
+     * JavaScript regexp parser. taken from [mdn](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions)
+     * @return {String}
+     */
+    escapeRegExp: function( input ) {
+      return input != null ? String( input ).replace( re_regexp_chars, '\\$1' ) : exit();
+    },
+
+    /**
+     * convenience wrapper for native _RegExp_ constructor.
+     * @param  {String} flags
+     * @return {RegExp}
+     */
+    toRegExp: function( input, flags ) {
       return input != null ? new RegExp( input, flags ) : exit();
     }
   };
