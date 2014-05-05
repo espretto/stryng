@@ -2910,7 +2910,9 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // consider _String#endsWith_ to behave the same on that matter.
   if ( is.Function( string.startswith ) ) {
     try {
-      string.startsWith( regex );
+      if( !'1'.startsWith( /\d/ ) ){
+        throw string;
+      }
     } catch ( e ) {
       shim_methods.push( 'startsWith', 'endsWith' );
     }
@@ -3222,15 +3224,11 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
       // - if the would-be result of `Number.toInteger( position )` is negative, add `input.length`
       // - if it still is negative, apply zero
       // - leave it up to `substr`'s implicit parsing any otherwise
-      position = +position || 0;
-      if ( position < 0 ) {
-        position += input.length;
-        if ( position < 0 ) {
-          position = 0;
-        } else {
-          position = Math_floor( position );
-        }
-      }
+      position = position <= -1
+        ? ( position = Number_toInteger( position ) + input.length ) < 0
+        ? 0
+        : position
+        : position;
 
       return input.substr( position, length );
     },
