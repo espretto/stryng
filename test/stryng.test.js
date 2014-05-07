@@ -6,10 +6,7 @@ var Object_defineProperty = ( function( defineProperty ) {
   try {
     var object = {}
     defineProperty( object, 'bool', { value: true} );
-    object.bool = false; // should not be writable by default
-    if(object.bool){
-      return defineProperty;
-    }
+    return defineProperty;
   } catch ( e ) {}
 } )( Object.defineProperty )
 

@@ -2737,13 +2737,15 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     // regular expressions
     // -------------------
 
-    re_source_matches_end = regex = /[^\\]\$$/,
+    re_escaped_hex          = /\\[xu]([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/g, // callback replace with char
+    re_escaped_whitespace   = /\\([btnfr"\\])/g, // callback replace with char
+    re_is_float             = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/, // test only
+    re_lower_boundary       = /[ _-]([a-z]?)/g, // callback toUpperCase 1st group
     re_lower_upper_boundary = /([a-z])([A-Z])/g, // callback '$1-$2' or '$1_$2'
-    re_lower_boundary = /[ _-]([a-z]?)/g, // callback toUpperCase 1st group
-    re_space_underscore = /[ _]/g, // callback '-'
-    re_space_hyphen = /[ -]/g, // callback '_'
-    re_regexp_chars = /([.*+?^=!:${}()|\[\]\/\\])/g, // callback '\\$1'
-    re_is_float = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
+    re_regexp_chars         = /([.*+?^=!:${}()|\[\]\/\\])/g, // callback '\\$1'
+    re_source_matches_end   = regex = /[^\\]\$$/, // test only
+    re_space_hyphen         = /[ -]/g, // callback '_'
+    re_space_underscore     = /[ _]/g, // callback '-'
 
     // ### diacritics & liguatures
     // because character mappings easily grow large we only provide
@@ -2914,7 +2916,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // consider _String#endsWith_ to behave the same on that matter.
   if ( is.Function( string.startsWith ) ) {
     try {
-      if ( !'1'.startsWith( /\d/ ) || !'ab'.startsWith( 'b', 1 ) ) {
+      if ( !'ab'.startsWith( 'b', 1 ) || !'1'.startsWith( /\d/ ) ) {
         throw string;
       }
     } catch ( e ) {
@@ -2942,8 +2944,12 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // -----------
 
   /**
+   * Stryng's constructor behaves just like the native one does.
+   * static functions are only available on the Stryng namespace while
+   * instance methods are also available as static functions with inversed signatures
+   * i.e. they take the otherwise wrapped string as their first argument.
    * @class Stryng
-   * @param {*} [value=""]
+   * @param {String} [value=""]
    *   the value to parse. defaults to the empty string
    * @param {Boolean} [is_mutable=false]
    *   whether the created instance should be mutable or
@@ -2956,8 +2962,16 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     var that = this,
       args_len = arguments.length;
 
-    // allow omitting the new operator
-    if ( !( that instanceof Stryng ) ) return args_len ? new Stryng( value, is_mutable ) : new Stryng();
+    // allow omitting the `new` operator
+    // while preserving the exact behaviour
+    // the native _String_ constructor has.
+    if ( !( that instanceof Stryng ) ){
+      return (
+        args_len
+        ? new Stryng( value, is_mutable )
+        : new Stryng()
+      );
+    }
 
     /**
      * the wrapped native string primitive
@@ -3001,13 +3015,12 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // ----------------
 
   /**
+   * curried version of [Stryng#constructor](#Stryng).
    * in case the instance was not constructed to be mutable
-   * this is the hook to get a copy of it. delegates to [Stryng#constructor](#Stryng)
+   * this is the hook to get a copy of it. only available on the prototype.
+   * @function Stryng#clone
    * @param {Boolean} [is_mutable=false]
-   *   whether the cloned instance should be mutable or
-   *   create a new instance from the internal result of every method call
-   * @return {Stryng} -
-   *   a copy of the Stryng instance
+   * @return {Stryng}
    */
   Stryng.prototype.clone = function( is_mutable ) {
     return new Stryng( this._value, is_mutable );
@@ -3042,6 +3055,12 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   // ```
   // but only for as long as `stryng` was actually constructed using
   // that specific `Stryng` constructor and not some other foreign (i)frame's one.
+  
+  /**
+   * returns the this' string primitive. only available on the prototype.
+   * @function Stryng#toString
+   * @return {String}
+   */
   Stryng.prototype.valueOf =
     Stryng.prototype.toString = function() {
       return this._value; // we can rest assured that this is a primitive
@@ -3049,12 +3068,15 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
 
   // instance methods
   // ----------------
-  // the herein defined methods will be available as both
-  // static functions on the `Stryng` namespace and instance methods
-  // of the `Stryng` class. they are declared as static but __documented as
+  // __important note__: Stryng members are declared as static but __documented as
   // instance methods__, which makes it a lot shorter, less verbose and
-  // easier to highlight the fact that all instance methods are available
-  // as static ones but __not vice versa__.
+  // easier to highlight the fact that every instance method is available
+  // as a static function on the Stryng namespace but __not vice versa__.
+  // exceptions to this rule are
+  // 
+  // - _Stryng#clone_
+  // - _Stryng#toString_
+  // - _Stryng#valueOf_
 
   /**
    * @lends Stryng.prototype
@@ -3291,8 +3313,8 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
     },
 
     /**
-     * delegates to native _Array#reverse_.
-     * this is a naive implementation of reversing a string.
+     * composition of native _String#split_, _Array#reverse_ and _Array#join_.
+     * note that this rather naive implementation may not produce correct results.
      * for an alternative that knows how to properly reverse
      * diacritics and accented characters use [esrever](https://github.com/mathiasbynens/esrever).
      * @return {String}
@@ -3780,7 +3802,9 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
           char_code === 12 ? '\\f' : // form feed
           char_code === 13 ? '\\r' : // carriage return
           (
-            char_code < 256 ? '\\x' + ( char_code < 16 ? '0' : '' ) : '\\u' + ( char_code < 4096 ? '0' : '' )
+            char_code < 256
+            ? '\\x' + ( char_code < 16 ? '0' : '' )
+            : '\\u' + ( char_code < 4096 ? '0' : '' )
           ) + char_code.toString( 16 )
         );
       }
@@ -3797,21 +3821,22 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
      */
     unquote: function( input ) {
       return input != null ?
-        Stryng.strip( String( input )
-
-          .replace( /\\[xu]([0-9A-F]{2})([0-9A-F]{2})?/gi, function( _, x, u ) {
-            return String_fromCharCode( parseInt( x + ( u || '' ), 16 ) );
-          } )
-          .replace( /\\([btnfr"\\])/g, function( _, esc ) {
-            return (
-              esc === 'b' ? '\b' : // backspace
-              esc === 't' ? '\t' : // tab
-              esc === 'n' ? '\n' : // new line
-              esc === 'f' ? '\f' : // form feed
-              esc === 'r' ? '\r' : // carriage return
-              esc // backslash, double quote and any other
-            )
-          } ), '"', 1 ) : exit();
+        Stryng.strip(
+          String( input )
+            .replace( re_escaped_hex, function( _, he, xa ) {
+              return String_fromCharCode( parseInt( he + ( xa || '' ), 16 ) );
+            } )
+            .replace( re_escaped_whitespace, function( _, esc ) {
+              return (
+                esc === 'b' ? '\b' : // backspace
+                esc === 't' ? '\t' : // tab
+                esc === 'n' ? '\n' : // new line
+                esc === 'f' ? '\f' : // form feed
+                esc === 'r' ? '\r' : // carriage return
+                esc // backslash, double quote and any other
+              )
+            } )
+          , '"', 1 ) : exit();
     },
 
     /**
@@ -4210,10 +4235,7 @@ var Object_defineProperty = ( function( defineProperty ) {
   try {
     var object = {}
     defineProperty( object, 'bool', { value: true} );
-    object.bool = false; // should not be writable by default
-    if(object.bool){
-      return defineProperty;
-    }
+    return defineProperty;
   } catch ( e ) {}
 } )( Object.defineProperty )
 
