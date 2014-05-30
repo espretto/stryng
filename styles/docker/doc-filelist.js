@@ -1,1 +1,0 @@
-var tree={"files":["README.md"],"dirs":{"src":{"files":["stryng.js"]}}};
