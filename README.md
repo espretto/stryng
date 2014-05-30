@@ -130,3 +130,8 @@ Many thanks to the authors of
 
 - [jaguarjs-jsdoc](https://github.com/davidshimjs/jaguarjs-jsdoc)
 - [docker](https://github.com/jbt/docker)
+
+Licence
+-------
+
+released under the [MIT licence](http://mariusrunge.com/mit-licence.html);
