@@ -65,29 +65,18 @@ module.exports = function( grunt ) {
       }
     },
 
-    grock: {
-      options: {
-        github: false,
-        index: 'README.md',
-        out: DOCS_OUT + '/grock',
-        style: 'thin',
-        verbose: true
-      },
-      files: DOCS_IN
-    },
-
-    jsdoc: {
-      all: {
-        src: DOCS_IN,
-        options: {
-          verbose: true,
-          destination: DOCS_OUT,
-          configure: 'docs/conf.json',
-          template: 'docs/templates/jaguar',
-          'private': false
-        }
-      }
-    },
+    // jsdoc: {
+    //   all: {
+    //     src: DOCS_IN,
+    //     options: {
+    //       verbose: true,
+    //       destination: DOCS_OUT,
+    //       configure: 'docs/conf.json',
+    //       template: 'docs/templates/jaguar',
+    //       'private': false
+    //     }
+    //   }
+    // },
 
     uglify: {
       options: {
