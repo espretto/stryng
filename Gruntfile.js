@@ -17,6 +17,13 @@ module.exports = function( grunt ) {
       }
     },
 
+    jshint: {
+      options: {
+        jshintrc: './.jshintrc'
+      },
+      all: ['src/stryng.js']
+    },
+
     docker: {
       app: {
         expand: true,
@@ -132,6 +139,7 @@ module.exports = function( grunt ) {
     'grunt-contrib-watch',
     'grunt-contrib-clean',
     'grunt-contrib-uglify',
+    'grunt-contrib-jshint',
     'grunt-docker',
     'grunt-jsdoc',
   ].forEach( grunt.loadNpmTasks, grunt );

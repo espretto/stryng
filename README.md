@@ -10,7 +10,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 ### features
 
 - manually inherits the native `String` namespace and prototype
-- progressive enhancement to fullfill ECMA-Script 5 & 6 standards
+- progressive enhancement to fulfill ECMA-Script 5 & 6 standards
 - every function is available as both
   - static function for functional programming
   - instance method for object oriented programming
