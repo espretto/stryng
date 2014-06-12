@@ -124,13 +124,6 @@ please refer to either the [api documentation](http://espretto.github.io/Stryng)
 - unfortunately _docker_'s markdown parser doesn't support lists nested deeper than 2 levels
 - read the annotated source and try to stick to its flavour
 
-credits
+Licence
 -------
-Many thanks to the authors of
-
-- [jaguarjs-jsdoc](https://github.com/davidshimjs/jaguarjs-jsdoc)
-- [docker](https://github.com/jbt/docker)
-
-licence
--------
-[MIT](http://mariusrunge.com/mit-licence.html)
+released under the [MIT licence](http://mariusrunge.com/mit-licence.html);
