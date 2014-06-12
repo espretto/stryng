@@ -1,3 +1,8 @@
+/*!
+ * stryngjs released under MIT licence
+ * http://mariusrunge.com/mit-licence.html
+ */
+
 // baseline setup
 // ==============
 // leverage _uglifyjs_' ability to declare global variables

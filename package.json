@@ -30,5 +30,9 @@
     ],
     "harness": "mocha",
     "files": "test/*.test.js"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha ./test/stryng.test.js",
+    "gzip": "gzip -c9 dist/stryng.min.js > dist/stryng.min.js.gz"
   }
 }

@@ -95,7 +95,7 @@ module.exports = function( grunt ) {
       },
       all: {
         files: {
-          'src/stryng.min.js': ['src/stryng.js']
+          'dist/stryng.min.js': ['src/stryng.js']
         }
       }
     },

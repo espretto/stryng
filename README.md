@@ -10,7 +10,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 ### features
 
 - manually inherits the native `String` namespace and prototype
-- progressive enhancement to fullfill ECMA-Script 5 & 6 standards
+- progressive enhancement to fulfill ECMA-Script 5 & 6 standards
 - every function is available as both
   - static function for functional programming
   - instance method for object oriented programming
@@ -124,9 +124,13 @@ please refer to either the [api documentation](http://espretto.github.io/Stryng)
 - unfortunately _docker_'s markdown parser doesn't support lists nested deeper than 2 levels
 - read the annotated source and try to stick to its flavour
 
-Credits
+credits
 -------
 Many thanks to the authors of
 
 - [jaguarjs-jsdoc](https://github.com/davidshimjs/jaguarjs-jsdoc)
 - [docker](https://github.com/jbt/docker)
+
+licence
+-------
+[MIT](http://mariusrunge.com/mit-licence.html)
