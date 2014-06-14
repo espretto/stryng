@@ -80,7 +80,7 @@ module.exports = function( grunt ) {
 
     uglify: {
       options: {
-        // beautify: true,
+        beautify: true,
         preserveComments: 'some',
         compress: {
           // global_defs: {

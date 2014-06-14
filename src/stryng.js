@@ -9,14 +9,15 @@
   // baseline setup
   // ==============
   
-  /**
-   * Stryng's version.
-   * @name Stryng.VERSION
-   * @readOnly
-   * @type {String}
-   */
-  var VERSION = '0.9.1',
-    string = VERSION,
+  var // one to var them all
+
+    /**
+     * Stryng's version.
+     * @name Stryng.VERSION
+     * @readOnly
+     * @type {String}
+     */
+    version = '0.9.1',
 
     // used for input validation
     INFINITY = 1 / 0,
@@ -25,7 +26,7 @@
     MAX_CHARCODE = 65535, // Math.pow(2, 16) - 1
 
     // used to convert to string
-    String = string.constructor,
+    String = version.constructor,
 
     // methods _Stryng_ hopes to adopt
     methods = 'charAt,charCodeAt,codePointAt,concat,contains,endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,replace,search,slice,split,startsWith,substr,substring,toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,trim,trimLeft,trimRight'.split( ',' ),
@@ -73,9 +74,9 @@
     // - implicitely return `undefined` otherwise
     core_defineProperty = ( function( defineProperty ) {
       try {
-        defineProperty( Stryng, 'VERSION', {
+        defineProperty( Stryng, 'version', {
           writable: false,
-          value: VERSION
+          value: version
         } );
         return defineProperty;
       } catch ( e ) {
@@ -130,8 +131,6 @@
     re_source_matches_end   = /[^\\]\$$/, // test only
     re_space_hyphen         = /[ -]/g, // callback '_'
     re_space_underscore     = /[ _]/g, // callback '-'
-
-    regex = re_escaped_hex,
 
     // ### diacritics & liguatures
     // because character mappings easily grow large we only provide
@@ -275,7 +274,7 @@
 
   is.Array = Array.isArray || is.Array;
 
-  if ( typeof regex === 'object' ) {
+  if ( typeof re_is_float === 'object' ) {
     is.Function = function( value ) {
       return typeof value === 'function';
     };
@@ -298,10 +297,10 @@
   // check if the native implementation of _String#startsWith_
   // already knows how to deal with regular expressions or indices.
   // consider _String#endsWith_ to behave the same on that matter.
-  if ( is.Function( string.startsWith ) ) {
+  if ( is.Function( version.startsWith ) ) {
     try {
       if ( !'ab'.startsWith( 'b', 1 ) || !'1'.startsWith( /\d/ ) ) {
-        throw string;
+        throw version;
       }
     } catch ( e ) {
       shim_methods.push( 'startsWith', 'endsWith' );
@@ -696,7 +695,8 @@
     join: function( delimiter /*, string... */ ) {
       if ( delimiter == null ) exit();
       
-      // avoid non-optimizable Array#slice on arguments
+      // avoid non-optimizable Array#slice on arguments, see
+      // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
       var i = arguments.length,
         args = new Array( i - 1 );
 
@@ -1493,6 +1493,7 @@
         exit();
       }
     }
+    // implies parsing `char_codes`
     return core_fromCharCode.apply( null, char_codes );
   };
 
@@ -1535,6 +1536,9 @@
     Stryng[ fn_name ] = fn;
 
     Stryng.prototype[ fn_name ] = function( /* proxied arguments */) {
+
+      // Array#slice arguments makes this function unoptimizable, see
+      // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
       var i = arguments.length,
         args = new Array( i ),
         that = this,
@@ -1566,7 +1570,7 @@
   // [1]: http://bonsaiden.github.io/JavaScript-Garden/#function.arguments
   core_forEach.call( methods, function( fn_name ) {
 
-    var fn = string[ fn_name ];
+    var fn = version[ fn_name ];
 
     if ( is.Function( fn ) && !core_contains.call( shim_methods, fn_name ) ) {
 
@@ -1591,9 +1595,9 @@
   // - amd - anonymous
   // - browser - opt to rename
 
-  if ( 'undefined' !== typeof module && module.exports ) {
+  if ( typeof module !== 'undefined' && module.exports ) {
     module.exports = Stryng;
-  } else if ( 'function' === typeof define && define.amd ) {
+  } else if ( typeof define === 'function' && define.amd ) {
     define( function() {
       return Stryng;
     } );
