@@ -17,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  version = '0.9.1',
+  version = '0.9.2',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -104,7 +104,7 @@
   core_toString = is.toString,
 
   core_forEach = methods.forEach || function(iterator) {
-    for (var array = this, i = array.length; i--; iterator(array[i]));
+    for (var array = this, i = array.length; i--;) iterator(array[i], i);
   },
 
   core_contains = methods.contains || function(item) {
@@ -142,39 +142,19 @@
   // we also rely on native _String#toLowerCase_ and _String#toUpperCase_
   // to properly convert characters - <a href="javascript:alert('give me the link!')">which they don't</a>
 
-  latin_1_supplement = {
-    'A': '\\xC0-\\xC3\\xC5',
-    'Ae': '\\xC4',
-    'a': '\\xE0-\\xE3\\xE5',
-    'AE': '\\xC6',
-    'ae': '\\xE6\\xE4',
-    'C': '\\xC7',
-    'c': '\\xE7',
-    'E': '\\xC8-\\xCB',
-    'e': '\\xE8-\\xEB',
-    'I': '\\xCC-\\xCF',
-    'i': '\\xEC-\\xEF',
-    'D': '\\xD0',
-    'd': '\\xF0',
-    'N': '\\xD1',
-    'n': '\\xF1',
-    'O': '\\xD2-\\xD5\\xD8',
-    'Oe': '\\xD6',
-    'o': '\\xF2-\\xF5\\xF8',
-    'oe': '\\xF6',
-    'U': '\\xD9-\\xDB',
-    'Ue': '\\xDC',
-    'u': '\\xF9-\\xFB',
-    'ue': '\\xFC',
-    'Y': '\\xDD',
-    'y': '\\xFD\\xFF',
-    'ss': '\\xDF'
-  };
+  ltn1_reprs = 'A,A,A,A,Ae,A,AE,C,E,E,E,E,I,I,I,I,D,N,O,O,O,O,Oe,-,Oe,U,U,U,Ue,Y,Th,ss,a,a,a,a,ae,a,ae,c,e,e,e,e,i,i,i,i,d,n,o,o,o,o,oe,-,oe,u,u,u,ue,y,th,y'.split(','),
+  
+  ltn1_chars = (function(){
+    var offset = 0xC0,
+      i = 0xFF - offset,
+      result = new Array(i);
+    while(i--){
+      result[i] = core_fromCharCode(offset + i);
+    }
+    return result.join('');
+  }()),
 
-  // compile the character ranges to regular expressions to match and replace later
-  core_forOwn.call(latin_1_supplement, function(chars, nearest_char) {
-    latin_1_supplement[nearest_char] = new RegExp('[' + chars + ']', 'g');
-  });
+  re_ltn1 = new RegExp('[' + ltn1_chars + ']', 'g');
 
   // ### the whitespace shim
   // native implementations of _String#trim_ might miss out
@@ -1168,47 +1148,50 @@
      * [String#quote](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/quote).
      * @return {String}
      */
-    quote: function(input) {
-      input = input != null ? String(input) : exit();
+    quote: (function() {
+      var esc_regex = /[\\"]/g,
+        esc_callback = '\\$&',
+        ctrl_map = {
+          '\b': '\\b',
+          '\t': '\\t',
+          '\n': '\\n',
+          '\f': '\\f',
+          '\r': '\\r'
+        },
+        ctrl_regex = new RegExp('[\b\t\n\f\r]', 'g'),
+        ctrl_callback = function(match){
+          return ctrl_map[match];
+        },
+        xhex_regex = /[\x00-\x07\x0B\x0E-\x1F\x7F-\xFF]/g,
+        xhex_callback = function(match, char_code){
+          char_code = match.charCodeAt(0);
+          return '\\x' + (char_code < 16 ? '0' : '') + char_code;
+        },
+        uhex_regex = /[\u0100-\uFFFF]/g,
+        uhex_callback = function(match, char_code){
+          char_code = match.charCodeAt(0);
+          return '\\u' + (char_code < 4096 ? '0' : '') + char_code;
+        };
 
-      // - delegate to native _JSON.stringify_ if available
-      // - otherwise iterate over this' string's characters
-      //   - preserve ASCII printables
-      //   - use short escape characters
-      //   - use hexadecimal notation as a last resort, whichever is shortest
-      // - wrap `result` in double quotes and return it
-
-      if (core_stringify) {
-        return core_stringify(input);
-      }
-
-      var i = 0,
-        result = '',
-        input_len = input.length,
-        char_code;
-
-      for (; i < input_len; i++) {
-        char_code = input.charCodeAt(i);
-
-        result += (
-          char_code === 34 ? '\\"' : // double quote
-          char_code === 92 ? '\\\\' : // backslash
-          31 < char_code && char_code < 127 ? core_fromCharCode(char_code) : // ASCII printables
-          char_code === 8 ? '\\b' : // backspace
-          char_code === 9 ? '\\t' : // tab
-          char_code === 10 ? '\\n' : // new line
-          char_code === 12 ? '\\f' : // form feed
-          char_code === 13 ? '\\r' : // carriage return
-          (
-            char_code < 256 ?
-            '\\x' + (char_code < 16 ? '0' : '') :
-            '\\u' + (char_code < 4096 ? '0' : '')
-          ) + char_code.toString(16)
+      return function(input){
+        input = input != null ? String(input) : exit();
+        // - delegate to native _JSON.stringify_ if available
+        // - otherwise
+        //   - preserve ASCII printables
+        //   - use short escape characters
+        //   - use hexadecimal notation as a last resort, whichever is shortest
+        // - wrap `result` in double quotes and return it
+        return (
+          core_stringify ?
+          core_stringify(input) :
+          Stryng.wrap(input
+            .replace(esc_regex, esc_callback)
+            .replace(ctrl_regex, ctrl_callback)
+            .replace(xhex_regex, xhex_callback)
+            .replace(uhex_regex, uhex_callback), '"', 1)
         );
       }
-
-      return '"' + result + '"';
-    },
+    }()),
 
     /**
      * mirrors the effect of [Stryng#quote](#quote) without using `eval`.
@@ -1388,11 +1371,9 @@
      * @todo replace symbols otherwise being percent-escaped
      */
     simplify: function(input) {
-      input = input != null ? String(input) : exit();
-      core_forOwn.call(latin_1_supplement, function(re, nearest_char) {
-        input = input.replace(re, nearest_char);
-      });
-      return input;
+      return input != null ? String(input).replace(re_ltn1, function(match){
+        return ltn1_reprs[ltn1_chars.indexOf(match)];
+      }) : exit();
     },
 
     /**
