@@ -3,7 +3,7 @@
  * http://mariusrunge.com/mit-licence.html
  */
 
-(function(root) {
+(function (root) {
   'use strict';
 
   // baseline setup
@@ -17,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  version = '0.9.2',
+  version = '0.1.0',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -56,7 +56,7 @@
 
   // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
   // implementation of `Number.toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
-  core_toInteger = Number.toInteger || function(n) {
+  core_toInteger = Number.toInteger || function (n) {
     return (
       (n = +n) && isFinite(n) ? // toNumber and isFinite
       n - (n % 1) : // ceil negatives, floor positives
@@ -72,7 +72,7 @@
   //   - or only supports DOM objects, IE8
   // - if successful, return the reference to that function
   // - implicitely return `undefined` otherwise
-  core_defineProperty = (function(defineProperty) {
+  core_defineProperty = (function (defineProperty) {
     try {
       defineProperty(Stryng, 'version', {
         writable: false,
@@ -85,15 +85,9 @@
   })(Object.defineProperty),
 
   // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
-  core_keys = Object.keys || function(object) {
-    var keys = [],
-      key, i = 0;
-
-    for (key in object) {
-      if (object.hasOwnProperty(key)) {
-        keys[i++] = key;
-      }
-    }
+  core_keys = Object.keys || function (object) {
+    var keys = [], key, i = 0;
+    for (key in object) if (object.hasOwnProperty(key)) keys[i++] = key;
     return keys;
   },
 
@@ -103,58 +97,50 @@
   core_call = String.call,
   core_toString = is.toString,
 
-  core_forEach = methods.forEach || function(iterator) {
+  core_forEach = methods.forEach || function (iterator) {
     for (var array = this, i = array.length; i--;) iterator(array[i], i);
   },
 
-  core_contains = methods.contains || function(item) {
+  core_contains = methods.contains || function (item) {
     for (var array = this, i = array.length; i-- && array[i] !== item;);
     return i !== -1;
-  },
-
-  // for the w3c-wishlist: composition of _Array#forEach_ and _Object.keys_.
-  core_forOwn = function(iterator, context) {
-    var object = this;
-    core_forEach.call(core_keys(object), function(key) {
-      return iterator.call(context, object[key], key);
-    });
   },
 
   // regular expressions
   // -------------------
 
-  re_escaped_hex = /\\[xu]([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/g, // callback replace with char
-  re_escaped_whitespace = /\\([btnfr"\\])/g, // callback replace with char
+  re_escaped_hex = /\\[xu]([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/g, // ord to char
+  re_escaped_whitespace = /\\([btnfr"\\])/g, // replace with 1st group
   re_is_float = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/, // test only
-  re_lower_boundary = /[ _-]([a-z]?)/g, // callback toUpperCase 1st group
-  re_lower_upper_boundary = /([a-z])([A-Z])/g, // callback '$1-$2' or '$1_$2'
-  re_regexp_chars = /([.*+?^=!:${}()|\[\]\/\\])/g, // callback '\\$1'
+  re_lower_boundary = /[ _-]([a-z]?)/g, // toUpperCase 1st group
+  re_lower_upper_boundary = /([a-z])([A-Z])/g, // '$1-$2' or '$1_$2'
+  re_regexp_chars = /([.*+?^=!:${}()|\[\]\/\\])/g, // '\\$1'
   re_source_matches_end = /[^\\]\$$/, // test only
-  re_space_hyphen = /[ -]/g, // callback '_'
-  re_space_underscore = /[ _]/g, // callback '-'
+  re_space_hyphen = /[ -]/g, // replace with '_'
+  re_space_underscore = /[ _]/g, // replace with '-'
 
   // ### diacritics & liguatures
   // because character mappings easily grow large we only provide
   // the [Latin-1 Supplement](http://unicode-table.com/en/#latin-1-supplement)
-  // ( letters in range [xC0-xFF] ) mapped to their nearest character
+  // (letters in range [xC0-xFF]) mapped to their nearest character
   // allowed in URL path segments.
   // 
   // we also rely on native _String#toLowerCase_ and _String#toUpperCase_
   // to properly convert characters - <a href="javascript:alert('give me the link!')">which they don't</a>
 
   ltn1_reprs = 'A,A,A,A,Ae,A,AE,C,E,E,E,E,I,I,I,I,D,N,O,O,O,O,Oe,-,Oe,U,U,U,Ue,Y,Th,ss,a,a,a,a,ae,a,ae,c,e,e,e,e,i,i,i,i,d,n,o,o,o,o,oe,-,oe,u,u,u,ue,y,th,y'.split(','),
-  
-  ltn1_chars = (function(){
+
+  ltn1_chars = (function () {
     var offset = 0xC0,
       i = 0xFF - offset,
       result = new Array(i);
-    while(i--){
+    while (i--) {
       result[i] = core_fromCharCode(offset + i);
     }
     return result.join('');
   }()),
 
-  re_ltn1 = new RegExp('[' + ltn1_chars + ']', 'g');
+  re_ltn1 = new RegExp('[' + ltn1_chars + ']', 'g'),
 
   // ### the whitespace shim
   // native implementations of _String#trim_ might miss out
@@ -163,7 +149,7 @@
   // this section detects those flaws and constructs the regular expressions used
   // in the polyfills. Many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
   // 
-  // - let `re_whitespace` be the native white space matcher.
+  // - let `re_ws` be the native white space matcher.
   // - iterate over our white space characters
   // - add all whitespace characters not recognized
   //   as such to the matcher's source.
@@ -177,43 +163,40 @@
   // [4]: http://blog.stevenlevithan.com/archives/faster-trim-javascript
   // [5]: http://perfectionkills.com/whitespace-deviations/
 
-  var re_no_whitespace = /\S/,
-    re_whitespaces = /\s\s*/g,
-    re_trim_left = /^\s\s*/,
-    re_trim_right = /\s*\s$/,
-    re_linebreaks = /\r?\n|\u2028|\u2029/g;
+  re_wss = /\s\s*/g,
+  re_no_ws = /\S/,
+  re_trim_left = /^\s\s*/,
+  re_trim_right = /\s*\s$/,
+  re_linebreaks = /\r?\n|\u2028|\u2029/g;
 
-  (function() {
+  (function () {
 
     var is_spec_compliant = true,
-      re_whitespace = /\s/,
-      re_whitespace_source = re_whitespace.source,
-      re_whitespaces_source,
+      re_ws = /\s/,
+      re_ws_source = re_ws.source,
+      re_wss_source,
 
       hex_char_codes = (
-        '0009,' + // tab
-        '000A,' + // line feed
-        '000B,' + // vertical tab
-        '000C,' + // form feed
-        '000D,' + // carriage return
-        '0020,' + // space
-        '00A0,' + // nbsp
-        '1680,180E,2000,2001,' + // prevent
-        '2002,2003,2004,2005,' + // formatter
-        '2006,2007,2008,2009,' + // from
-        '200A,202F,205F,3000,' + // inlining
+        '9,' + // tab
+        'A,' + // line feed
+        'B,' + // vertical tab
+        'C,' + // form feed
+        'D,' + // carriage return
+        '20,' + // space
+        'A0,' + // nbsp
+        '1680,180E,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,200A,202F,205F,3000,' + // Zs
         '2028,' + // line separator
         '2029,' + // paragraph separator
         'FEFF' // byte order mark
       ).split(','),
-      chr;
+      char;
 
-    core_forEach.call(hex_char_codes, function(hex_char_code) {
+    core_forEach.call(hex_char_codes, function (hex_char_code) {
 
-      chr = core_fromCharCode(parseInt(hex_char_code, 16));
+      char = core_fromCharCode(parseInt(hex_char_code, 16));
 
-      if (!re_whitespace.test(chr)) {
-        re_whitespace_source += '\\u' + hex_char_code;
+      if (!re_ws.test(char)) {
+        re_ws_source += '\\u' + hex_char_code;
         is_spec_compliant = false;
       }
 
@@ -223,12 +206,12 @@
 
       shim_methods.push('trim', 'trimRight', 'trimLeft');
 
-      re_whitespaces_source = '[' + re_whitespace_source + '][' + re_whitespace_source + ']*';
+      re_wss_source = '[' + re_ws_source + '][' + re_ws_source + ']*';
 
-      re_no_whitespace = new RegExp('[^' + re_whitespace_source + ']');
-      re_whitespaces = new RegExp(re_whitespaces_source, 'g');
-      re_trim_left = new RegExp('^' + re_whitespaces_source);
-      re_trim_right = new RegExp('[' + re_whitespace_source + ']+$');
+      re_no_ws = new RegExp('[^' + re_ws_source + ']');
+      re_wss = new RegExp(re_wss_source, 'g');
+      re_trim_left = new RegExp('^' + re_wss_source);
+      re_trim_right = new RegExp('[' + re_ws_source + ']+$');
     }
 
   }());
@@ -244,19 +227,17 @@
   // - apply native implementations where available
   // - fix old webkit's bug where `typeof regex` yields `'function'` 
 
-  core_forEach.call(['Array', 'Function', 'RegExp'], function(class_name) {
-
+  core_forEach.call(['Array', 'Function', 'RegExp'], function (class_name) {
     var repr = '[object ' + class_name + ']';
-    is[class_name] = function(value) {
+    is[class_name] = function (value) {
       return value && core_toString.call(value) === repr;
     };
-
   });
 
   is.Array = Array.isArray || is.Array;
 
   if (typeof re_is_float === 'object') {
-    is.Function = function(value) {
+    is.Function = function (value) {
       return typeof value === 'function';
     };
   }
@@ -365,10 +346,10 @@
     // which otherwise assigns to simple `length` porperty
     if (core_defineProperty) {
       core_defineProperty(that, 'length', {
-        get: function() {
+        get: function () {
           return that._value.length;
         },
-        set: function() {}
+        set: function () {}
       });
     } else {
       that.length = that._value.length;
@@ -386,7 +367,7 @@
    * @param {Boolean} [is_mutable=false]
    * @return {Stryng}
    */
-  Stryng.prototype.clone = function(is_mutable) {
+  Stryng.prototype.clone = function (is_mutable) {
     return new Stryng(this._value, is_mutable);
   };
 
@@ -426,7 +407,7 @@
    * @return {String}
    */
   Stryng.prototype.valueOf =
-    Stryng.prototype.toString = function() {
+    Stryng.prototype.toString = function () {
       return this._value; // we can rest assured that this is a primitive
   };
 
@@ -452,7 +433,7 @@
      * shim for native [String#trim](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.20)
      * @return {String}
      */
-    trim: function(input) {
+    trim: function (input) {
       return input != null ?
         String(input)
         .replace(re_trim_left, '')
@@ -464,7 +445,7 @@
      * shim for non-standard [String#trimLeft](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimLeft)
      * @return {String}
      */
-    trimLeft: function(input) {
+    trimLeft: function (input) {
       return input != null ? String(input).replace(re_trim_left, '') : exit();
     },
 
@@ -473,7 +454,7 @@
      * shim for non-standard [String#trimRight](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/TrimRight)
      * @return {String}
      */
-    trimRight: function(input) {
+    trimRight: function (input) {
       return input != null ? String(input).replace(re_trim_right, '') : exit();
     },
 
@@ -484,7 +465,7 @@
      * @param {Number} [position=0]
      * @return {Boolean}
      */
-    contains: function(input, search, position) {
+    contains: function (input, search, position) {
       return input != null ? String(input).indexOf(search, position) !== -1 : exit();
     },
 
@@ -495,7 +476,7 @@
      * @param {Number} [position=0]
      * @return {Boolean}
      */
-    startsWith: function(input, search, position) {
+    startsWith: function (input, search, position) {
       input = input != null ? String(input) : exit();
 
       // - if `search` is a regular expression,
@@ -533,7 +514,7 @@
      * @return {Boolean}
      * @throws if `search` is a regular expression but does not match its input's end.
      */
-    endsWith: function(input, search, end_position) {
+    endsWith: function (input, search, end_position) {
       input = input != null ? String(input) : exit();
 
       // - let `input_len` be this' string's length
@@ -586,7 +567,7 @@
      * @return {String}
      * @throws if `n` is either negative or infinite.
      */
-    repeat: function(input, n) {
+    repeat: function (input, n) {
       n = +n || 0;
       if (input == null || n < 0 || n == INFINITY) exit();
       n = core_floor(n);
@@ -611,12 +592,12 @@
      * @param {Number} [length=length-position] this' string's length minus `position`
      * @return {String}
      */
-    substr: function(input, position, length) {
+    substr: function (input, position, length) {
       input = input != null ? String(input) : exit();
 
       // parse the `position` argument.
       // 
-      // - if the would-be result of `Number.toInteger( position )` is negative, add `input.length`
+      // - if the would-be result of `Number.toInteger(position)` is negative, add `input.length`
       // - if it still is negative, apply zero
       // - leave it up to `substr`'s implicit parsing any otherwise
       position = (
@@ -637,7 +618,7 @@
      * @param {Number} [n=0] number of operations
      * @return {String}
      */
-    wrap: function(input, outfix, n) {
+    wrap: function (input, outfix, n) {
       if (input == null) exit();
       // implies parsing `outfix` and `n`
       outfix = Stryng.repeat(outfix, n);
@@ -651,7 +632,7 @@
      * @param {String} [search="undefined"] the substring to search for
      * @return {Number}
      */
-    count: function(input, search) {
+    count: function (input, search) {
       input = input != null ? String(input) : exit();
 
       search = String(search);
@@ -674,7 +655,7 @@
      * @param {...String} [joinees=[]]
      * @return {String}
      */
-    join: function(delimiter /*, string... */ ) {
+    join: function (delimiter /*, string... */) {
       if (delimiter == null) exit();
 
       // avoid non-optimizable Array#slice on arguments, see
@@ -682,9 +663,7 @@
       var i = arguments.length,
         args = new Array(i - 1);
 
-      while (--i) { // skip `delimiter`
-        args[i] = arguments[i];
-      }
+      while (--i) args[i] = arguments[i]; // skip `delimiter`
 
       // implies parsing `delimiter`
       return args.join(delimiter);
@@ -697,7 +676,7 @@
      * diacritics and accented characters use [esrever](https://github.com/mathiasbynens/esrever).
      * @return {String}
      */
-    reverse: function(input) {
+    reverse: function (input) {
       return input != null ? String(input)
         .split('')
         .reverse()
@@ -711,7 +690,7 @@
      * @param {String} [insertion="undefined"]
      * @return {String}
      */
-    insert: function(input, position, insertion) {
+    insert: function (input, position, insertion) {
       input = input != null ? String(input) : exit();
 
       // help out _String#slice_'s implicit parsing which will apply different
@@ -728,12 +707,12 @@
      * @param {...Number} index indices to split at. negatives allowed
      * @return {String[]}
      */
-    splitAt: function(input /*, index... */ ) {
+    splitAt: function (input /*, index... */) {
       input = input != null ? String(input) : exit();
 
       // - for each index
       //   - if it is negative, add this' string's length
-      //   - apply `pending_index` of the previous iteration ( initially zero ) as `index`'s minimum
+      //   - apply `pending_index` of the previous iteration (initially zero) as `index`'s minimum
       //   - let native _String#subcore_ apply the maximum
       //   - push what's within input between `pending_index` and `index` to `result`
       //   - update `pending_index` for the next iteration
@@ -774,7 +753,7 @@
      *   default as per [ecma-262/5.1](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14)
      * @return {String[]}
      */
-    splitLeft: function(input, delimiter, n) {
+    splitLeft: function (input, delimiter, n) {
       input = input != null ? String(input) : exit();
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
@@ -835,7 +814,7 @@
      * @return {String[]}
      * @throws if `delimiter` is a regular expression
      */
-    splitRight: function(input, delimiter, n) {
+    splitRight: function (input, delimiter, n) {
       input = input != null ? String(input) : exit();
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
@@ -877,7 +856,7 @@
      * [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-7.3).
      * @return {String[]}
      */
-    splitLines: function(input) {
+    splitLines: function (input) {
       return input != null ? String(input).split(re_linebreaks) : exit();
     },
 
@@ -888,7 +867,7 @@
      * @param {String} [replacement="undefined"] replacement
      * @return {String}
      */
-    exchange: function(input, replacee, replacement) {
+    exchange: function (input, replacee, replacement) {
       input = input != null ? String(input) : exit();
       replacee = String(replacee);
       replacement = String(replacement);
@@ -909,7 +888,7 @@
      *   number of replacement operations.
      * @return {String}
      */
-    exchangeLeft: function(input, replacee, replacement, n) {
+    exchangeLeft: function (input, replacee, replacement, n) {
       input = input != null ? String(input) : exit();
       replacee = String(replacee);
       replacement = String(replacement);
@@ -930,7 +909,7 @@
      *   number of replacement operations.
      * @return {String}
      */
-    exchangeRight: function(input, replacee, replacement, n) {
+    exchangeRight: function (input, replacee, replacement, n) {
       input = input != null ? String(input) : exit();
       replacee = String(replacee);
       replacement = String(replacement);
@@ -950,7 +929,7 @@
      * @param {String} [fill="undefined"]
      * @return {String}
      */
-    just: function(input, max_len, fill) {
+    just: function (input, max_len, fill) {
       max_len = +max_len || 0;
       if (input == null || max_len < 0 || max_len == INFINITY) exit();
       max_len = core_floor(max_len);
@@ -978,7 +957,7 @@
      * @param {String} [fill="undefined"]
      * @return {String}
      */
-    justLeft: function(input, max_len, fill) {
+    justLeft: function (input, max_len, fill) {
       max_len = +max_len || 0;
       if (input == null || max_len < 0 || max_len == INFINITY) exit();
       max_len = core_floor(max_len);
@@ -1006,7 +985,7 @@
      * @param {String} [fill="undefined"]
      * @return {String}
      */
-    justRight: function(input, max_len, fill) {
+    justRight: function (input, max_len, fill) {
       max_len = +max_len || 0;
       if (input == null || max_len < 0 || max_len == INFINITY) exit();
       max_len = core_floor(max_len);
@@ -1034,7 +1013,7 @@
      * @return {String} -
      *
      */
-    strip: function(input, outfix, n) {
+    strip: function (input, outfix, n) {
       return Stryng.stripRight(Stryng.stripLeft(input, outfix, n), outfix, n);
     },
 
@@ -1044,7 +1023,7 @@
      * @param {Number} [n=Math.pow(2,32)-1] number of removals.
      * @return {String}
      */
-    stripLeft: function(input, prefix, n) {
+    stripLeft: function (input, prefix, n) {
       input = input != null ? String(input) : exit();
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
@@ -1076,7 +1055,7 @@
      * @param {Number} [n=Math.pow(2,32)-1] number of removals.
      * @return {String}
      */
-    stripRight: function(input, suffix, n) {
+    stripRight: function (input, suffix, n) {
       input = input != null ? String(input) : exit();
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
@@ -1107,12 +1086,12 @@
 
     /**
      * slices this' string to exactly fit the given `max_len`
-     * while including the `ellipsis` at its end ( enforced ).
+     * while including the `ellipsis` at its end (enforced).
      * @param {Number} [max_len=Math.pow(2,32)-1] length of the result.
      * @param {String} [ellipsis="..."]
      * @return {String}
      */
-    truncate: function(input, max_len, ellipsis) {
+    truncate: function (input, max_len, ellipsis) {
       input = input != null ? String(input) : exit();
 
       // - parse `max_len` with `toUInt32`, default to `Math.pow(2, 32) - 1`
@@ -1143,37 +1122,38 @@
      * backslash-escapes all occurences of double quote, backslash,
      * backspace, tab, newline, form feed and carriage return,
      * hex-encodes any non-ASCII-printable character and wraps the result
-     * in ( unescaped ) double quotes. this can be interpreted as a
+     * in (unescaped) double quotes. this can be interpreted as a
      * shallow version of the native _JSON#stringify_. shim for non-standard
      * [String#quote](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/quote).
      * @return {String}
      */
-    quote: (function() {
-      var esc_regex = /[\\"]/g,
-        esc_callback = '\\$&',
+    quote: (function () {
+      var esc_regex = /(\\|")/g,
+        esc_callback = '\\$1',
         ctrl_map = {
           '\b': '\\b',
           '\t': '\\t',
           '\n': '\\n',
+          '\v': '\\v',
           '\f': '\\f',
           '\r': '\\r'
         },
-        ctrl_regex = new RegExp('[\b\t\n\f\r]', 'g'),
-        ctrl_callback = function(match){
+        ctrl_regex = new RegExp('[\b\t\n\v\f\r]', 'g'),
+        ctrl_callback = function (match) {
           return ctrl_map[match];
         },
-        xhex_regex = /[\x00-\x07\x0B\x0E-\x1F\x7F-\xFF]/g,
-        xhex_callback = function(match, char_code){
+        xhex_regex = /[\x00-\x07\x0E-\x1F\x7F-\xFF]/g,
+        xhex_callback = function (match, char_code) {
           char_code = match.charCodeAt(0);
           return '\\x' + (char_code < 16 ? '0' : '') + char_code;
         },
         uhex_regex = /[\u0100-\uFFFF]/g,
-        uhex_callback = function(match, char_code){
+        uhex_callback = function (match, char_code) {
           char_code = match.charCodeAt(0);
           return '\\u' + (char_code < 4096 ? '0' : '') + char_code;
         };
 
-      return function(input){
+      return function (input) {
         input = input != null ? String(input) : exit();
         // - delegate to native _JSON.stringify_ if available
         // - otherwise
@@ -1190,24 +1170,24 @@
             .replace(xhex_regex, xhex_callback)
             .replace(uhex_regex, uhex_callback), '"', 1)
         );
-      }
+      };
     }()),
 
     /**
      * mirrors the effect of [Stryng#quote](#quote) without using `eval`.
      * unescapes all occurences of backslash-escaped
-     * characters ( `"\\t\r\n\f\b` ), decodes all hex-encoded
+     * characters (`"\\t\r\n\f\b`), decodes all hex-encoded
      * characters and removes surrounding double quotes once.
      * @return {String}
      */
-    unquote: function(input) {
+    unquote: function (input) {
       input = input != null ? String(input) : exit();
 
       input = input
-        .replace(re_escaped_hex, function(_, he, xa) {
+        .replace(re_escaped_hex, function (_, he, xa) {
           return core_fromCharCode(parseInt(he + (xa || ''), 16));
         })
-        .replace(re_escaped_whitespace, function(_, esc) {
+        .replace(re_escaped_whitespace, function (_, esc) {
           return (
             esc === 'b' ? '\b' : // backspace
             esc === 't' ? '\t' : // tab
@@ -1226,7 +1206,7 @@
      * @param {String} [appendix="undefined"]
      * @return {String}
      */
-    append: function(input, appendix) {
+    append: function (input, appendix) {
       return input != null ? String(input) + appendix : exit();
     },
 
@@ -1235,7 +1215,7 @@
      * @param {String} [intro="undefined"]
      * @return {String}
      */
-    prepend: function(input, intro) {
+    prepend: function (input, intro) {
       return input != null ? intro + String(input) : exit();
     },
 
@@ -1245,7 +1225,7 @@
      * @param {String} [comparable="undefined"] string to compare to
      * @return {Boolean}
      */
-    equals: function(input, comparable) {
+    equals: function (input, comparable) {
       return input != null ? String(input) === String(comparable) : exit();
     },
 
@@ -1255,7 +1235,7 @@
      * @param {String} [comparable="undefined"] string to compare to
      * @return {Boolean}
      */
-    iequals: function(input, comparable) {
+    iequals: function (input, comparable) {
       return input != null ? String(input).toLowerCase() === String(comparable).toLowerCase() : exit();
     },
 
@@ -1263,7 +1243,7 @@
      * returns whether or not this' string has length `0`
      * @return {Boolean}
      */
-    isEmpty: function(input) {
+    isEmpty: function (input) {
       return input != null ? !String(input) : exit();
     },
 
@@ -1272,8 +1252,8 @@
      * whitespace, line terminators and/or Zs only.
      * @return {Boolean}
      */
-    isBlank: function(input) {
-      return input != null ? !String(input) || !re_no_whitespace.test(input) : exit();
+    isBlank: function (input) {
+      return input != null ? !String(input) || !re_no_ws.test(input) : exit();
     },
 
     /**
@@ -1284,7 +1264,7 @@
      * JavaScript's float range.
      * @return {Boolean}
      */
-    isFloat: function(input) {
+    isFloat: function (input) {
       return input != null ? re_is_float.test(input) : exit();
     },
 
@@ -1293,15 +1273,15 @@
      * whitespace, line terminators and/or Zs by a single space character.
      * @return {String}
      */
-    clean: function(input) {
-      return Stryng.trim(input).replace(re_whitespaces, ' ');
+    clean: function (input) {
+      return Stryng.trim(input).replace(re_wss, ' ');
     },
 
     /**
      * upper-cases this' string's first character.
      * @return {String}
      */
-    capitalize: function(input) {
+    capitalize: function (input) {
       input = input != null ? String(input) : exit();
       return !input ? input : input.charAt().toUpperCase() + input.substring(1);
     },
@@ -1317,10 +1297,10 @@
      * for a _classified_ output compose this method with [Stryng#capitalize](#capitalize).
      * @return {String}
      */
-    camelize: function(input) {
+    camelize: function (input) {
       return input != null ?
         String(input)
-        .replace(re_lower_boundary, function(_, character) {
+        .replace(re_lower_boundary, function (_, character) {
           return character ? character.toUpperCase() : '';
         }) : exit();
     },
@@ -1335,7 +1315,7 @@
      * inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_underscore)
      * @return {String}
      */
-    underscore: function(input) {
+    underscore: function (input) {
       return input != null ?
         String(input)
         .replace(re_lower_upper_boundary, '$1_$2')
@@ -1355,7 +1335,7 @@
      * inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_dasherize)
      * @return {String}
      */
-    hyphenize: function(input) {
+    hyphenize: function (input) {
       return input != null ?
         String(input)
         .replace(re_lower_upper_boundary, '$1-$2')
@@ -1370,8 +1350,8 @@
      * @return {String} [description]
      * @todo replace symbols otherwise being percent-escaped
      */
-    simplify: function(input) {
-      return input != null ? String(input).replace(re_ltn1, function(match){
+    simplify: function (input) {
+      return input != null ? String(input).replace(re_ltn1, function (match) {
         return ltn1_reprs[ltn1_chars.indexOf(match)];
       }) : exit();
     },
@@ -1380,7 +1360,7 @@
      * maps every character of this' string to its ordinal representation.
      * @return {Number[]}
      */
-    ord: function(input) {
+    ord: function (input) {
       input = input != null ? String(input) : exit();
 
       var i = input.length,
@@ -1396,7 +1376,7 @@
      * JavaScript regexp parser. taken from [mdn](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions)
      * @return {String}
      */
-    escapeRegExp: function(input) {
+    escapeRegExp: function (input) {
       return input != null ? String(input).replace(re_regexp_chars, '\\$1') : exit();
     },
 
@@ -1405,7 +1385,7 @@
      * @param  {String} flags
      * @return {RegExp}
      */
-    toRegExp: function(input, flags) {
+    toRegExp: function (input, flags) {
       return input != null ? new RegExp(input, flags) : exit();
     }
   };
@@ -1422,7 +1402,7 @@
    * @param {*} value
    * @return {Boolean}
    */
-  Stryng.isStryng = function(value) {
+  Stryng.isStryng = function (value) {
     return (value instanceof Stryng);
   };
 
@@ -1435,9 +1415,9 @@
    * @param {Number} [from=32] inclusively
    * @param {Number} [to=127] exclusively assuming _Math.random_ never yields `1`
    * @return {String}
-   * @throws if `n` is negative or not finite or `to` exceeds `Math.pow( 2, 16 )`
+   * @throws if `n` is negative or not finite or `to` exceeds `Math.pow(2, 16)`
    */
-  Stryng.random = function(n, from, to) {
+  Stryng.random = function (n, from, to) {
     n = +n || 0;
     if (n < 0 || n == INFINITY) exit();
     n = core_floor(n);
@@ -1466,9 +1446,9 @@
    * @Stryng.chr
    * @param {...Number} charCode
    * @return {String}
-   * @throws if one of the `charCode`s exceeds `Math.pow( 2, 16 ) - 1`
+   * @throws if one of the `charCode`s exceeds `Math.pow(2, 16) - 1`
    */
-  Stryng.chr = function( /* char_codes,... */ ) {
+  Stryng.chr = function (/* char_codes,... */) {
     var char_codes = arguments,
       i = char_codes.length;
     while (i--) {
@@ -1514,11 +1494,13 @@
   // - populate the function onto Stryng's prototype wrapped in another which
   //   unshifts the _Stryng_ instance's wrapped `_value`
   //   to become the first argument among the proxied ones to the static function
-  core_forOwn.call(stryng_members, function(fn, fn_name) {
+  core_forEach.call(core_keys(stryng_members), function(fn_name){
+
+    var fn = stryng_members[fn_name];
 
     Stryng[fn_name] = fn;
 
-    Stryng.prototype[fn_name] = function( /* proxied arguments */ ) {
+    Stryng.prototype[fn_name] = function (/* proxied arguments */) {
 
       // Array#slice arguments makes this function unoptimizable, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
@@ -1551,18 +1533,18 @@
   //   - handles the result accordingly
   // 
   // [1]: http://bonsaiden.github.io/JavaScript-Garden/#function.arguments
-  core_forEach.call(methods, function(fn_name) {
+  core_forEach.call(methods, function (fn_name) {
 
     var fn = version[fn_name];
 
     if (is.Function(fn) && !core_contains.call(shim_methods, fn_name)) {
 
-      Stryng[fn_name] = adopt_native_statics && String[fn_name] || function(input /*, proxied argments */ ) {
+      Stryng[fn_name] = adopt_native_statics && String[fn_name] || function (input /*, proxied argments */) {
         if (input == null) exit();
         return core_call.apply(fn, arguments);
       };
 
-      Stryng.prototype[fn_name] = function( /* proxied arguments */ ) {
+      Stryng.prototype[fn_name] = function (/* proxied arguments */) {
 
         var that = this, // promote compression
           result = fn.apply(that._value, arguments);
@@ -1581,7 +1563,7 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = Stryng;
   } else if (typeof define === 'function' && define.amd) {
-    define(function() {
+    define(function () {
       return Stryng;
     });
   } else {
@@ -1593,7 +1575,7 @@
      * @return {Stryng}
      */
     var previous_Stryng = root.Stryng;
-    Stryng.noConflict = function() {
+    Stryng.noConflict = function () {
       root.Stryng = previous_Stryng;
       return Stryng;
     };
