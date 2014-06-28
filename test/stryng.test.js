@@ -8,6 +8,7 @@ var Object_defineProperty = (function(defineProperty) {
   try {
     var object = {};
     defineProperty(object, 'bool', {value: true});
+    if(!object.bool) throw object;
     return defineProperty;
   } catch (e) {}
 })(Object.defineProperty);

@@ -80,6 +80,7 @@
         writable: false,
         value: version
       });
+      if(!Stryng.version) throw version;
       return defineProperty;
     } catch (e) {
       Stryng.version = version;
