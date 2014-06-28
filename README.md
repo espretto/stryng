@@ -1,7 +1,7 @@
 
 Stryng
 ------
-for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively ( and yes, this will break your tongue if you read aloud ). Stryng to the rescue!
+for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively (and yes, this will break your tongue if you read aloud). Stryng to the rescue!
 
 ### compat
 
@@ -25,52 +25,52 @@ design considerations
 
 Stryng instances wrap string primitives
 ```
-var stryng = new Stryng(); // wrapped empty string, `new` operator is optional
-stryng.isEmpty();          // > true
+var stryng = new Stryng(''); // wrapped empty string, `new` operator is optional
+stryng.isEmpty();            // > true
 ```
 by default Stryng instances are immutable just like native strings.
 ```
-stryng = stryng.append('key');  // reassign it, just like we would with natives
-var immutable = stryng.clone(); // delegates to the constructor
-immutable === stryng;           // > false, objects differ
-immutable.equals( stryng )      // > true, contents equal
+var immutable = stryng.append(''); // reassign it, just like we would with natives
+immutable === stryng;              // > false, objects differ
+immutable.equals(stryng)           // > true, contents equal
 ```
 you can create mutable instances by either passing `true` to the Stryng constructor as the 2nd argument or call its curried variation on an existing instance.
 ```
-var mutable = stryng.clone( true );     // equal to `Stryng( stryng, true )`
-var referer = mutable.append('stroke'); // wrapped 'keystroke'
-referer === mutable;                    // > true, both refer to the same object
-mutable.equals( referer );              // > true, contents could never differ
+var mutable = stryng.clone(true);    // equal to `Stryng(stryng, true)`
+var referer = mutable.append('fox'); // 'keystroke'
+referer === mutable;                 // > true, both refer to the same object
+mutable.equals(referer);             // > true, contents could never differ
 ```
 to retrieve the wrapped value, take actions that imply a call to Stryng's `toString` or `valueOf` methods or call them directly.
 ```
-stryng.toString(); // > 'key', as primitve, same as `stryng.valueOf()`
-stryng + 'stroke'; // > 'keystroke', as primitive
+stryng.toString(); // > 'fox', as primitve, same as `stryng.valueOf()`
+stryng + 'tail';   // > 'foxtail', as primitive
 ```
 infact Stryng integration is rather seemless
 ```
 var object = {};
-var n = Stryng( 123 );    // wrapped '123'
-object[ stryng ] = +n;    // parse wrapped '123' to number and assign to `object['key']`
-JSON.stringify( object ); // > '{"key":123}'
+var key = String('num'); // 'num'
+var n = Stryng(123);     // '123'
+object[stryng] = +n;     // parse '123' to number and assign to `object['num']`
+JSON.stringify(object);  // > '{"num":123}'
 ```
-type checking however cannot be tricked into recognizing Stryngs as strings
+type checking however cannot be tricked into recognizing Stryngs as natives
 ```
-typeof stryng;                 // > 'object'
-stryng instanceof String;      // > false, not even if it actually did occur along the prototype chain
-object.toString.call( stryng ) // > '[object Object]', reliable as always
+typeof stryng;               // > 'object'
+stryng instanceof String;    // > false, not even if it actually did occur along the prototype chain
+object.toString.call(stryng) // > '[object Object]', reliable as always
 
-// for as long as Stryng is not another ( iframe's ) `window`'s property
-stryng instanceof Stryng;  // > true
-Stryng.isStryng( stryng ); // > true, wraps the above for convenience
+// for as long as Stryng is not another (iframe's) `window`'s property
+stryng instanceof Stryng; // > true
+Stryng.isStryng(stryng);  // > true, wraps the above for convenience
 ```
 
 ### type safety
 
 #### strings
-arguments expected to be strings are cast using `String( arg )`. as a direct consequence `'undefined'` will be applied as the default value. this decision derives from JavaScript's native behaviour:
+arguments expected to be strings are cast using `String(arg)`. as a direct consequence `'undefined'` will be applied as the default value. this decision derives from JavaScript's native behaviour:
 ```
-var str = String( undefined ); // primitive 'undefined'
+var str = String(undefined); // primitive 'undefined'
 
 str.contains();   // > true
 str.endsWith();   // > true
@@ -80,7 +80,7 @@ str.indexOf();    // > 0
 
 'this is yours'.replace('yours'); // > 'this is undefined'
 ```
-the only exception to this rule is Stryng's constructor.
+Stryng's constructor is an exception to this rule. passing in `null` or `undefined` will throw an error.
 
 #### numbers
 arguments expected to be numbers are cast dependent on the use case. the spec basically follows two different approaches to parsing arguments to numbers which Stryng both applies reasonably.
@@ -94,21 +94,20 @@ show cases
 ----------
 produce URL slugs
 ```
-Stryng( headline, true ) // we are only interested in the last function's output
-  .clean()     // reduce groups of whitespace to a single space
-  .trim()      // cut off arbitrary leading and trailing whitespace
+Stryng(headline, true) // we are only interested in the last function's output
+  .clean()     // reduce groups of whitespace to a single space and trim
   .simplify()  // replace ligatures and diacritics from the Latin-1 Supplement with ASCII printables
   .hyphenize() // apply hyphen as the word separator and lower-case
 ```
 varying the format
 ```
-var headline     = Stryng('the quick brown fox', false ), // though mutable by default
-    hyphenized   = headline.hyphenize(),     // wrapped 'the-quick-brown-fox'
-    camelCased   = hyphenized.camelize(),    // wrapped 'theQuickBrownFox'
-    under_scored = camelCased.underscore(),  // wrapped 'the_quick_brown_fox'
-    rotated      = under_scored.hyphenize(), // wrapped 'the-quick-brown-fox'
+var headline     = Stryng('the quick brown fox', false), // though mutable by default
+    hyphenized   = headline.hyphenize(),     // 'the-quick-brown-fox'
+    camelCased   = hyphenized.camelize(),    // 'theQuickBrownFox'
+    under_scored = camelCased.underscore(),  // 'the_quick_brown_fox'
+    rotated      = under_scored.hyphenize(), // 'the-quick-brown-fox'
 
-    classified   = camelCased.capitalize();  // wrapped 'TheQuickBrownFox'
+    classified   = camelCased.capitalize();  // 'TheQuickBrownFox'
 ```
 
 please refer to the tests for more examples.

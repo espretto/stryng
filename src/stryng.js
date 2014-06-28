@@ -3,8 +3,6 @@
  * http://mariusrunge.com/mit-licence.html
  */
 
- /* global define*/
-
 (function (root) {
   'use strict';
 
@@ -19,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  version = '0.1.0',
+  version = '0.1.2',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -27,7 +25,7 @@
   // used to limit _String.fromCharCode_
   MAX_CHARCODE = 65535, // Math.pow(2, 16) - 1
 
-  // used to convert to string
+  // promote compression, don't be fooled by override
   String = version.constructor,
 
   // methods _Stryng_ hopes to adopt
@@ -48,6 +46,14 @@
   // and instance methods. polyfills are reduced in functionality and byte-size.
   // they are thus __for internal use only__ and neither populated onto
   // native prototypes nor intended to be spec-compliant.
+
+  // ### corner stone
+  // name this a core method. used for string to work on
+
+  core_string = function(input){
+    if(input == null) exit('input must not be null');
+    return String(input);
+  },
 
   // ### native static methods
 
@@ -80,7 +86,6 @@
         writable: false,
         value: version
       });
-      if(!Stryng.version) throw version;
       return defineProperty;
     } catch (e) {
       Stryng.version = version;
@@ -112,15 +117,59 @@
   // regular expressions
   // -------------------
 
-  re_escaped_hex = /\\[xu]([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/g, // ord to char
-  re_escaped_whitespace = /\\([btnfr"\\])/g, // replace with 1st group
-  re_is_float = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/, // test only
-  re_lower_boundary = /[ _-]([a-z]?)/g, // toUpperCase 1st group
-  re_lower_upper_boundary = /([a-z])([A-Z])/g, // '$1-$2' or '$1_$2'
-  re_regexp_chars = /([.*+?^=!:${}()|\[\]\/\\])/g, // '\\$1'
-  re_source_matches_end = /[^\\]\$$/, // test only
-  re_space_hyphen = /[ -]/g, // replace with '_'
-  re_space_underscore = /[ _]/g, // replace with '-'
+  // ### quote & unquote
+  ctrl_map = {
+    '\b': 'b',
+    '\t': 't',
+    '\n': 'n',
+    '\v': 'v',
+    '\f': 'f',
+    '\r': 'r'
+  },
+  esc_ctrl_map = {
+    'b': '\b', // backspace
+    't': '\t', // tab
+    'n': '\n', // new line
+    'f': '\f', // form feed
+    'r': '\r', // carriage return
+    'v': '\v'  // vertical tab
+  },
+  re_ctrl = new RegExp('[\b\t\n\f\r\v"\\\\]', 'g'),
+  cb_ctrl = function (match) {
+    return '\\' + (ctrl_map[match] || match);
+  },
+  re_esc_ctrl = /\\([btnfrv"\\])/g,
+  cb_esc_ctrl = function (_, esc) {
+    return esc_ctrl_map[esc] || esc;
+  },
+  re_xhex = /[\x00-\x07\x0E-\x1F\x7F-\xFF]/g,
+  cb_xhex = function (match, char_code) {
+    char_code = match.charCodeAt(0);
+    return '\\x' + (char_code < 16 ? '0' : '') + char_code;
+  },
+  re_uhex = /[\u0100-\uFFFF]/g,
+  cb_uhex = function (match, char_code) {
+    char_code = match.charCodeAt(0);
+    return '\\u' + (char_code < 4096 ? '0' : '') + char_code;
+  },
+  re_esc_uxhex = /\\[xu]([0-9a-fA-F]{2,4})/g,
+  cb_esc_uxhex = function (_, uxhex) {
+    return core_fromCharCode(parseInt(uxhex, 16));
+  },
+
+  // ### name transforms
+  re_low_boundary = /[ _-]([a-z]?)/g,
+  cb_low_boundary = function (_, char) {
+    return char ? char.toUpperCase() : '';
+  },
+  re_case_switch = /([a-z])([A-Z])/g,
+  re_space_hyphen = /[ -]/g,
+  re_space_underscore = /[ _]/g,
+
+  // ### util
+  re_regexp = /([.*+?^=!:${}()|\[\]\/\\])/g,
+  re_is_float = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
+  re_match_end = /[^\\]\$$/,
 
   // ### diacritics & liguatures
   // because character mappings easily grow large we only provide
@@ -144,6 +193,9 @@
   }()),
 
   re_ltn1 = new RegExp('[' + ltn1_chars + ']', 'g'),
+  cb_ltn1 = function (match) {
+    return ltn1_reprs[ltn1_chars.indexOf(match)];
+  },
 
   // ### the whitespace shim
   // native implementations of _String#trim_ might miss out
@@ -170,7 +222,7 @@
   re_no_ws = /\S/,
   re_trim_left = /^\s\s*/,
   re_trim_right = /\s*\s$/,
-  re_linebreaks = /\r?\n|\u2028|\u2029/g;
+  re_line_terminators = /\r?\n|\u2028|\u2029/g;
 
   (function () {
 
@@ -194,12 +246,12 @@
       ).split(','),
       char;
 
-    core_forEach.call(hex_char_codes, function (hex_char_code) {
+    core_forEach.call(hex_char_codes, function (hex) {
 
-      char = core_fromCharCode(parseInt(hex_char_code, 16));
+      char = core_fromCharCode(parseInt(hex, 16));
 
       if (!re_ws.test(char)) {
-        re_ws_source += '\\u' + hex_char_code;
+        re_ws_source += '\\u' + hex;
         is_spec_compliant = false;
       }
 
@@ -278,11 +330,8 @@
     shim_methods.push('substr');
   }
 
-  // custom exit
-  // -----------
-  // wraps the process of throwing an _Error_.
-  function exit(message) {
-    throw new Error('invalid usage of stryng member. ' + (message || ''));
+  function exit(message){
+    throw new Error(message || 'invalid usage of stryng member');
   }
 
   // defining Stryng
@@ -297,8 +346,8 @@
    * instance methods are also available as static functions with inversed signatures
    * i.e. they take the otherwise wrapped string as their first argument.
    * @class Stryng
-   * @param {String} [value=""]
-   *   the value to parse. defaults to the empty string
+   * @param {String} value
+   *   the value to parse.
    * @param {Boolean} [is_mutable=false]
    *   whether the created instance should be mutable or
    *   create a new instance from the result of every method call
@@ -307,26 +356,19 @@
    *   in the instance returned.
    */
   function Stryng(value, is_mutable) {
-    var that = this,
-      args_len = arguments.length;
+    var that = this;
 
     // allow omitting the `new` operator
     // while preserving the exact behaviour
     // the native _String_ constructor has.
-    if (!(that instanceof Stryng)) {
-      return (
-        args_len ?
-        new Stryng(value, is_mutable) :
-        new Stryng()
-      );
-    }
+    if (!(that instanceof Stryng)) return new Stryng(value, is_mutable);
 
     /**
      * the wrapped native string primitive
      * @name Stryng~_value
      * @type {String}
      */
-    that._value = args_len ? String(value) : '';
+    that._value = core_string(value);
 
     /**
      * whether the created instance should be mutable or
@@ -437,10 +479,7 @@
      * @return {String}
      */
     trim: function (input) {
-      return input != null ?
-        String(input)
-        .replace(re_trim_left, '')
-        .replace(re_trim_right, '') : exit();
+      return core_string(input).replace(re_trim_left, '').replace(re_trim_right, '');
     },
 
     /**
@@ -449,7 +488,7 @@
      * @return {String}
      */
     trimLeft: function (input) {
-      return input != null ? String(input).replace(re_trim_left, '') : exit();
+      return core_string(input).replace(re_trim_left, '');
     },
 
     /**
@@ -458,7 +497,7 @@
      * @return {String}
      */
     trimRight: function (input) {
-      return input != null ? String(input).replace(re_trim_right, '') : exit();
+      return core_string(input).replace(re_trim_right, '');
     },
 
     /**
@@ -469,7 +508,7 @@
      * @return {Boolean}
      */
     contains: function (input, search, position) {
-      return input != null ? String(input).indexOf(search, position) !== -1 : exit();
+      return core_string(input).indexOf(search, position) !== -1;
     },
 
     /**
@@ -480,7 +519,7 @@
      * @return {Boolean}
      */
     startsWith: function (input, search, position) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - if `search` is a regular expression,
       //   return whether or not it matches the beginning of
@@ -518,7 +557,7 @@
      * @throws if `search` is a regular expression but does not match its input's end.
      */
     endsWith: function (input, search, end_position) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - let `input_len` be this' string's length
       // - parse the `end_position` argument by the following rules
@@ -546,7 +585,7 @@
 
       if (is.RegExp(search)) {
 
-        if (!re_source_matches_end.test(search.source)) {
+        if (!re_match_end.test(search.source)) {
           exit('"search" must match end i.e. end with "$"');
         }
 
@@ -596,7 +635,7 @@
      * @return {String}
      */
     substr: function (input, position, length) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // parse the `position` argument.
       // 
@@ -623,7 +662,7 @@
      */
     wrap: function (input, outfix, n) {
       if (input == null) exit();
-      // implies parsing `outfix` and `n`
+      // implies parsing `input`, `outfix` and `n`
       outfix = Stryng.repeat(outfix, n);
       return outfix + input + outfix;
     },
@@ -636,7 +675,7 @@
      * @return {Number}
      */
     count: function (input, search) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       search = String(search);
 
@@ -680,10 +719,10 @@
      * @return {String}
      */
     reverse: function (input) {
-      return input != null ? String(input)
+      return core_string(input)
         .split('')
         .reverse()
-        .join('') : exit();
+        .join('');
     },
 
     /**
@@ -694,7 +733,7 @@
      * @return {String}
      */
     insert: function (input, position, insertion) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // help out _String#slice_'s implicit parsing which will apply different
       // defaults for `undefined` to the first and second argument
@@ -711,7 +750,7 @@
      * @return {String[]}
      */
     splitAt: function (input /*, index... */) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - for each index
       //   - if it is negative, add this' string's length
@@ -757,7 +796,7 @@
      * @return {String[]}
      */
     splitLeft: function (input, delimiter, n) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
       // - return the empty array if `n` is zero
@@ -818,7 +857,7 @@
      * @throws if `delimiter` is a regular expression
      */
     splitRight: function (input, delimiter, n) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
       // - return the empty array if `n` is zero
@@ -860,7 +899,7 @@
      * @return {String[]}
      */
     splitLines: function (input) {
-      return input != null ? String(input).split(re_linebreaks) : exit();
+      return core_string(input).split(re_line_terminators);
     },
 
     /**
@@ -871,7 +910,7 @@
      * @return {String}
      */
     exchange: function (input, replacee, replacement) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
       replacee = String(replacee);
       replacement = String(replacement);
 
@@ -892,7 +931,7 @@
      * @return {String}
      */
     exchangeLeft: function (input, replacee, replacement, n) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
       replacee = String(replacee);
       replacement = String(replacement);
 
@@ -913,7 +952,7 @@
      * @return {String}
      */
     exchangeRight: function (input, replacee, replacement, n) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
       replacee = String(replacee);
       replacement = String(replacement);
 
@@ -1027,7 +1066,7 @@
      * @return {String}
      */
     stripLeft: function (input, prefix, n) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
       // - parse `prefix` to string
@@ -1059,7 +1098,7 @@
      * @return {String}
      */
     stripRight: function (input, suffix, n) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
       // - parse `suffix` to string
@@ -1095,7 +1134,7 @@
      * @return {String}
      */
     truncate: function (input, max_len, ellipsis) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       // - parse `max_len` with `toUInt32`, default to `Math.pow(2, 32) - 1`
       // - if `max_len` is zero return the empty string
@@ -1130,51 +1169,23 @@
      * [String#quote](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/quote).
      * @return {String}
      */
-    quote: (function () {
-      var esc_regex = /(\\|")/g,
-        esc_callback = '\\$1',
-        ctrl_map = {
-          '\b': '\\b',
-          '\t': '\\t',
-          '\n': '\\n',
-          '\v': '\\v',
-          '\f': '\\f',
-          '\r': '\\r'
-        },
-        ctrl_regex = new RegExp('[\b\t\n\v\f\r]', 'g'),
-        ctrl_callback = function (match) {
-          return ctrl_map[match];
-        },
-        xhex_regex = /[\x00-\x07\x0E-\x1F\x7F-\xFF]/g,
-        xhex_callback = function (match, char_code) {
-          char_code = match.charCodeAt(0);
-          return '\\x' + (char_code < 16 ? '0' : '') + char_code;
-        },
-        uhex_regex = /[\u0100-\uFFFF]/g,
-        uhex_callback = function (match, char_code) {
-          char_code = match.charCodeAt(0);
-          return '\\u' + (char_code < 4096 ? '0' : '') + char_code;
-        };
-
-      return function (input) {
-        input = input != null ? String(input) : exit();
-        // - delegate to native _JSON.stringify_ if available
-        // - otherwise
-        //   - preserve ASCII printables
-        //   - use short escape characters
-        //   - use hexadecimal notation as a last resort, whichever is shortest
-        // - wrap `result` in double quotes and return it
-        return (
-          core_stringify ?
-          core_stringify(input) :
-          Stryng.wrap(input
-            .replace(esc_regex, esc_callback)
-            .replace(ctrl_regex, ctrl_callback)
-            .replace(xhex_regex, xhex_callback)
-            .replace(uhex_regex, uhex_callback), '"', 1)
-        );
-      };
-    }()),
+    quote: function (input) {
+      input = core_string(input);
+      // - delegate to native _JSON.stringify_ if available
+      // - otherwise
+      //   - preserve ASCII printables
+      //   - use short escape characters
+      //   - use hexadecimal notation as a last resort, whichever is shortest
+      // - wrap `result` in double quotes and return it
+      return (
+        core_stringify ?
+        core_stringify(input) :
+        '"' + input
+          .replace(re_ctrl, cb_ctrl)
+          .replace(re_xhex, cb_xhex)
+          .replace(re_uhex, cb_uhex) + '"'
+      );
+    },
 
     /**
      * mirrors the effect of [Stryng#quote](#quote) without using `eval`.
@@ -1184,23 +1195,9 @@
      * @return {String}
      */
     unquote: function (input) {
-      input = input != null ? String(input) : exit();
-
-      input = input
-        .replace(re_escaped_hex, function (_, he, xa) {
-          return core_fromCharCode(parseInt(he + (xa || ''), 16));
-        })
-        .replace(re_escaped_whitespace, function (_, esc) {
-          return (
-            esc === 'b' ? '\b' : // backspace
-            esc === 't' ? '\t' : // tab
-            esc === 'n' ? '\n' : // new line
-            esc === 'f' ? '\f' : // form feed
-            esc === 'r' ? '\r' : // carriage return
-            esc // backslash, double quote and any other
-          );
-        });
-      return Stryng.strip(input, '"', 1);
+      return core_string(input)
+        .replace(re_esc_uxhex, cb_esc_uxhex)
+        .replace(re_esc_ctrl, cb_esc_ctrl).slice(1, -1);
     },
 
     /**
@@ -1210,7 +1207,7 @@
      * @return {String}
      */
     append: function (input, appendix) {
-      return input != null ? String(input) + appendix : exit();
+      return core_string(input) + appendix;
     },
 
     /**
@@ -1219,7 +1216,7 @@
      * @return {String}
      */
     prepend: function (input, intro) {
-      return input != null ? intro + String(input) : exit();
+      return intro + core_string(input);
     },
 
     /**
@@ -1229,7 +1226,7 @@
      * @return {Boolean}
      */
     equals: function (input, comparable) {
-      return input != null ? String(input) === String(comparable) : exit();
+      return core_string(input) === String(comparable);
     },
 
     /**
@@ -1239,7 +1236,7 @@
      * @return {Boolean}
      */
     iequals: function (input, comparable) {
-      return input != null ? String(input).toLowerCase() === String(comparable).toLowerCase() : exit();
+      return core_string(input).toLowerCase() === String(comparable).toLowerCase();
     },
 
     /**
@@ -1247,7 +1244,7 @@
      * @return {Boolean}
      */
     isEmpty: function (input) {
-      return input != null ? !String(input) : exit();
+      return !core_string(input);
     },
 
     /**
@@ -1256,7 +1253,8 @@
      * @return {Boolean}
      */
     isBlank: function (input) {
-      return input != null ? !String(input) || !re_no_ws.test(input) : exit();
+      input = core_string(input);
+      return !input || !re_no_ws.test(input);
     },
 
     /**
@@ -1268,7 +1266,7 @@
      * @return {Boolean}
      */
     isFloat: function (input) {
-      return input != null ? re_is_float.test(input) : exit();
+      return re_is_float.test(core_string(input));
     },
 
     /**
@@ -1285,7 +1283,7 @@
      * @return {String}
      */
     capitalize: function (input) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
       return !input ? input : input.charAt().toUpperCase() + input.substring(1);
     },
 
@@ -1301,11 +1299,7 @@
      * @return {String}
      */
     camelize: function (input) {
-      return input != null ?
-        String(input)
-        .replace(re_lower_boundary, function (_, character) {
-          return character ? character.toUpperCase() : '';
-        }) : exit();
+      return core_string(input).replace(re_low_boundary, cb_low_boundary);
     },
 
     /**
@@ -1319,11 +1313,10 @@
      * @return {String}
      */
     underscore: function (input) {
-      return input != null ?
-        String(input)
-        .replace(re_lower_upper_boundary, '$1_$2')
+      return core_string(input)
+        .replace(re_case_switch, '$1_$2')
         .replace(re_space_hyphen, '_')
-        .toLowerCase() : exit();
+        .toLowerCase();
     },
 
     /**
@@ -1339,11 +1332,10 @@
      * @return {String}
      */
     hyphenize: function (input) {
-      return input != null ?
-        String(input)
-        .replace(re_lower_upper_boundary, '$1-$2')
+      return core_string(input)
+        .replace(re_case_switch, '$1-$2')
         .replace(re_space_underscore, '-')
-        .toLowerCase() : exit();
+        .toLowerCase();
     },
 
     /**
@@ -1354,9 +1346,7 @@
      * @todo replace symbols otherwise being percent-escaped
      */
     simplify: function (input) {
-      return input != null ? String(input).replace(re_ltn1, function (match) {
-        return ltn1_reprs[ltn1_chars.indexOf(match)];
-      }) : exit();
+      return core_string(input).replace(re_ltn1, cb_ltn1);
     },
 
     /**
@@ -1364,7 +1354,7 @@
      * @return {Number[]}
      */
     ord: function (input) {
-      input = input != null ? String(input) : exit();
+      input = core_string(input);
 
       var i = input.length,
         result = new Array(i);
@@ -1379,8 +1369,8 @@
      * JavaScript regexp parser. taken from [mdn](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions)
      * @return {String}
      */
-    escapeRegExp: function (input) {
-      return input != null ? String(input).replace(re_regexp_chars, '\\$1') : exit();
+    escapeRegex: function (input) {
+      return core_string(input).replace(re_regexp, '\\$1');
     },
 
     /**
@@ -1388,8 +1378,8 @@
      * @param  {String} flags
      * @return {RegExp}
      */
-    toRegExp: function (input, flags) {
-      return input != null ? new RegExp(input, flags) : exit();
+    toRegex: function (input, flags) {
+      return new RegExp(core_string(input), flags);
     }
   };
 
@@ -1566,6 +1556,7 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = Stryng;
   } else if (typeof define === 'function' && define.amd) {
+    /* global define*/
     define(function () {
       return Stryng;
     });

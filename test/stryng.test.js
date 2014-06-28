@@ -6,11 +6,11 @@ var expect = require('expect.js');
 // feature detect
 var Object_defineProperty = (function(defineProperty) {
   try {
-    var object = {};
-    defineProperty(object, 'bool', {value: true});
-    if(!object.bool) throw object;
-    return defineProperty;
-  } catch (e) {}
+    defineProperty({}, 'x', {});
+  } catch (e) {
+    return false;
+  }
+  return defineProperty;
 })(Object.defineProperty);
 
 describe('Stryng()', function() {
@@ -27,20 +27,12 @@ describe('Stryng()', function() {
 
   describe('.constructor()', function() {
 
+    it('should fail if `input` is missing', function() {
+      expect(Stryng).to.throwError();
+    });
+
     it('should work without the new operator', function() {
       expect(Stryng('')).to.be.a(Stryng);
-    });
-
-    it('should wrap the empty string if no arguments passed', function () {
-      expect(Stryng()).to.have.length(0);
-    });
-
-    it('should wrap "null" passed `null`', function() {
-      expect(Stryng(null).toString()).to.equal('null');
-    });
-
-    it('should wrap "undefined" passed `undefined`', function() {
-      expect(Stryng(void 0).toString()).to.equal('undefined');
     });
 
     it('should return the wrapped empty string if passed the empty array', function() {
@@ -57,9 +49,7 @@ describe('Stryng()', function() {
   		expect(Stryng(primitive)).to.have.length(length);
   	});
 
-    // conditional tests
-
-  	it('should not be writable, passes if Object.defineProperty is not available or buggy', function () {
+  	it('should not be writable, depends on `Object.defineProperty`', function () {
   		var primitive = 'test',
   			length = primitive.length,
         nice_try_length = 0,
@@ -811,7 +801,7 @@ describe('Stryng()', function() {
     });
 
     it('should return true for the empty string', function() {
-      expect(Stryng().isEmpty()).to.be.ok();
+      expect(Stryng('').isEmpty()).to.be.ok();
     });
 
     it('should return false for anything else (after parsing)', function() {
@@ -825,8 +815,8 @@ describe('Stryng()', function() {
       expect(Stryng.isBlank).to.throwError();
     });
 
-    it('should return true for this empty string', function() {
-      expect(Stryng().isBlank()).to.be.ok();
+    it('should return true for the empty string', function() {
+      expect(Stryng('').isBlank()).to.be.ok();
     });
 
     it('should return true for whitespace only strings', function() {
@@ -1010,29 +1000,29 @@ describe('Stryng()', function() {
     });
   });
 
-  describe('.escapeRegExp()', function(){
+  describe('.escapeRegex()', function(){
 
     it('should fail if `input` is missing', function() {
-      expect(Stryng.escapeRegExp).to.throwError();
+      expect(Stryng.escapeRegex).to.throwError();
     });
 
     it('should escape meaningful characters', function () {
       expect(
-        Stryng.escapeRegExp('.*+?^=!:${}()|[]/\\')
+        Stryng.escapeRegex('.*+?^=!:${}()|[]/\\')
       ).to.equal(
         '\\.\\*\\+\\?\\^\\=\\!\\:\\$\\{\\}\\(\\)\\|\\[\\]\\/\\\\'
       );
     });
   });
 
-  describe('.toRegExp()', function(){
+  describe('.toRegex()', function(){
 
     it('should fail if `input` is missing', function() {
-      expect(Stryng.toRegExp).to.throwError();
+      expect(Stryng.toRegex).to.throwError();
     });
 
     it('should delegate to native `new RegExp()`', function() {
-      expect(Stryng.toRegExp('abc', 'g')).to.be.a(RegExp).and.to.have.property('global', true);
+      expect(Stryng.toRegex('abc', 'g')).to.be.a(RegExp).and.to.have.property('global', true);
     });
   });
 
