@@ -178,7 +178,7 @@
       re_ws_source = re_ws.source,
       re_wss_source,
 
-      hex_char_codes = (
+      hex_char_codes = ( // avoid parseInt inconcistencies
         '0009,' + // tab
         '000A,' + // line feed
         '000B,' + // vertical tab

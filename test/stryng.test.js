@@ -6,7 +6,8 @@ var expect = require('expect.js');
 // feature detect
 var Object_defineProperty = (function(defineProperty) {
   try {
-    defineProperty({}, 'bool', { value: true});
+    var object = {};
+    defineProperty(object, 'bool', {value: true});
     return defineProperty;
   } catch (e) {}
 })(Object.defineProperty);
