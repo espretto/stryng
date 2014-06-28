@@ -3,6 +3,8 @@
  * http://mariusrunge.com/mit-licence.html
  */
 
+ /* global define*/
+
 (function (root) {
   'use strict';
 
@@ -177,13 +179,13 @@
       re_wss_source,
 
       hex_char_codes = (
-        '9,' + // tab
-        'A,' + // line feed
-        'B,' + // vertical tab
-        'C,' + // form feed
-        'D,' + // carriage return
-        '20,' + // space
-        'A0,' + // nbsp
+        '0009,' + // tab
+        '000A,' + // line feed
+        '000B,' + // vertical tab
+        '000C,' + // form feed
+        '000D,' + // carriage return
+        '0020,' + // space
+        '00A0,' + // nbsp
         '1680,180E,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,200A,202F,205F,3000,' + // Zs
         '2028,' + // line separator
         '2029,' + // paragraph separator

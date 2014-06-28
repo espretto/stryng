@@ -14,7 +14,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 - every function is available as both
   - static function for functional programming
   - instance method for object oriented programming
-- (im-)mutability of Stryng instances
+- opt for (im-)mutable of Stryng instances
 - seemless integration by overriding `toString` and `valueOf` on Stryng's prototype
 - spec-like failproof type casting mechanisms and default values to prevent unexpected results
 

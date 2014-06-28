@@ -1,15 +1,13 @@
-module.exports = function( grunt ) {
-  
-  var 
+module.exports = function (grunt) {
 
-  DOCS_OUT = 'docs/dist',
-  DOCS_IN = [
-    'README.md',
-    'src/stryng.js'
-  ];
-  LIVERELOAD = true;
+  var DOCS_OUT = 'docs/dist',
+    DOCS_IN = [
+      'README.md',
+      'src/stryng.js'
+    ],
+    LIVERELOAD = true;
 
-  grunt.initConfig( {
+  grunt.initConfig({
 
     clean: {
       docs: {
@@ -19,9 +17,9 @@ module.exports = function( grunt ) {
 
     jshint: {
       options: {
-        jshintrc: './.jshintrc'
+        jshintrc: '.jshintrc'
       },
-      all: ['src/stryng.js']
+      all: ['src/stryng.js', 'Gruntfile.js', 'test/stryng.test.js']
     },
 
     docker: {
@@ -32,28 +30,6 @@ module.exports = function( grunt ) {
         options: {
           onlyUpdated: false,
           colourScheme: 'tango',
-
-          // 'autumn'
-          // 'borland'
-          // 'bw'
-          // 'colorful'
-          // 'default'
-          // 'emacs'
-          // 'friendly'
-          // 'fruity'
-          // 'manni'
-          // 'monokai'
-          // 'murphy'
-          // 'native'
-          // 'pastie'
-          // 'perldoc'
-          // 'rrt'
-          // 'tango'
-          // 'trac'
-          // 'vim'
-          // 'vs'
-
-
           ignoreHidden: false,
           sidebarState: true,
           exclude: [],
@@ -64,19 +40,6 @@ module.exports = function( grunt ) {
         }
       }
     },
-
-    // jsdoc: {
-    //   all: {
-    //     src: DOCS_IN,
-    //     options: {
-    //       verbose: true,
-    //       destination: DOCS_OUT,
-    //       configure: 'docs/conf.json',
-    //       template: 'docs/templates/jaguar',
-    //       'private': false
-    //     }
-    //   }
-    // },
 
     uglify: {
       options: {
@@ -96,55 +59,34 @@ module.exports = function( grunt ) {
       }
     },
 
-    connect: {
-      docs: {
-        options: {
-          livereload: LIVERELOAD,
-          hostname: '*',
-          keepalive: true,
-          port: 8000,
-          base: [DOCS_OUT, '']
+    browserify: {
+      test: {
+        files: {
+          'test/stryng.test.bundle.js': 'test/stryng.test.js'
         }
       }
-    },
-
-    watch: {
-      options: {
-        livereload: LIVERELOAD
-      },
-      jsdoc: {
-        files: DOCS_IN.concat([
-          'docs/conf.json'
-        ]),
-        tasks: ['jsdoc', 'grock', 'docker']
-      }
     }
-
-  } );
+  });
 
   // task libs
   [
-    'grunt-contrib-connect',
-    'grunt-contrib-watch',
     'grunt-contrib-clean',
     'grunt-contrib-uglify',
     'grunt-contrib-jshint',
+    'grunt-browserify',
     'grunt-docker',
-    'grunt-jsdoc',
-  ].forEach( grunt.loadNpmTasks, grunt );
+  ].forEach(grunt.loadNpmTasks, grunt);
 
   // task definitions
-  grunt.registerTask( 'default', 'Generate and serve documentation', [
+  grunt.registerTask('doc', 'Generate and serve documentation', [
     'clean:docs',
-    'jsdoc',
-    'docker',
-    'connect:docs'
-  ] );
+    // 'jsdoc',
+    'docker'
+  ]);
 
-  // try
-  // ```
-  // node_modules/.bin/grock --glob 'stryng.js'
-  // ```
-  // for [grock](https://github.com/killercup/grock)
-
-}
+  grunt.registerTask('default', [
+    'jshint',
+    'browserify',
+    'uglify'
+  ]);
+};

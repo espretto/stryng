@@ -4,64 +4,34 @@
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Stryng - Tests</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        html, body
-        {
-        display:block;
-        height:100%;
-        width:100%;
-        margin:0;
-        padding:0;
-        }
-    </style>
+    
+    <title>stryng tests</title>
+
+    <link rel="stylesheet" href="/node_modules/mocha/mocha.css"/>
   </head>
   <body>
-    <script src="https://getfirebug.com/releases/lite/1.4/firebug-lite.js" charset="UTF-8">
-      {
-        saveCookies : false,
-        startOpened : true, //false,
-        startInNewWindow : false,
-        showIconWhenHidden : true,
-        overrideConsole : true,
-        ignoreFirebugElements : true,
-        disableXHRListener : false,
-        disableWhenFirebugActive : false, //true,
-        enableTrace : false,
-        enablePersistent : false
-      }
+    <div id="mocha"></div>
+    <script src="/src/stryng.js" charset="UTF-8"></script>
+    <script>
+      // run manual tests from the console
+      _Stryng = Stryng.noConflict();
+      console && console.log('try out: `_Stryng().isEmpty()`');
     </script>
     <script src="/node_modules/mocha/mocha.js" charset="UTF-8"></script>
-    <script>mocha.setup({ ui : "bdd", reporter : 'tap' });</script>
-    <script src="/test/stryng.web.js" charset="UTF-8"></script>
     <script>
-      (function poll(){
-        var fb_iframe, fb_window, fb_document, fb_bodies, fb_body, cssText;
-
-        fb_iframe = document.getElementById('FirebugUI');
-
-        if(!fb_iframe) return setTimeout(poll, 500);
-        
-        fb_window   = fb_iframe.contentWindow;
-        fb_document = fb_iframe.contentDocument || fb_window && fb_window.document;
-        fb_bodies   = fb_document.getElementsByTagName('body');
-
-        (function poll(){
-
-          if(!fb_bodies.length) return setTimeout(poll, 500);
-
-          fb_body = fb_bodies[0];
-          cssText = 'display:block;'
-            + 'width:'  + (window.innerWidth  || document.documentElement.clientWidth  || fb_body.clientWidth ) + 'px;'
-            + 'height:' + (window.innerHeight || document.documentElement.clientHeight || fb_body.clientHeight) + 'px;'
-          ;
-          fb_iframe.style.cssText = fb_body.style.cssText = cssText;
-
-          mocha.run();
-        })();
-      })();
+      // mocha.setup({ ui : "bdd", reporter : 'tap' });
+      mocha.setup({
+        ui: "bdd",
+        globals: ["console","__fxdriver_unwrapped"]
+      }); 
+    </script>
+    <script src="/test/stryng.test.bundle.js" charset="UTF-8"></script>
+    <script>
+      window.onload = function(){
+        mocha.run();
+      };
     </script>
   </body>
 </html>
