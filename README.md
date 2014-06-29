@@ -101,7 +101,7 @@ Stryng(headline, true) // we are only interested in the last function's output
 ```
 varying the format
 ```
-var headline     = Stryng('the quick brown fox', false), // though mutable by default
+var headline     = Stryng('the quick brown fox', false), // though immutable by default
     hyphenized   = headline.hyphenize(),     // 'the-quick-brown-fox'
     camelCased   = hyphenized.camelize(),    // 'theQuickBrownFox'
     under_scored = camelCased.underscore(),  // 'the_quick_brown_fox'
