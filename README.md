@@ -37,7 +37,7 @@ immutable.equals(stryng)           // > true, contents equal
 you can create mutable instances by either passing `true` to the Stryng constructor as the 2nd argument or call its curried variation on an existing instance.
 ```
 var mutable = stryng.clone(true);    // equal to `Stryng(stryng, true)`
-var referer = mutable.append('fox'); // 'keystroke'
+var referer = mutable.append('fox'); // 'fox'
 referer === mutable;                 // > true, both refer to the same object
 mutable.equals(referer);             // > true, contents could never differ
 ```
@@ -49,9 +49,9 @@ stryng + 'tail';   // > 'foxtail', as primitive
 infact Stryng integration is rather seemless
 ```
 var object = {};
-var key = String('num'); // 'num'
+var key = Stryng('num'); // 'num'
 var n = Stryng(123);     // '123'
-object[stryng] = +n;     // parse '123' to number and assign to `object['num']`
+object[key] = +n;        // parse '123' to number and assign to `object['num']`
 JSON.stringify(object);  // > '{"num":123}'
 ```
 type checking however cannot be tricked into recognizing Stryngs as natives

@@ -11,7 +11,7 @@ var Object_defineProperty = (function(defineProperty) {
     return false;
   }
   return defineProperty;
-})(Object.defineProperty);
+}(Object.defineProperty));
 
 describe('Stryng()', function() {
 
