@@ -29,7 +29,11 @@
   String = version.constructor,
 
   // methods _Stryng_ hopes to adopt
-  methods = 'charAt,charCodeAt,codePointAt,concat,contains,endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,replace,search,slice,split,startsWith,substr,substring,toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,trim,trimLeft,trimRight'.split(','),
+  methods = 'charAt,charCodeAt,codePointAt,concat,contains,' +
+    'endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,' +
+    'replace,search,slice,split,startsWith,substr,substring,' +
+    'toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,' +
+    'trim,trimLeft,trimRight'.split(','),
 
   // methods which's native implementations to override if necessary
   shim_methods = [],

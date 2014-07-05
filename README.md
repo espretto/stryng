@@ -1,7 +1,7 @@
 
 Stryng
 ------
-for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively (and yes, this will break your tongue if you read aloud). Stryng to the rescue!
+for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively. Stryng to the rescue!
 
 ### compat
 
@@ -14,7 +14,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 - every function is available as both
   - static function for functional programming
   - instance method for object oriented programming
-- opt for (im-)mutable of Stryng instances
+- opt for (im-)mutable Stryng instances
 - seemless integration by overriding `toString` and `valueOf` on Stryng's prototype
 - spec-like failproof type casting mechanisms and default values to prevent unexpected results
 

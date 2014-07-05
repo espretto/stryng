@@ -11,6 +11,7 @@
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-docker": "0.0.8",
+    "grunt-jsdoc": "^0.5.6",
     "mocha": "~1.15.1"
   },
   "testling": {
@@ -33,5 +34,6 @@
   "scripts": {
     "test": "node_modules/.bin/mocha ./test/stryng.test.js",
     "gzip": "gzip -c9 dist/stryng.min.js > dist/stryng.min.js.gz"
-  }
+  },
+  "repository": "git@github.com:espretto/stryng"
 }

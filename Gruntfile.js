@@ -41,6 +41,17 @@ module.exports = function (grunt) {
       }
     },
 
+    jsdoc: {
+      all: {
+        src: DOCS_IN,
+        options: {
+          destination: DOCS_OUT,
+          template : 'node_modules/grunt-jsdoc/node_modules/ink-docstrap/template',
+          configure : 'docs/jsdoc.conf.json'
+        }
+      }
+    },
+
     uglify: {
       options: {
         // beautify: true,
@@ -75,12 +86,13 @@ module.exports = function (grunt) {
     'grunt-contrib-jshint',
     'grunt-browserify',
     'grunt-docker',
+    'grunt-jsdoc'
   ].forEach(grunt.loadNpmTasks, grunt);
 
   // task definitions
   grunt.registerTask('doc', 'Generate and serve documentation', [
     'clean:docs',
-    // 'jsdoc',
+    'jsdoc',
     'docker'
   ]);
 
