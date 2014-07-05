@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>README.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "", thisFile = "README.md", defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+  <script src="goToLine.js"></script>
+  <script src="fileSearch.js"></script>
+  <link rel="stylesheet" href="goToLine.css" />
+  <link rel="stylesheet" href="fileSearch.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+      <div class="heading h2">
+        <a href="#stryng">Stryng</a>
+      </div>
+      <div class="heading h3">
+        <a href="#compat">compat</a>
+      </div>
+      <div class="heading h3">
+        <a href="#features">features</a>
+      </div>
+      <div class="heading h2">
+        <a href="#design%20considerations">design considerations</a>
+      </div>
+      <div class="heading h3">
+        <a href="#constructing%20stryngs">constructing stryngs</a>
+      </div>
+      <div class="heading h3">
+        <a href="#type%20safety">type safety</a>
+      </div>
+      <div class="heading h4">
+        <a href="#strings">strings</a>
+      </div>
+      <div class="heading h4">
+        <a href="#numbers">numbers</a>
+      </div>
+      <div class="heading h2">
+        <a href="#show%20cases">show cases</a>
+      </div>
+      <div class="heading h2">
+        <a href="#documentation">documentation</a>
+      </div>
+      <div class="heading h3">
+        <a href="#notes%20on%20doc%20notation">notes on doc notation</a>
+      </div>
+      <div class="heading h2">
+        <a href="#licence">Licence</a>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><div class="docs markdown">
+<div class="pilwrap" id="stryng">
+  <h2>
+    <a href="#stryng" name="stryng" class="pilcrow">&#182;</a>
+    Stryng
+  </h2>
+</div>
+
+
+<p>for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively. Stryng to the rescue!</p>
+
+
+<div class="pilwrap" id="compat">
+  <h3>
+    <a href="#compat" name="compat" class="pilcrow">&#182;</a>
+    compat
+  </h3>
+</div>
+
+
+<p><a href="https://ci.testling.com/espretto/Stryng"><img src="https://ci.testling.com/espretto/stryng.png" alt="browser support" title="" /></a></p>
+
+
+<div class="pilwrap" id="features">
+  <h3>
+    <a href="#features" name="features" class="pilcrow">&#182;</a>
+    features
+  </h3>
+</div>
+
+
+<ul>
+<li>manually inherits the native <code>String</code> namespace and prototype</li>
+<li>progressive enhancement to fulfill ECMA-Script 5 &amp; 6 standards</li>
+<li>every function is available as both
+<ul><li>static function for functional programming</li>
+<li>instance method for object oriented programming</li></ul></li>
+<li>opt for (im-)mutable Stryng instances</li>
+<li>seemless integration by overriding <code>toString</code> and <code>valueOf</code> on Stryng's prototype</li>
+<li>spec-like failproof type casting mechanisms and default values to prevent unexpected results</li>
+</ul>
+
+
+<div class="pilwrap" id="design%20considerations">
+  <h2>
+    <a href="#design%20considerations" name="design%20considerations" class="pilcrow">&#182;</a>
+    design considerations
+  </h2>
+</div>
+
+
+
+<div class="pilwrap" id="constructing%20stryngs">
+  <h3>
+    <a href="#constructing%20stryngs" name="constructing%20stryngs" class="pilcrow">&#182;</a>
+    constructing stryngs
+  </h3>
+</div>
+
+
+<p>Stryng instances wrap string primitives</p>
+
+<div class='highlight'><pre><code language=''>var stryng = new Stryng(''); // wrapped empty string, `new` operator is optional
+stryng.isEmpty();            // &gt; true
+</code></pre></div>
+
+<p>by default Stryng instances are immutable just like native strings.</p>
+
+<div class='highlight'><pre><code language=''>var immutable = stryng.append(''); // reassign it, just like we would with natives
+immutable === stryng;              // &gt; false, objects differ
+immutable.equals(stryng)           // &gt; true, contents equal
+</code></pre></div>
+
+<p>you can create mutable instances by either passing <code>true</code> to the Stryng constructor as the 2nd argument or call its curried variation on an existing instance.</p>
+
+<div class='highlight'><pre><code language=''>var mutable = stryng.clone(true);    // equal to `Stryng(stryng, true)`
+var referer = mutable.append('fox'); // 'fox'
+referer === mutable;                 // &gt; true, both refer to the same object
+mutable.equals(referer);             // &gt; true, contents could never differ
+</code></pre></div>
+
+<p>to retrieve the wrapped value, take actions that imply a call to Stryng's <code>toString</code> or <code>valueOf</code> methods or call them directly.</p>
+
+<div class='highlight'><pre><code language=''>stryng.toString(); // &gt; 'fox', as primitve, same as `stryng.valueOf()`
+stryng + 'tail';   // &gt; 'foxtail', as primitive
+</code></pre></div>
+
+<p>infact Stryng integration is rather seemless</p>
+
+<div class='highlight'><pre><code language=''>var object = {};
+var key = Stryng('num'); // 'num'
+var n = Stryng(123);     // '123'
+object[key] = +n;        // parse '123' to number and assign to `object['num']`
+JSON.stringify(object);  // &gt; '{"num":123}'
+</code></pre></div>
+
+<p>type checking however cannot be tricked into recognizing Stryngs as natives</p>
+
+<div class='highlight'><pre><code language=''>typeof stryng;               // &gt; 'object'
+stryng instanceof String;    // &gt; false, not even if it actually did occur along the prototype chain
+object.toString.call(stryng) // &gt; '[object Object]', reliable as always
+
+// for as long as Stryng is not another (iframe's) `window`'s property
+stryng instanceof Stryng; // &gt; true
+Stryng.isStryng(stryng);  // &gt; true, wraps the above for convenience
+</code></pre></div>
+
+
+<div class="pilwrap" id="type%20safety">
+  <h3>
+    <a href="#type%20safety" name="type%20safety" class="pilcrow">&#182;</a>
+    type safety
+  </h3>
+</div>
+
+
+
+<div class="pilwrap" id="strings">
+  <h4>
+    <a href="#strings" name="strings" class="pilcrow">&#182;</a>
+    strings
+  </h4>
+</div>
+
+
+<p>arguments expected to be strings are cast using <code>String(arg)</code>. as a direct consequence <code>'undefined'</code> will be applied as the default value. this decision derives from JavaScript's native behaviour:</p>
+
+<div class='highlight'><pre><code language=''>var str = String(undefined); // primitive 'undefined'
+
+str.contains();   // &gt; true
+str.endsWith();   // &gt; true
+str.startsWith(); // &gt; true
+str.search();     // &gt; 0
+str.indexOf();    // &gt; 0
+
+'this is yours'.replace('yours'); // &gt; 'this is undefined'
+</code></pre></div>
+
+<p>Stryng's constructor is an exception to this rule. passing in <code>null</code> or <code>undefined</code> will throw an error.</p>
+
+
+<div class="pilwrap" id="numbers">
+  <h4>
+    <a href="#numbers" name="numbers" class="pilcrow">&#182;</a>
+    numbers
+  </h4>
+</div>
+
+
+<p>arguments expected to be numbers are cast dependent on the use case. the spec basically follows two different approaches to parsing arguments to numbers which Stryng both applies reasonably.</p>
+
+<ol>
+<li><em>toUInt32</em> where only positive numbers make sense and default to the more or less infinite value <code>Math.pow(2, 32) - 1</code>. <code>str.split(',')</code> for example applies this value to its 2nd argument as the default number of substrings to return.</li>
+<li><em>toInteger</em> in every other scenario. this will cast with <code>Number</code>, apply zero for <code>NaN</code>, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives</li>
+</ol>
+
+<p>Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.</p>
+
+
+<div class="pilwrap" id="show%20cases">
+  <h2>
+    <a href="#show%20cases" name="show%20cases" class="pilcrow">&#182;</a>
+    show cases
+  </h2>
+</div>
+
+
+<p>produce URL slugs</p>
+
+<div class='highlight'><pre><code language=''>Stryng(headline, true) // we are only interested in the last function's output
+  .clean()     // reduce groups of whitespace to a single space and trim
+  .simplify()  // replace ligatures and diacritics from the Latin-1 Supplement with ASCII printables
+  .hyphenize() // apply hyphen as the word separator and lower-case
+</code></pre></div>
+
+<p>varying the format</p>
+
+<div class='highlight'><pre><code language=''>var headline     = Stryng('the quick brown fox', false), // though immutable by default
+    hyphenized   = headline.hyphenize(),     // 'the-quick-brown-fox'
+    camelCased   = hyphenized.camelize(),    // 'theQuickBrownFox'
+    under_scored = camelCased.underscore(),  // 'the_quick_brown_fox'
+    rotated      = under_scored.hyphenize(), // 'the-quick-brown-fox'
+
+    classified   = camelCased.capitalize();  // 'TheQuickBrownFox'
+</code></pre></div>
+
+<p>please refer to the tests for more examples.</p>
+
+
+<div class="pilwrap" id="documentation">
+  <h2>
+    <a href="#documentation" name="documentation" class="pilcrow">&#182;</a>
+    documentation
+  </h2>
+</div>
+
+
+<p>please refer to either the <a href="http://espretto.github.io/Stryng">api documentation</a> or read Stryng's story - the <a href="http://espretto.github.io/Stryng/docker/README.md.html">annotated source</a>.</p>
+
+
+<div class="pilwrap" id="notes%20on%20doc%20notation">
+  <h3>
+    <a href="#notes%20on%20doc%20notation" name="notes%20on%20doc%20notation" class="pilcrow">&#182;</a>
+    notes on doc notation
+  </h3>
+</div>
+
+
+<ul>
+<li>explain code <em>sections</em> - preferrably with step-by-step lists - instead of annotating every single snippet</li>
+<li>use underscored variable names for privates, camel-case for the api.</li>
+<li>unfortunately <em>docker</em>'s markdown parser doesn't support lists nested deeper than 2 levels</li>
+<li>read the annotated source and try to stick to its flavour</li>
+</ul>
+
+
+<div class="pilwrap" id="licence">
+  <h2>
+    <a href="#licence" name="licence" class="pilcrow">&#182;</a>
+    Licence
+  </h2>
+</div>
+
+
+<p>released under the <a href="http://mariusrunge.com/mit-licence.html">MIT licence</a>;</p></div>
+  </div>
+</body>
+</html>
