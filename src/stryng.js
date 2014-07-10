@@ -17,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  version = '0.1.2',
+  version = '0.1.3',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -29,11 +29,11 @@
   String = version.constructor,
 
   // methods _Stryng_ hopes to adopt
-  methods = 'charAt,charCodeAt,codePointAt,concat,contains,' +
+  methods = ('charAt,charCodeAt,codePointAt,concat,contains,' +
     'endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,' +
     'replace,search,slice,split,startsWith,substr,substring,' +
     'toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,' +
-    'trim,trimLeft,trimRight'.split(','),
+    'trim,trimLeft,trimRight').split(','),
 
   // methods which's native implementations to override if necessary
   shim_methods = [],
@@ -52,7 +52,7 @@
   // native prototypes nor intended to be spec-compliant.
 
   // ### corner stone
-  // name this a core method. used for string to work on
+  // name this a core method. used for Stryng to work on
 
   core_string = function(input){
     if(input == null) exit('input must not be null');
@@ -163,8 +163,8 @@
 
   // ### name transforms
   re_low_boundary = /[ _-]([a-z]?)/g,
-  cb_low_boundary = function (_, char) {
-    return char ? char.toUpperCase() : '';
+  cb_low_boundary = function (_, chr) {
+    return chr ? chr.toUpperCase() : '';
   },
   re_case_switch = /([a-z])([A-Z])/g,
   re_space_hyphen = /[ -]/g,
@@ -188,7 +188,7 @@
 
   ltn1_chars = (function () {
     var offset = 0xC0,
-      i = 0xFF - offset,
+      i = 0x100 - offset,
       result = new Array(i);
     while (i--) {
       result[i] = core_fromCharCode(offset + i);
@@ -231,8 +231,7 @@
   (function () {
 
     var is_spec_compliant = true,
-      re_ws = /\s/,
-      re_ws_source = re_ws.source,
+      re_ws_source = '\\s',
       re_wss_source,
 
       hex_char_codes = ( // avoid parseInt inconcistencies
@@ -247,14 +246,11 @@
         '2028,' + // line separator
         '2029,' + // paragraph separator
         'FEFF' // byte order mark
-      ).split(','),
-      char;
+      ).split(',');
 
     core_forEach.call(hex_char_codes, function (hex) {
 
-      char = core_fromCharCode(parseInt(hex, 16));
-
-      if (!re_ws.test(char)) {
+      if (!re_wss.test(core_fromCharCode(parseInt(hex, 16)))) {
         re_ws_source += '\\u' + hex;
         is_spec_compliant = false;
       }
@@ -304,29 +300,33 @@
   // feature detection
   // -----------------
 
-  // check whether or not native static functions exist on the global
-  // _core_ namespace __and__ do throw an error if no arguments passed
-  // as required for static functions on _Stryng_.
-  if (is.Function(String.slice)) {
-    try {
-      String.slice();
-    } catch (e) {
-      adopt_native_statics = true;
-    }
-  }
+  // wrap try-catch clauses for optimizability
+  (function(){
 
-  // check if the native implementation of _String#startsWith_
-  // already knows how to deal with regular expressions or indices.
-  // consider _String#endsWith_ to behave the same on that matter.
-  if (is.Function(version.startsWith)) {
-    try {
-      if (!'ab'.startsWith('b', 1) || !'1'.startsWith(/\d/)) {
-        throw version;
+    // check whether or not native static functions exist on the global
+    // _core_ namespace __and__ do throw an error if no arguments passed
+    // as required for static functions on _Stryng_.
+    if (is.Function(String.slice)) {
+      try {
+        String.slice();
+      } catch (e) {
+        adopt_native_statics = true;
       }
-    } catch (e) {
-      shim_methods.push('startsWith', 'endsWith');
     }
-  }
+
+    // check if the native implementation of _String#startsWith_
+    // already knows how to deal with regular expressions or indices.
+    // consider _String#endsWith_ to behave the same on that matter.
+    if (is.Function(version.startsWith)) {
+      try {
+        if (!'ab'.startsWith('b', 1) || !'a'.startsWith(re_no_ws)) {
+          throw version;
+        }
+      } catch (e) {
+        shim_methods.push('startsWith', 'endsWith');
+      }
+    }
+  }());
 
   // check if the native implementation of _String#substr_
   // correctly deals with negative indices.
@@ -865,12 +865,7 @@
 
       // - parse `n` with `toUInt32`, default to `Math.pow(2, 32) - 1`
       // - return the empty array if `n` is zero
-      // - if `delimiter` is a regular expression
-      //   - check its source if it matches a string's end by `$`
-      //   - extract `n` matches using _String#match_ combined with
-      //     subsequently truncating this' string.
-      //   - unshift the substrings between the matches and any captured groups to `result`
-      // - otherwise let `result` be the result of _String#split_
+      // - if `delimiter` is a regular expression throw an error
       //   called on this' string with `delimiter`
       // - if argument `n` is lesser than `result.length`
       //   - remove the first `n` items from `result`
@@ -976,17 +971,17 @@
      * @return {String}
      */
     just: function (input, max_len, fill) {
+      input = core_string(input);
       max_len = +max_len || 0;
-      if (input == null || max_len < 0 || max_len == INFINITY) exit();
+      if (max_len < 0 || max_len == INFINITY) exit();
       max_len = core_floor(max_len);
 
-      input = String(input);
-      fill = String(fill);
+      fill = fill !== void 0 ? String(fill) : ' ';
 
       var input_len = input.length,
         fill_len = fill.length * 2; // safe, `<< 1` converts to 32-Bit Integer
 
-      if (max_len <= input_len || !fill) return input;
+      if (max_len <= input_len) return input;
 
       while (input.length + fill_len <= max_len) {
         input = fill + input + fill;
@@ -1004,12 +999,12 @@
      * @return {String}
      */
     justLeft: function (input, max_len, fill) {
+      input = core_string(input);
       max_len = +max_len || 0;
-      if (input == null || max_len < 0 || max_len == INFINITY) exit();
+      if (max_len < 0 || max_len == INFINITY) exit();
       max_len = core_floor(max_len);
 
-      input = String(input);
-      fill = String(fill);
+      fill = fill !== void 0 ? String(fill) : ' ';
 
       var input_len = input.length,
         fill_len = fill.length;
@@ -1032,12 +1027,12 @@
      * @return {String}
      */
     justRight: function (input, max_len, fill) {
+      input = core_string(input);
       max_len = +max_len || 0;
-      if (input == null || max_len < 0 || max_len == INFINITY) exit();
+      if (max_len < 0 || max_len == INFINITY) exit();
       max_len = core_floor(max_len);
 
-      input = String(input);
-      fill = String(fill);
+      fill = fill !== void 0 ? String(fill) : ' ';
 
       var input_len = input.length,
         fill_len = fill.length;
