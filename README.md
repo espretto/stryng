@@ -25,33 +25,35 @@ design considerations
 
 Stryng instances wrap string primitives
 ```
-var stryng = new Stryng(''); // wrapped empty string, `new` operator is optional
-stryng.isEmpty();            // > true
+var stryng = Stryng('fox'); // wrapped empty string, `new` operator is optional
+stryng.isEmpty();           // > false
 ```
 by default Stryng instances are immutable just like native strings.
 ```
-var immutable = stryng.append(''); // reassign it, just like we would with natives
-immutable === stryng;              // > false, objects differ
-immutable.equals(stryng)           // > true, contents equal
+var add = stryng.append(''); // reassign it, just like we would with natives
+add === stryng;              // > false, objects differ
+add.equals(stryng)           // > true, contents equal
 ```
 you can create mutable instances by either passing `true` to the Stryng constructor as the 2nd argument or call its curried variation on an existing instance.
 ```
-var mutable = stryng.clone(true);    // equal to `Stryng(stryng, true)`
-var referer = mutable.append('fox'); // 'fox'
-referer === mutable;                 // > true, both refer to the same object
-mutable.equals(referer);             // > true, contents could never differ
+var mutable = stryng.clone(true);     // equal to `Stryng(stryng, true)`
+var referer = mutable.append('tail'); // 'foxtail'
+referer === mutable;                  // > true, both refer to the same object
+mutable.equals(referer);              // > true, contents could never differ
 ```
 to retrieve the wrapped value, take actions that imply a call to Stryng's `toString` or `valueOf` methods or call them directly.
 ```
-stryng.toString(); // > 'fox', as primitve, same as `stryng.valueOf()`
-stryng + 'tail';   // > 'foxtail', as primitive
+stryng.toString(); // > 'foxtail', as primitve, same as `stryng.valueOf()`
+stryng + 'or';     // > 'foxtailor', as primitive
 ```
 infact Stryng integration is rather seemless
 ```
 var object = {};
 var key = Stryng('num'); // 'num'
-var n = Stryng(123);     // '123'
-object[key] = +n;        // parse '123' to number and assign to `object['num']`
+key.length;              // 3
+key.length++;            // has no effect, provided Object.defineProperty is available
+var value = Stryng(123); // '123'
+object[key] = +value;    // parse '123' to number and assign to `object['num']`
 JSON.stringify(object);  // > '{"num":123}'
 ```
 type checking however cannot be tricked into recognizing Stryngs as natives
@@ -114,7 +116,7 @@ please refer to the tests for more examples.
 
 documentation
 -------------
-please refer to either the [api documentation](http://espretto.github.io/Stryng) or read Stryng's story - the [annotated source](http://espretto.github.io/Stryng/docker/README.md.html).
+please refer to either the [api documentation](http://espretto.github.io/Stryng).
 
 ### notes on doc notation
 

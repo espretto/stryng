@@ -55,8 +55,7 @@ describe('Stryng()', function() {
         nice_try_length = 0,
   			stryng = Stryng(primitive);
         
-  		if(Object_defineProperty);
-  		{
+  		if(Object_defineProperty){
   			stryng.length = nice_try_length;
   			expect(stryng).to.not.have.length(nice_try_length).and.have.length(length);
   		}
