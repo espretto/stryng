@@ -5,7 +5,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 
 ### compat
 
-[![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/Stryng)
+[![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/stryng)
 
 ### features
 
