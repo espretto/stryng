@@ -326,7 +326,6 @@
   // -----------
 
   /**
-   * Stryng's constructor behaves just like the native one does.
    * static functions are only available on the Stryng namespace while
    * instance methods are also available as static functions with inversed signatures
    * i.e. they take the otherwise wrapped string as their first argument.
@@ -336,6 +335,7 @@
    * @param {Boolean} [isMutable=false]
    *   whether the created instance should be mutable or
    *   create a new instance from the result of every method call
+   * @throws if `value` is either `null` or `undefined`
    * @return {Stryng} -
    *   the `input`'s string representation wrapped
    *   in the instance returned.
@@ -556,10 +556,8 @@
 
       position = (
         position <= -1 ?
-        (position = coreToInteger(position) + input.length) < 0 ?
-        0 :
-        position :
-        position
+          (position = coreToInteger(position) + input.length) < 0 ? 0 : position
+        : position
       );
       return input.substr(position, length);
     },
@@ -817,7 +815,7 @@
      * to reach but not exceed a length of `maxLen`. passing a `maxLen`
      * lesser than this' string's length has no effect. it is never truncated.
      * @param {Number} [maxLen=0]
-     * @param {String} [fill="undefined"]
+     * @param {String} fill
      * @return {String}
      */
     just: function (input, maxLen, fill) {
@@ -825,7 +823,7 @@
       maxLen = +maxLen || 0;
       if (maxLen < 0 || maxLen == INFINITY) exit();
       maxLen = coreFloor(maxLen);
-      fill = fill !== void 0 ? String(fill) : ' ';
+      fill = String(fill);
 
       var inputLen = input.length,
         fillLen = fill.length * 2; // safe, `<< 1` converts to 32-Bit Integer
@@ -840,7 +838,7 @@
      * to reach but not exceed a length of `maxLen`. passing a `maxLen`
      * lesser than this' string's length has no effect. it is never truncated.
      * @param {Number} [maxLen=0]
-     * @param {String} [fill="undefined"]
+     * @param {String} fill
      * @return {String}
      */
     justLeft: function (input, maxLen, fill) {
@@ -848,7 +846,7 @@
       maxLen = +maxLen || 0;
       if (maxLen < 0 || maxLen == INFINITY) exit();
       maxLen = coreFloor(maxLen);
-      fill = fill !== void 0 ? String(fill) : ' ';
+      fill = String(fill);
 
       var inputLen = input.length,
         fillLen = fill.length;
@@ -863,7 +861,7 @@
      * to reach but not exceed a length of `maxLen`. passing a `maxLen`
      * lesser than this' string's length has no effect. it is never truncated.
      * @param {Number} [maxLen=0]
-     * @param {String} [fill="undefined"]
+     * @param {String} fill
      * @return {String}
      */
     justRight: function (input, maxLen, fill) {
@@ -871,7 +869,7 @@
       maxLen = +maxLen || 0;
       if (maxLen < 0 || maxLen == INFINITY) exit();
       maxLen = coreFloor(maxLen);
-      fill = fill !== void 0 ? String(fill) : ' ';
+      fill = String(fill);
 
       var inputLen = input.length,
         fillLen = fill.length;
