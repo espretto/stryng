@@ -75,8 +75,8 @@ Stryng's constructor and every static function however will throw an error if pa
 #### numbers
 arguments expected to be numbers are cast dependent on the use case. the spec basically follows two different approaches to parsing arguments to numbers which Stryng both applies reasonably.
 
-1. _toUInt32_ where only positive numbers make sense and default to the more or less infinite value `Math.pow(2, 32) - 1`. for example `str.split(',')` applies this value to its 2nd argument as the default number of substrings to return.
-2. _toInteger_ in every other scenario. this will cast with `Number`, apply zero for `NaN`, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives
+1. `toUInt32` where only positive numbers make sense and default to the more or less infinite value `Math.pow(2, 32) - 1`. for example `str.split(',')` applies this value to its 2nd argument as the default maximum number of substrings to return.
+2. `toInteger` in every other scenario. this will cast with `Number`, apply zero for `NaN`, leave zero and infinites untouched or otherwise round towards zero i.e. ceil negatives and floor positives
 
 Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.
 
