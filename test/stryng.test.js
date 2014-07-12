@@ -780,6 +780,16 @@ describe('Stryng()', function() {
     it('should append the given argument', function() {
       expect(Stryng.append('Hello', ' World!')).to.equal('Hello World!');
     });
+
+    it('should not append the given `tail` if `input` already ends with it', function(){
+      var path = 'file.html';
+      expect(Stryng.append(path, '.html', true)).to.equal(path);
+    });
+
+    it('should append the given `tail` even though `input` already ends with it', function(){
+      var path = 'file.html';
+      expect(Stryng.append(path, '.html')).to.equal(path + '.html');
+    });
   });
 
   describe('.prepend()', function() {
@@ -790,6 +800,16 @@ describe('Stryng()', function() {
 
     it('should prepend the given argument', function() {
       expect(Stryng.prepend(' World!', 'Hello')).to.equal('Hello World!');
+    });
+
+    it('should not prepend the given `head` if `input` already starts with it', function(){
+      var path = '/path/to/resource';
+      expect(Stryng.prepend(path, '/', true)).to.equal(path);
+    });
+
+    it('should prepend the given `head` even though `input` already starts with it', function(){
+      var path = '/path/to/resource';
+      expect(Stryng.prepend(path, '/')).to.equal('/' + path);
     });
   });
 

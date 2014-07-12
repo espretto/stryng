@@ -994,22 +994,29 @@
     },
 
     /**
-     * appends the given `appendix` to this' string. unlike native _String#concat_
-     * this method applies `'undefined'` as the default `appendix`.
-     * @param {String} [appendix="undefined"]
+     * appends the given `tail` to this' string. unlike native _String#concat_
+     * this method applies `'undefined'` as the default `tail`. has no effect
+     * if `weak` is truthy and this' string already ends with `tail`.
+     * @param {String} [tail="undefined"]
      * @return {String}
      */
-    append: function (input, appendix) {
-      return toString(input) + appendix;
+    append: function (input, tail, weak) {
+      input = toString(input);
+      if (!!weak && Stryng.endsWith(input, tail)) return input;
+      return input + tail
     },
 
     /**
-     * prepends the given `intro` to this' string.
-     * @param {String} [intro="undefined"]
+     * prepends the given `head` to this' string. has no effect
+     * if `weak` is truthy and this' string already starts with `head`.
+     * @param {String} [head="undefined"]
+     * @param {Boolean} [weak=false]
      * @return {String}
      */
-    prepend: function (input, intro) {
-      return intro + toString(input);
+    prepend: function (input, head, weak) {
+      input = toString(input);
+      if (!!weak && Stryng.startsWith(input, head)) return input;
+      return head + input;
     },
 
     /**
