@@ -167,7 +167,7 @@
   reSpaceUnderscore = /[ _]/g,
 
   // ### util
-  reRegex = /([.*+?^=!:${}()|\[\]\/\\])/g,
+  reRegex = /([.,*+-?^=!:${}()|\[\]\/\\])/g,
   reIsFloat = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
   reMatchEnd = /[^\\]\$$/,
 
@@ -1003,7 +1003,7 @@
     append: function (input, tail, weak) {
       input = toString(input);
       if (!!weak && Stryng.endsWith(input, tail)) return input;
-      return input + tail
+      return input + tail;
     },
 
     /**
