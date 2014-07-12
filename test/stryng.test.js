@@ -335,6 +335,25 @@ describe('Stryng()', function() {
     });
   });
 
+  describe('.embrace()', function() {
+
+    it('should fail if `input` is missing', function() {
+      expect(Stryng.embrace).to.throwError();
+    });
+
+    it('should fail `braces.length !== 2`', function() {
+      expect(Stryng.embrace).withArgs('btw', '').to.throwError();
+    });
+
+    it('should apply round brackets as the default', function() {
+      expect(Stryng.embrace('btw')).to.equal('(btw)');
+    });
+
+    it('should wrap `input` with the given `braces`', function() {
+      expect(Stryng.embrace('optional', '[]')).to.equal('[optional]');
+    });
+  });
+
   describe('.count()', function() {
 
     it('should fail if `input` is missing', function() {

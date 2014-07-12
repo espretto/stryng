@@ -567,14 +567,27 @@
     /**
      * prepends and appends `outfix` to `input` in one go.
      * to do the opposite use [Stryng.strip](#strip).
-     * @param {String} [outfix="undefined"] prefix and suffix
+     * @param {String} [outfix] prefix and suffix
      * @param {Number} [n=0] number of operations
      * @return {String}
      */
     wrap: function (input, outfix, n) {
-      if (input == null) exit();
+      input = toString(input);
       outfix = Stryng.repeat(outfix, n); // implies parsing `input`, `outfix` and `n`
       return outfix + input + outfix;
+    },
+
+    /**
+     * prepends the 1st and appends the 2nd character of `braces` to `input`.
+     * @param  {String} [braces='()']
+     * @throws if `braces.length !== 2`
+     * @return {String}
+     */
+    embrace: function(input, braces){
+      input = toString(input);
+      braces = braces !== void 0 ? String(braces) : '()';
+      if(braces.length !== 2) exit();
+      return braces.charAt(0) + input + braces.charAt(1);
     },
 
     /**
