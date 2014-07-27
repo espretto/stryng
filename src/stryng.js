@@ -535,9 +535,9 @@
 
       var result = '';
 
-      while (n) {
+      while (n >= 1) {
         if (n % 2) result += input;
-        n = coreFloor(n / 2);
+        n /= 2;
         input += input;
       }
       return result;
