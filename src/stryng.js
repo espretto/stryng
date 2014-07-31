@@ -51,14 +51,6 @@
   // they are thus __for internal use only__ and neither populated onto
   // native prototypes nor intended to be spec-compliant.
 
-  // ### corner stone
-  // name this a core method. used for Stryng to work on
-
-  toString = function(input){
-    if(input == null) exit('input must not be null');
-    return String(input);
-  },
-
   // ### native static methods
 
   coreFloor = Math.floor,
@@ -313,6 +305,14 @@
   // correctly deals with negative indices.
   if ('ab'.substr(-1) !== 'b') {
     shimMethods.push('substr');
+  }
+
+  // corner stones
+  // -------------
+
+  function toString(input){
+    if(input == null) exit('input must not be null');
+    return String(input);
   }
 
   function exit(message){
