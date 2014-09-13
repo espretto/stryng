@@ -17,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  VERSION = '0.1.4',
+  VERSION = '0.1.5',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -33,16 +33,20 @@
     'endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,' +
     'replace,search,slice,split,startsWith,substr,substring,' +
     'toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,' +
-    'trim,trimLeft,trimRight').split(','),
+    'toSource,trim,trimLeft,trimRight').split(','),
 
   // methods which's native implementations to override if necessary
-  shimMethods = [],
+  overrides = [],
 
   // whether or not to adopt native static functions
   adoptNativeStatics,
 
   // inner module to hold type/class check functions
   is = {},
+
+  noop = function(){},
+  typeFunction = 'function',
+  typeUndefined = 'undefined',
 
   // method shortcuts
   // ----------------
@@ -64,7 +68,7 @@
   coreFloor = Math.floor,
   coreRandom = Math.random,
   coreFromCharCode = String.fromCharCode,
-  coreStringify = typeof JSON !== 'undefined' && JSON.stringify,
+  coreStringify = typeof JSON !== typeUndefined && JSON.stringify,
 
   // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
   // implementation of `Number.toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
@@ -102,7 +106,7 @@
   // ### native instance methods
 
   corePush = methods.push,
-  coreCall = String.call,
+  coreCall = noop.call,
   coreToString = is.toString,
 
   coreForEach = methods.forEach || function (iterator) {
@@ -143,13 +147,13 @@
     return escCtrlMap[esc] || esc;
   },
   reXhex = /[\x00-\x07\x0E-\x1F\x7F-\xFF]/g,
-  cbXhex = function (match, charCode) {
-    charCode = match.charCodeAt(0);
+  cbXhex = function (match) {
+    var charCode = match.charCodeAt(0);
     return '\\x' + (charCode < 16 ? '0' : '') + charCode;
   },
   reUhex = /[\u0100-\uFFFF]/g,
-  cbUhex = function (match, charCode) {
-    charCode = match.charCodeAt(0);
+  cbUhex = function (match) {
+    var charCode = match.charCodeAt(0);
     return '\\u' + (charCode < 4096 ? '0' : '') + charCode;
   },
   reEscUXhex = /\\[xu]([0-9a-fA-F]{2,4})/g,
@@ -242,7 +246,7 @@
     });
 
     if (reWsSource.length > reWsSourceLen) {
-      shimMethods.push('trim', 'trimRight', 'trimLeft');
+      overrides.push('trim', 'trimRight', 'trimLeft');
       reWssSource = '[' + reWsSource + '][' + reWsSource + ']*';
       reNoWs = new RegExp('[^' + reWsSource + ']');
       reWss = new RegExp(reWssSource, 'g');
@@ -255,7 +259,7 @@
   // type safety
   // -----------
   // the inner module `is` holds type checks. this is an excerpt from
-  // my [gist](https://gist.github.com/esnippo/9960508) inspired by the
+  // my [gist](https://gist.github.com/espretto/c9a8961645e2754155af) inspired by the
   // [jQuery](http://jquery.com) and [underscore](http://underscorejs.org) libraries.
   // 
   // - provide quick access to precomputed `repr` within _Array#forEach_ closure
@@ -274,7 +278,7 @@
 
   if (typeof reIsFloat === 'object') {
     is.Function = function (value) {
-      return typeof value === 'function';
+      return typeof value === typeFunction;
     };
   }
 
@@ -304,7 +308,7 @@
           throw VERSION;
         }
       } catch (e) {
-        shimMethods.push('startsWith', 'endsWith');
+        overrides.push('startsWith', 'endsWith');
       }
     }
   }());
@@ -312,7 +316,7 @@
   // check if the native implementation of _String#substr_
   // correctly deals with negative indices.
   if ('ab'.substr(-1) !== 'b') {
-    shimMethods.push('substr');
+    overrides.push('substr');
   }
 
   function exit(message){
@@ -379,7 +383,7 @@
         get: function () {
           return that._value.length;
         },
-        set: function () {}
+        set: noop
       });
     } else {
       that.length = that._value.length;
@@ -1322,7 +1326,7 @@
 
     var fn = VERSION[fnName];
 
-    if (is.Function(fn) && !coreContains.call(shimMethods, fnName)) {
+    if (is.Function(fn) && !coreContains.call(overrides, fnName)) {
 
       Stryng[fnName] = adoptNativeStatics && String[fnName] || function (input) {
         if (input == null) exit();
@@ -1344,9 +1348,9 @@
   // - amd - anonymous
   // - browser - opt to rename
 
-  if (typeof module !== 'undefined' && module.exports) {
+  if (typeof module !== typeUndefined && module.exports) {
     module.exports = Stryng;
-  } else if (typeof define === 'function' && define.amd) {
+  } else if (typeof define === typeFunction && define.amd) {
     /* global define*/
     define(function () {
       return Stryng;
