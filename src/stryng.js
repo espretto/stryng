@@ -39,7 +39,7 @@
   overrides = [],
 
   // whether or not to adopt native static functions
-  adoptNativeStatics,
+  hasStaticNatives = false,
 
   // inner module to hold type/class check functions
   is = {},
@@ -92,10 +92,11 @@
         writable: false,
         value: VERSION
       });
-      return defineProperty;
     } catch (e) {
       Stryng.VERSION = VERSION;
+      defineProperty = false;
     }
+    return defineProperty;
   })(Object.defineProperty),
 
   // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
@@ -125,20 +126,20 @@
 
   // ### quote & unquote
   ctrlMap = {
-    '\b': 'b',
-    '\t': 't',
-    '\n': 'n',
-    '\v': 'v',
-    '\f': 'f',
-    '\r': 'r'
+    '\b': 'b', // backspace
+    '\f': 'f', // form feed
+    '\n': 'n', // new line
+    '\r': 'r', // carriage return
+    '\t': 't', // tab
+    '\v': 'v'  // vertical tab
   },
   escCtrlMap = {
-    'b': '\b', // backspace
-    't': '\t', // tab
-    'n': '\n', // new line
-    'f': '\f', // form feed
-    'r': '\r', // carriage return
-    'v': '\v'  // vertical tab
+    'b': '\b',
+    'f': '\f',
+    'n': '\n',
+    'r': '\r',
+    't': '\t',
+    'v': '\v' 
   },
   reCtrl = new RegExp('[\b\t\n\f\r\v"\\\\]', 'g'),
   cbCtrl = function (match) {
@@ -295,7 +296,7 @@
       try {
         String.slice();
       } catch (e) {
-        adoptNativeStatics = true;
+        hasStaticNatives = true;
       }
     }
 
@@ -1335,7 +1336,7 @@
 
     if (is.Function(fn) && !coreContains.call(overrides, fnName)) {
 
-      Stryng[fnName] = adoptNativeStatics && String[fnName] || function (input) {
+      Stryng[fnName] = hasStaticNatives && String[fnName] || function (input) {
         if (input == null) exit();
         return coreCall.apply(fn, arguments);
       };
