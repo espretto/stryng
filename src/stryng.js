@@ -637,11 +637,10 @@
 
       // avoid non-optimizable Array#slice on arguments, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
-      var i = arguments.length,
-        args = new Array(i - 1);
+      var args = arguments;
+      args.length === 1 ? [args[0]] : Array.apply(null, args);
 
-      while (--i) args[i] = arguments[i]; // skip `delimiter`
-      return args.join(delimiter); // implies parsing `delimiter`
+      return args.join(args.shift()); // implies parsing `delimiter`
     },
 
     /**
@@ -1099,7 +1098,7 @@
      */
     capitalize: function (input) {
       input = toString(input);
-      return !input ? input : input.charAt().toUpperCase() + input.substring(1);
+      return !input ? input : input.charAt(0).toUpperCase() + input.substring(1);
     },
 
     /**
@@ -1258,7 +1257,7 @@
 
     while (i--) {
       if (charCodes[i] > MAX_CHARCODE) {
-        exit();
+        exit('charCode ' + charCodes[i] + ' out of range');
       }
     }
     return coreFromCharCode.apply(null, charCodes); // implies parsing `charCodes`
@@ -1308,12 +1307,11 @@
 
       // Array#slice arguments makes this function unoptimizable, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
-      var i = arguments.length,
-        args = new Array(i),
+      var args = arguments,
         that = this,
         result;
 
-      while (i--) args[i] = arguments[i];
+      args = args.length === 1 ? [args[0]] : Array.apply(null, args);
       args.unshift(that._value);
       result = fn.apply(null, args);
       return recycle(that, result);
