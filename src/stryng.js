@@ -33,7 +33,7 @@
     'endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,' +
     'replace,search,slice,split,startsWith,substr,substring,' +
     'toLocaleLowerCase,toLocaleUpperCase,toLowerCase,toUpperCase,' +
-    'toSource,trim,trimLeft,trimRight').split(','),
+    'trim,trimLeft,trimRight').split(','),
 
   // methods which's native implementations to override if necessary
   overrides = [],
@@ -44,9 +44,11 @@
   // inner module to hold type/class check functions
   is = {},
 
+  // promote compression
   noop = function(){},
   typeFunction = 'function',
   typeUndefined = 'undefined',
+  strPrototype = 'prototype',
 
   // method shortcuts
   // ----------------
@@ -401,7 +403,7 @@
    * @param {Boolean} [isMutable=false]
    * @return {Stryng}
    */
-  Stryng.prototype.clone = function (isMutable) {
+  Stryng[strPrototype].clone = function (isMutable) {
     return new Stryng(this._value, isMutable);
   };
 
@@ -409,12 +411,21 @@
   // ------------
 
   /**
-   * returns the this' string primitive. only available on the prototype.
+   * returns this' string primitive. only available on the prototype.
    * @function Stryng#toString
    * @return {String}
    */
-  Stryng.prototype.valueOf = Stryng.prototype.toString = function () {
+  Stryng[strPrototype].valueOf = Stryng[strPrototype].toString = function () {
     return this._value; // we can rest assured that this is a primitive
+  };
+
+  /**
+   * returns the string representation of the expression
+   * used to construct this instance.
+   * @return {String} eval-string-expression
+   */
+  Stryng[strPrototype].toSource = function(){
+    return '(new Stryng("' + this._value + ', ' + this._isMutable + '"))';
   };
 
   // instance methods
@@ -1293,7 +1304,7 @@
 
     Stryng[fnName] = fn;
 
-    Stryng.prototype[fnName] = function () {
+    Stryng[strPrototype][fnName] = function () {
 
       // Array#slice arguments makes this function unoptimizable, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
@@ -1333,7 +1344,7 @@
         return coreCall.apply(fn, arguments);
       };
 
-      Stryng.prototype[fnName] = function () {
+      Stryng[strPrototype][fnName] = function () {
         var that = this,
           result = fn.apply(that._value, arguments);
 
