@@ -269,14 +269,12 @@
   // - apply native implementations where available
   // - fix old webkit's bug where `typeof regex` yields `'function'` 
 
-  coreForEach.call(['Array', 'Function', 'RegExp'], function (className) {
+  coreForEach.call(['Function', 'RegExp'], function (className) {
     var repr = '[object ' + className + ']';
     is[className] = function (value) {
       return value && coreToString.call(value) === repr;
     };
   });
-
-  is.Array = Array.isArray || is.Array;
 
   if (typeof reIsFloat === 'object') {
     is.Function = function (value) {
