@@ -191,10 +191,10 @@
   latin1Chars = (function () {
     var offset = 0xC0,
       i = 0x100 - offset,
-      result = new Array(i);
+      result = '';
 
-    while (i--) result[i] = coreFromCharCode(offset + i);
-    return result.join('');
+    while (i--) result += coreFromCharCode(offset + i);
+    return result;
   }()),
 
   reLatin1 = new RegExp('[' + latin1Chars + ']', 'g'),
