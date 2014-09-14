@@ -635,7 +635,7 @@
       // avoid non-optimizable Array#slice on arguments, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
       var args = arguments;
-      args.length === 1 ? [args[0]] : Array.apply(null, args);
+      args = args.length === 1 ? [args[0]] : Array.apply(null, args);
 
       return args.join(args.shift()); // implies parsing `delimiter`
     },
