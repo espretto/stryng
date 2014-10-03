@@ -672,7 +672,7 @@
           containsEmptyString = coreContains.call(searches, ''),
           indices = new Array(searchesLen),
           result = {},
-          track = 0,
+          offset = 0,
           index,
           minIndex,
           found,
@@ -687,8 +687,8 @@
 
           if (!search) continue; // skip the empty string
 
-          if (index === void 0 || index !== -1 && index < track){
-            indices[i] = index = input.indexOf(search, track);
+          if (index === void 0 || index !== -1 && index < offset){
+            indices[i] = index = input.indexOf(search, offset);
           }
 
           if (-1 < index && index < minIndex){
@@ -700,7 +700,7 @@
         if(minIndex === INFINITY) break;
 
         result[found] = (result[found]+1) || 1;
-        track = minIndex + found.length; // ..except for .length access
+        offset = minIndex + found.length; // ..except for .length access
       }
 
       if (containsEmptyString) result[''] = input.length + 1;
