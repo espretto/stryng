@@ -373,18 +373,47 @@ describe('Stryng()', function() {
     });
   });
 
+  describe('.countMultiple()', function() {
+
+    it('should fail if `input` is missing', function() {
+      expect(Stryng.countMultiple).to.throwError();
+    });
+
+    it('should return the empty object if not passed any `searches`', function() {
+      expect(Stryng.countMultiple('text'/* default=[] */)).to.eql({});
+    });
+
+    it('should return the length + 1 if passed the empty string', function() {
+      expect(Stryng.countMultiple('foo', [''])).to.eql({'': 4});
+    });
+
+    it('should return the number of non-overlapping occurences for each string', function() {
+      expect(Stryng.countMultiple('foo foo bar', ['foo', 'bar'])).to.eql({foo: 2, bar: 1});
+    });
+
+    it('should increment the counter of the first string in `searches` that matches if others overlap with it', function (){
+      expect(Stryng.countMultiple('foo foo foo', ['f', 'fo', 'foo'])).to.eql({f: 3});
+      expect(Stryng.countMultiple('foo foo foo', ['fo', 'foo', 'f'])).to.eql({fo: 3});
+      expect(Stryng.countMultiple('foo foo foo', ['foo', 'f', 'fo'])).to.eql({foo: 3});
+    });
+  });
+
   describe('.join()', function() {
 
     it('should fail if `input` is missing', function() {
       expect(Stryng.join).to.throwError();
     });
 
-    it('should return the empty string if no arguments passed to join', function() {
-      expect(Stryng.join(',')).to.equal('');
+    it('should fail if `joinees` is neither `undefined` nor `null` nor an array', function() {
+      expect(Stryng.join).withArgs(',', {not: null}).to.throwError();
+    });
+
+    it('should return the empty string if `joinees` passed', function() {
+      expect(Stryng.join('*')).to.equal('');
     });
 
     it('should allow an empty delimiter string', function() {
-      expect(Stryng.join('', 1, 2, 3)).to.equal('123');
+      expect(Stryng.join('', [1, 2, 3])).to.equal('123');
     });
   });
 

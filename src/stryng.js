@@ -17,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  VERSION = '0.1.6',
+  VERSION = '0.1.7',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -48,6 +48,7 @@
   strPrototype = 'prototype',
   reprFunction = '[object Function]',
   reprRegExp = '[object RegExp]',
+  reprArray = '[object Array]',
 
   // method shortcuts
   // ----------------
@@ -110,6 +111,22 @@
   coreContains = methods.contains || function (item) {
     for (var array = this, i = array.length; i-- && array[i] !== item;);
     return i !== -1;
+  },
+
+  // type safety
+  // -----------
+  // avoid old webkit's bug where `typeof /re/` yields `'function'`
+
+  isRegExp = function(value){
+    return coreToString.call(value) === reprRegExp;
+  },
+
+  isFunction = function(value){
+    return coreToString.call(value) === reprFunction;
+  },
+
+  isArray = Array.isArray || function(value){
+    return coreToString.call(value) == reprArray;
   },
 
   // regular expressions
@@ -250,18 +267,6 @@
     }
 
   }());
-
-  // type safety
-  // -----------
-  // avoid old webkit's bug where `typeof /re/` yields `'function'`
-
-  function isRegExp(value){
-    return coreToString.call(value) === reprRegExp;
-  }
-
-  function isFunction(value){
-    return coreToString.call(value) === reprFunction;
-  }
 
   // feature detection
   // -----------------
@@ -426,6 +431,7 @@
   // - _Stryng#clone_
   // - _Stryng#valueOf_
   // - _Stryng#toString_
+  // - _Stryng#toSource_
 
   /**
    * @lends Stryng.prototype
@@ -613,19 +619,101 @@
     },
 
     /**
+     * returns an object with the given `searches` as keys and their respective
+     * number of non-overlapping occurrences within `input` as values.
+     * the empty string is considered a _character boundary_
+     * thus `input.length + 1` will always be the result for that.
+     *
+     * if multiple search-strings match `input` at the same index
+     * the first one will take the credit so you might want
+     * to sort your `searches` by length in reverse order prior to passing them in.
+     *
+     * example:
+     * ```
+     * function byLength(a, b){
+     *   a = a.length;
+     *   b = b.length;
+     *   return a > b ?  1 :
+     *          a < b ? -1 : 0
+     * }
+     * var textToSearch = Stryng('abc abc abc'),
+     *     searches = ['a', 'ab', 'abc'];
+     *     
+     * textToSearch.countMultiple(searches); // {a: 3}
+     * textToSearch.countMultiple(searches.sort(byLength).reverse()); // {abc: 3}
+     * ```
+     * if you don't want this behavior use `Stryng.count` for each search instead.
+     *
+     * example:
+     * ```
+     * var testToSearch = Stryng(post),
+     *     result = {};
+     *     
+     * searches.forEach(function(search){
+     *   result[search] = testToSearch(search);
+     * });
+     *
+     * result; // {a: 3, ab: 3, abc: 3}
+     * ```
+     * note: duplicate entries within `searches` won't be removed prior to counting
+     * and thereby impact performance but don't change the result.
+     * 
+     * @param {Array.<String>} [searches=[]] the substring to search for
+     * @return {Object} 
+     */
+    countMultiple: function (input, searches){
+      input = toString(input);
+      if (searches === void 0) return {};
+      if (!isArray(searches)) exit('.countMultiple() requires and array as 2nd argument');
+
+      var searchesLen = searches.length,
+          containsEmptyString = coreContains.call(searches, ''),
+          indices = new Array(searchesLen),
+          result = {},
+          track = 0;
+
+      while (true){
+        var minIndex = INFINITY,
+            found, i = 0;
+
+        for (; i < searchesLen; i++){
+          var index = indices[i],
+              search = String(searches[i]); // though parsing is implied..
+
+          if (!search) continue; // skip the empty string
+
+          if (index === void 0 || index !== -1 && index < track){
+            indices[i] = index = input.indexOf(search, track);
+          }
+
+          if (-1 < index && index < minIndex){
+            minIndex = index;
+            found = search;
+          }
+        }
+
+        if(minIndex === INFINITY) break;
+
+        result[found] = (result[found]+1) || 1;
+        track = minIndex + found.length; // ..except for .length access
+      }
+
+      if (containsEmptyString) result[''] = input.length + 1;
+
+      return result;
+    },
+
+    /**
      * delegates to native _Arrray#join_. returns the empty string if no arguments passed.
-     * @param {...String} [joinees=[]]
+     * @param {Array.<String>} [joinees=[]]
      * @return {String}
      */
-    join: function (delimiter /*, string... */) {
+    join: function (delimiter, joinees) {
       if (delimiter == null) exit();
+      if (joinees === void 0) joinees = [];
+      else if (!isArray(joinees)) exit('.join() requires an array as 2nd argument');
 
-      // avoid non-optimizable Array#slice on arguments, see
-      // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
-      var args = [];
-      corePush.apply(args, arguments);
-
-      return args.join(args.shift()); // implies parsing `delimiter`
+      return joinees.join(delimiter); // implies parsing `delimiter`
     },
 
     /**
