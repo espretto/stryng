@@ -668,19 +668,22 @@
       if (searches === void 0) return {};
       if (!isArray(searches)) exit('.countMultiple() requires and array as 2nd argument');
 
-      var searchesLen = searches.length,
+      var searchesLen = searches.length, i,
           containsEmptyString = coreContains.call(searches, ''),
           indices = new Array(searchesLen),
           result = {},
-          track = 0;
+          track = 0,
+          index,
+          minIndex,
+          found,
+          search;
 
       while (true){
-        var minIndex = INFINITY,
-            found, i = 0;
+        minIndex = INFINITY;
 
-        for (; i < searchesLen; i++){
-          var index = indices[i],
-              search = String(searches[i]); // though parsing is implied..
+        for (i = 0; i < searchesLen; i++){
+          index = indices[i];
+          search = String(searches[i]); // though parsing is implied..
 
           if (!search) continue; // skip the empty string
 
