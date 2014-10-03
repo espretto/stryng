@@ -14,23 +14,6 @@
     "grunt-jsdoc": "^0.5.6",
     "mocha": "~1.15.1"
   },
-  "testling": {
-    "browsers": [
-      "ie/6..10",
-      "chrome/4.0",
-      "chrome/canary",
-      "firefox/3.0",
-      "firefox/nightly",
-      "opera/10",
-      "opera/11..latest",
-      "safari/4..latest",
-      "iphone/6.0",
-      "ipad/6.0",
-      "android-browser/4.2"
-    ],
-    "harness": "mocha",
-    "files": "test/*.test.js"
-  },
   "scripts": {
     "test": "node_modules/.bin/mocha ./test/stryng.test.js",
     "gzip": "gzip -c9 dist/stryng.min.js > dist/stryng.min.js.gz"

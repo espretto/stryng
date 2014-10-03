@@ -3,10 +3,6 @@ Stryng
 ------
 for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively. Stryng to the rescue!
 
-### compat
-
-[![browser support](https://ci.testling.com/espretto/stryng.png)](https://ci.testling.com/espretto/stryng)
-
 ### features
 
 - manually inherits the native `String` namespace and prototype
@@ -21,14 +17,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 quick reference
 ---------------
 
-Stryng adopts native static and instance methods and adds another ~40 methods on top. for the full reference, please refer to the [api documentation](http://espretto.github.io/Stryng).
-
-<style>
-  td {
-    font-family: monospace;
-    font-size: 12px;
-  }
-</style>
+Stryng adopts native static and instance methods and adds another ~40 methods on top. for the full reference, please refer to the [api documentation](http://espretto.github.io/stryng).
 
 method | static | instance | shim | arguments
 :--- | --- | --- | --- | ---
