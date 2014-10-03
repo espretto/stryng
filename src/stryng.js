@@ -109,7 +109,9 @@
   },
 
   coreContains = methods.contains || function (item) {
-    for (var array = this, i = array.length; i-- && array[i] !== item;);
+    var array = this, i;
+    if (array.indexOf) i = array.indexOf(item);
+    else for (i = array.length; i-- && array[i] !== item;);
     return i !== -1;
   },
 
