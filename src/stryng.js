@@ -17,7 +17,7 @@
    * @readOnly
    * @type {String}
    */
-  VERSION = '0.1.5',
+  VERSION = '0.1.6',
 
   // used for input validation
   INFINITY = 1 / 0,
@@ -41,14 +41,13 @@
   // whether or not to adopt native static functions
   hasStaticNatives = false,
 
-  // inner module to hold type/class check functions
-  is = {},
-
   // promote compression
   noop = function(){},
-  typeFunction = 'function',
-  typeUndefined = 'undefined',
+  strFunction = 'function',
+  strUndefined = 'undefined',
   strPrototype = 'prototype',
+  reprFunction = '[object Function]',
+  reprRegExp = '[object RegExp]',
 
   // method shortcuts
   // ----------------
@@ -62,7 +61,7 @@
   coreFloor = Math.floor,
   coreRandom = Math.random,
   coreFromCharCode = String.fromCharCode,
-  coreStringify = typeof JSON !== typeUndefined && JSON.stringify,
+  coreStringify = typeof JSON !== strUndefined && JSON.stringify,
 
   // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4) compliant
   // implementation of `Number.toInteger`, tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
@@ -102,7 +101,7 @@
 
   corePush = methods.push,
   coreCall = noop.call,
-  coreToString = is.toString,
+  coreToString = ({}).toString,
 
   coreForEach = methods.forEach || function (iterator) {
     for (var array = this, i = array.length; i--;) iterator(array[i], i);
@@ -183,10 +182,11 @@
 
   latin1Chars = (function () {
     var offset = 0xC0,
-      i = 0x100 - offset,
-      result = '';
+      length = 0x100 - offset,
+      result = '',
+      i = 0;
 
-    while (i--) result += coreFromCharCode(offset + i);
+    for(; i < length; i++) result += coreFromCharCode(offset + i);
     return result;
   }()),
 
@@ -253,26 +253,14 @@
 
   // type safety
   // -----------
-  // the inner module `is` holds type checks. this is an excerpt from
-  // my [gist](https://gist.github.com/espretto/c9a8961645e2754155af) inspired by the
-  // [jQuery](http://jquery.com) and [underscore](http://underscorejs.org) libraries.
-  // 
-  // - provide quick access to precomputed `repr` within _Array#forEach_ closure
-  // - early exit on "falsies"
-  // - apply native implementations where available
-  // - fix old webkit's bug where `typeof regex` yields `'function'` 
+  // avoid old webkit's bug where `typeof /re/` yields `'function'`
 
-  coreForEach.call(['Function', 'RegExp'], function (className) {
-    var repr = '[object ' + className + ']';
-    is[className] = function (value) {
-      return value && coreToString.call(value) === repr;
-    };
-  });
+  function isRegExp(value){
+    return coreToString.call(value) === reprRegExp;
+  }
 
-  if (typeof reIsFloat === 'object') {
-    is.Function = function (value) {
-      return typeof value === typeFunction;
-    };
+  function isFunction(value){
+    return coreToString.call(value) === reprFunction;
   }
 
   // feature detection
@@ -284,7 +272,7 @@
     // check whether or not native static functions exist on the global
     // _core_ namespace __and__ do throw an error if no arguments passed
     // as required for static functions on _Stryng_.
-    if (is.Function(String.slice)) {
+    if (isFunction(String.slice)) {
       try {
         String.slice();
       } catch (e) {
@@ -295,7 +283,7 @@
     // check if the native implementation of _String#startsWith_
     // already knows how to deal with regular expressions or indices.
     // consider _String#endsWith_ to behave the same on that matter.
-    if (is.Function(VERSION.startsWith)) {
+    if (isFunction(VERSION.startsWith)) {
       try {
         if (!'ab'.startsWith('b', 1) || !'a'.startsWith(reNoWs)) {
           throw VERSION;
@@ -491,7 +479,7 @@
      */
     startsWith: function (input, search, position) {
       input = toString(input);
-      if (is.RegExp(search)) return !input.substring(position).search(search);
+      if (isRegExp(search)) return !input.substring(position).search(search);
 
       var i = input.indexOf(search, position),
         inputLen = input.length;
@@ -523,7 +511,7 @@
         coreFloor(endPosition) || 0
       );
 
-      if (is.RegExp(search)) {
+      if (isRegExp(search)) {
         if (!reMatchEnd.test(search.source)) exit('"search" must match end i.e. end with "$"');
         return search.test(input.substring(0, endPosition));
       }
@@ -634,8 +622,8 @@
 
       // avoid non-optimizable Array#slice on arguments, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
-      var args = arguments;
-      args = args.length === 1 ? [args[0]] : Array.apply(null, args);
+      var args = [];
+      corePush.apply(args, arguments);
 
       return args.join(args.shift()); // implies parsing `delimiter`
     },
@@ -720,7 +708,7 @@
         lastIndex = 0,
         difference;
 
-      if (is.RegExp(delimiter)) {
+      if (isRegExp(delimiter)) {
         while (n-- && (match = input.match(delimiter))) {
           index = match.index;
           result.push(input.substring(0, index));
@@ -753,7 +741,7 @@
      */
     splitRight: function (input, delimiter, n) {
       input = toString(input);
-      if (is.RegExp(delimiter)) exit('no regex support for splitRight');
+      if (isRegExp(delimiter)) exit('no regex support for splitRight');
       n = (n === void 0 ? -1 : n) >>> 0;
       if (!n) return [];
       delimiter = String(delimiter);
@@ -1304,12 +1292,11 @@
 
       // Array#slice arguments makes this function unoptimizable, see
       // [bluebird wiki](https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments)
-      var args = arguments,
-        that = this,
+      var that = this,
+        args = [that._value],
         result;
 
-      args = args.length === 1 ? [args[0]] : Array.apply(null, args);
-      args.unshift(that._value);
+      corePush.apply(args, arguments);
       result = fn.apply(null, args);
       return recycle(that, result);
     };
@@ -1332,7 +1319,7 @@
 
     var fn = VERSION[fnName];
 
-    if (is.Function(fn) && !coreContains.call(overrides, fnName)) {
+    if (isFunction(fn) && !coreContains.call(overrides, fnName)) {
 
       Stryng[fnName] = hasStaticNatives && String[fnName] || function (input) {
         if (input == null) exit();
@@ -1354,9 +1341,9 @@
   // - amd - anonymous
   // - browser - opt to rename
 
-  if (typeof module !== typeUndefined && module.exports) {
+  if (typeof module !== strUndefined && module.exports) {
     module.exports = Stryng;
-  } else if (typeof define === typeFunction && define.amd) {
+  } else if (typeof define === strFunction && define.amd) {
     /* global define*/
     define(function () {
       return Stryng;
