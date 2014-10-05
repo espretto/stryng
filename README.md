@@ -7,10 +7,8 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 
 - manually inherits the native `String` namespace and prototype
 - progressive enhancement to fulfill ECMA-Script 5 & 6 standards
-- every function is available as both
-  - static function for functional programming
-  - instance method for object oriented programming
-- opt for (im-)mutability
+- every function is (un-)curried for use as static or instance method for composure or chaining
+- Stryng instances can be either mutable or immutable (default)
 - seemless integration by overriding `toString` and `valueOf` on Stryng's prototype
 - spec-like failproof type casting mechanisms and default values to prevent unexpected results
 
@@ -33,14 +31,15 @@ codePointAt | x | x | | index
 concat | x | x | | tail
 contains | x | x | x | fromIndex
 __count__ | x | x | | search
+__countMultiple__ | x | x | | [search, searc, sear, ...]
 __embrace__ | x | x | | `'()'`, `'[]'`, `'{}'` etc.
 endsWith | x | x | x | fromIndex
 __equals__ | x | x | | comparable
 __iequals__ | x | x | | comparable (ignore case)
 __escapeRegex__ | x | x |
 __exchange__ | x | x | | replacee, replacement
-__exchangeLeft__ | x | x | | replacee, replacement
-__exchangeRight__ | x | x | | replacee, replacement
+__exchangeLeft__ | x | x | | replacee, replacement, times
+__exchangeRight__ | x | x | | replacee, replacement, times
 fromCharCode | x | | | ordinal
 fromCodePoint | x | | | ordinal
 __hyphenize__ | x | x | |
@@ -49,7 +48,7 @@ __insert__ | x | x | | insertion, index
 __isBlank__ | x | x |
 __isEmpty__ | x | x |
 __isFloat__ | x | x |
-__join__ | x | x | | str, st, s, ...
+__join__ | x | x | | [str, st, s, ...]
 __just__ | x | x | | maxLength, filler
 __justLeft__ | x | x | | maxLength, filler
 __justRight__ | x | x | | maxLength, filler
