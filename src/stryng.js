@@ -652,7 +652,7 @@
      *     result = {};
      *     
      * searches.forEach(function(search){
-     *   result[search] = testToSearch(search);
+     *   result[search] = testToSearch.count(search);
      * });
      *
      * result; // {a: 3, ab: 3, abc: 3}
