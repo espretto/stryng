@@ -4,7 +4,7 @@ var Stryng = require('./../src/stryng.js');
 var expect = require('expect.js');
 
 // feature detect
-var Object_defineProperty = (function(defineProperty) {
+var objectDefineProperty = (function(defineProperty) {
   try {
     defineProperty({}, 'x', {});
   } catch (e) {
@@ -55,7 +55,7 @@ describe('Stryng()', function() {
         nice_try_length = 0,
   			stryng = Stryng(primitive);
         
-  		if(Object_defineProperty){
+  		if(objectDefineProperty){
   			stryng.length = nice_try_length;
   			expect(stryng).to.not.have.length(nice_try_length).and.have.length(length);
   		}
@@ -259,12 +259,8 @@ describe('Stryng()', function() {
       expect(Stryng.endsWith('foo bar', 'foo', 3)).to.be.ok();
     });
 
-    it('should throw an error if passed a regex not matching the end', function() {
+    it('should throw an error if passed a regex', function() {
       expect(Stryng.endsWith).withArgs('foo', /bar/).to.throwError();
-    });
-
-    it('should work for regexes, too', function() {
-      expect(Stryng.endsWith('foo bar', /foo$/, 3)).to.be.ok();
     });
   });
 
@@ -398,22 +394,22 @@ describe('Stryng()', function() {
     });
   });
 
-  describe('.join()', function() {
+  describe('.delimit()', function() {
 
     it('should fail if `input` is missing', function() {
-      expect(Stryng.join).to.throwError();
+      expect(Stryng.delimit).to.throwError();
     });
 
     it('should fail if `joinees` is neither `undefined` nor `null` nor an array', function() {
-      expect(Stryng.join).withArgs(',', {not: null}).to.throwError();
+      expect(Stryng.delimit).withArgs(',', {not: null}).to.throwError();
     });
 
     it('should return the empty string if `joinees` passed', function() {
-      expect(Stryng.join('*')).to.equal('');
+      expect(Stryng.delimit('*')).to.equal('');
     });
 
     it('should allow an empty delimiter string', function() {
-      expect(Stryng.join('', [1, 2, 3])).to.equal('123');
+      expect(Stryng.delimit('', [1, 2, 3])).to.equal('123');
     });
   });
 
@@ -1055,12 +1051,12 @@ describe('Stryng()', function() {
     });
 
     it('should fail for number greater than Math.pow(2, 16) - 1', function() {
-      expect(Stryng.chr).withArgs(1 << 16).to.throwError();
+      expect(Stryng.chr).withArgs([1 << 16]).to.throwError();
     });
 
     it('behave just like native String.fromCharCode', function() {
       expect(
-        Stryng.chr(72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100).toString()
+        Stryng.chr([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]).toString()
       ).to.equal(
         'Hello World'
       );
