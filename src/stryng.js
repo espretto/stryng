@@ -21,7 +21,6 @@
   STR_UNDEFINED = 'undefined',
   STR_OBJECT_ARRAY = '[object Array]',
   STR_OBJECT_REGEXP = '[object RegExp]',
-  STR_OBJECT_FUNCTION = '[object Function]',
 
   /**
     Stryng's version.
@@ -32,7 +31,7 @@
     @readOnly
     @type {string}
    */
-  VERSION = '0.1.8',
+  VERSION = '0.1.9',
 
   // string inheritance
   // ------------------
@@ -76,6 +75,7 @@
   // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4)
   // compliant implementation of `Number.toInteger`,
   // tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
+  // 
   numberToInteger = Number.toInteger || function (any) {
     var n = +any;
     return n ? isFinite(n) ? n - (n%1) : n : 0;
@@ -100,6 +100,7 @@
 
   // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys).
   // further assume that the `object` has `hasOwnProperty` on its prototype chain.
+  // 
   objectKeys = Object.keys || function (object) {
     var keys = [],
         key,
@@ -142,6 +143,7 @@
 
   // type safety
   // -----------
+
   isRegExp = function (any) {
     return _objectToString.call(any) === STR_OBJECT_REGEXP;
   },
@@ -201,6 +203,7 @@
   reStripQuotes = /^"|"$/g,
 
   // ### name transforms
+  // 
   reLowBoundary = /[ _-]([a-z]?)/g,
   cbLowBoundary = function (_, chr) {
     return chr ? chr.toUpperCase() : '';
@@ -216,6 +219,7 @@
   reIsFloat = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
 
   // ### diacritics & liguatures
+  // 
   // because character mappings easily grow large we only provide
   // the [Latin-1 Supplement](http://unicode-table.com/en/#latin-1-supplement)
   // (letters in range [xC0-xFF]) mapped to their nearest character
@@ -250,6 +254,7 @@
   },
 
   // ### the whitespace shim
+  // 
   // native implementations of <tt>String#trim</tt> might miss out
   // on some of the more exotic characters considered [whitespace][1],
   // [line terminators][2] or the mysterious [Zs][3].
@@ -309,25 +314,17 @@
   // feature detection
   // -----------------
 
-  (function () {
-    // wrap try-catch clauses for optimizability of outer scope
+  // check if the native implementation of `String#startsWith`
+  // already knows how to deal with indices.
+  // consider <tt>String#endsWith</tt> to behave the same on that matter.
+  // 
+  if (!isFunction(VERSION.startsWith) || !'ab'.startsWith('b', 1)) {
+    overrides.push('startsWith', 'endsWith');
+  }
 
-    // check if the native implementation of <tt>String#startsWith</tt>
-    // already knows how to deal with regular expressions or indices.
-    // consider <tt>String#endsWith</tt> to behave the same on that matter.
-    if (isFunction(VERSION.startsWith)) {
-      try {
-        if (!'ab'.startsWith('b', 1) || !'a'.startsWith(reNoWs)) {
-          throw VERSION;
-        }
-      } catch (e) {
-        overrides.push('startsWith', 'endsWith');
-      }
-    }
-  }());
-
-  // check if the native implementation of <tt>String#substr</tt>
+  // check if the native implementation of `String#substr`
   // correctly deals with negative indices.
+  // 
   if ('ab'.substr(-1) !== 'b') {
     overrides.push('substr');
   }
