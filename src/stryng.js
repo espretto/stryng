@@ -111,7 +111,7 @@
     var keys = [],
         i = 0;
 
-    for (var key in object){ // `key` is required to be purely local
+    for (var key in object) { // `key` is required to be purely local
       if (object.hasOwnProperty(key)){
         keys[i++] = key;
       }
@@ -342,12 +342,10 @@
     return typeof any === STR_FUNCTION;
   }
 
-  function isArray (any) {
-    return _objectToString.call(any) == STR_OBJECT_ARRAY;
-  }
-
   // override if natively available
-  if (isFunction(Array.isArray)) var isArray = Array.isArray;
+  var isArray = Array.isArray || function (any) {
+    return _objectToString.call(any) == STR_OBJECT_ARRAY;
+  };
 
   // constructor
   // -----------
@@ -448,7 +446,7 @@
     @method  toSource
     @return {string} eval-string-expression
    */
-  Stryng[STR_PROTOTYPE].toSource = function(){
+  Stryng[STR_PROTOTYPE].toSource = function () { 
     return '(new Stryng("' + this.__value__ + ', ' + this.isMutable + '"))';
   };
 
@@ -635,7 +633,7 @@
     embrace: function(input, braces){
       input = toString(input);
       braces = braces !== void 0 ? String(braces) : '()';
-      if(braces.length !== 2) exit();
+      if (braces.length !== 2) exit();
       return braces.charAt(0) + input + braces.charAt(1);
     },
 
@@ -654,8 +652,8 @@
       if (!search) return input.length + 1;
 
       var searchLen = search.length,
-        count = 0,
-        i = -searchLen; // prepare first run
+          count = 0,
+          i = -searchLen; // prepare first run
 
       do i = input.indexOf(search, i + searchLen);
       while (i !== -1 && ++count);
@@ -735,7 +733,7 @@
           }
         }
 
-        if(minIndex === INFINITY) break;
+        if (minIndex === INFINITY) break;
 
         result[found] = (result[found]+1) || 1;
         offset = minIndex + found.length; // ..except for .length access
@@ -818,7 +816,7 @@
           result = [], r = 0,
           len = indices.length, i = -1;
 
-      while (++i < len){
+      while (++i < len) {
         index = numberToInteger(indices[i]);
         if (index < 0) index += inputLen;
         if (index <= pendingIndex) {
@@ -897,7 +895,7 @@
       delimiter = String(delimiter);
 
       var result = input.split(delimiter),
-        difference = result.length - n;
+          difference = result.length - n;
 
       if (difference > 0) result.unshift(result.splice(0, difference).join(delimiter));
       return result;
@@ -990,7 +988,7 @@
       fill = String(fill);
 
       var inputLen = input.length,
-        fillLen = fill.length * 2; // safe, `<< 1` converts to 32-Bit Integer
+          fillLen = fill.length * 2; // safe, `<< 1` converts to 32-Bit Integer
 
       if (maxLen <= inputLen) return input;
       while (input.length + fillLen <= maxLen) input = fill + input + fill;
@@ -1016,7 +1014,7 @@
       fill = String(fill);
 
       var inputLen = input.length,
-        fillLen = fill.length;
+          fillLen = fill.length;
 
       if (maxLen <= inputLen || !fill) return input;
       while (input.length + fillLen <= maxLen) input = fill + input;
@@ -1042,7 +1040,7 @@
       fill = String(fill);
 
       var inputLen = input.length,
-        fillLen = fill.length;
+          fillLen = fill.length;
 
       if (maxLen <= inputLen || !fill) return input;
       while (input.length + fillLen <= maxLen) input += fill;
@@ -1108,8 +1106,8 @@
       if (!n || !suffix) return input;
 
       var suffixLen = suffix.length,
-        pendingIndex = input.length,
-        i;
+          pendingIndex = input.length,
+          i;
 
       do {
         pendingIndex -= suffixLen;
@@ -1372,7 +1370,7 @@
       input = toString(input);
 
       var i = input.length,
-        result = new Array(i);
+          result = new Array(i);
 
       while (i--) result[i] = input.charCodeAt(i);
       return result;
@@ -1442,7 +1440,7 @@
     if (to > MAX_CHARCODE) exit();
 
     var result = '',
-      difference = to - from;
+        difference = to - from;
 
     if (difference > 0) {
       while (n--) {
@@ -1467,9 +1465,11 @@
     var charCodes = charCodes_ || [],
         i = charCodes.length;
 
-    while (i--)
-      if (charCodes[i] > MAX_CHARCODE)
+    while (i--) {
+      if (charCodes[i] > MAX_CHARCODE) {
         exit('charCode ' + charCodes[i] + ' out of range');
+      }
+    }
 
     return stringFromCharCode.apply(null, charCodes); // implies parsing `charCodes`
   };
@@ -1510,7 +1510,7 @@
   //   unshifts the _Stryng_ instance's wrapped `_value`
   //   to become the first argument among the proxied ones to the static function
   //   
-  _arrayForEach.call(objectKeys(stryngFunctions), function(fnName){
+  _arrayForEach.call(objectKeys(stryngFunctions), function (fnName) {
 
     var fn = stryngFunctions[fnName];
 
