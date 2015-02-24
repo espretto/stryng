@@ -32,7 +32,7 @@
     @readOnly
     @type {string}
    */
-  VERSION = '0.1.9',
+  VERSION = '0.1.10',
 
   // string inheritance
   // ------------------
@@ -54,7 +54,7 @@
   hasStaticNatives = (function () {
     // wrap try-catch clauses for optimizability of outer scope
 
-    if (typeof String.slice === STR_FUNCTION) {
+    if (isFunction(String.slice)) {
       try { String.slice(/* undefined */); } // expect to throw
       catch (e){ return true; }
     }
@@ -111,7 +111,7 @@
     var keys = [],
         i = 0;
 
-    for (var key in object){ // required to be purely local
+    for (var key in object){ // `key` is required to be purely local
       if (object.hasOwnProperty(key)){
         keys[i++] = key;
       }
@@ -129,7 +129,7 @@
         len = array.length,
         i = -1;
 
-    while (++i < len) if(fn(array[i], i, array) === false) break;
+    while (++i < len) if (fn(array[i], i, array) === false) break;
   },
 
   _arrayIndexOf = methods.indexOf || function (item) {
@@ -213,7 +213,7 @@
   // (letters in range [xC0-xFF]) mapped to their nearest character
   // allowed in URL path segments.
   // 
-  // we also rely on native <tt>String#toLowerCase</tt> and <tt>String#toUpperCase</tt>
+  // we also rely on native `String#toLowerCase` and `String#toUpperCase`
   // to properly convert characters.
 
   latin1Reprs = ('A,A,A,A,Ae,A,AE,C,E,E,E,E,I,I,I,I,D,N,O,O,O,O,Oe,-,Oe,' + 
@@ -243,7 +243,7 @@
 
   // ### the whitespace shim
   // 
-  // native implementations of <tt>String#trim</tt> might miss out
+  // native implementations of `String#trim` might miss out
   // on some of the more exotic characters considered [whitespace][1],
   // [line terminators][2] or the mysterious [Zs][3]. this section detects those
   // flaws and constructs the regular expressions used in the shims.
@@ -308,7 +308,7 @@
 
   // check if the native implementation of `String#startsWith`
   // already knows how to deal with indices.
-  // consider <tt>String#endsWith</tt> to behave the same on that matter.
+  // consider `String#endsWith` to behave the same on that matter.
   // 
   if (!isFunction(VERSION.startsWith) || !'ab'.startsWith('b', 1)) {
     overrides.push('startsWith', 'endsWith');
@@ -325,7 +325,7 @@
   // --------------
 
   function toString (input) {
-    if (input == null) exit('input must not be null');
+    if (input === null || input === void 0) exit('input must not be null');
     return String(input);
   }
 
@@ -754,11 +754,16 @@
       @return {Stryng}
      */
     delimit: function (delimiter, joinees) {
-      return (joinees || []).join(toString(delimiter));
+      if (delimiter == null) exit();
+      return (
+        joinees === void 0 ? '' :
+        !isArray(joinees) ? exit('expected type: array') : 
+        joinees.join(delimiter) // implies parsing `delimiter`
+      );
     },
 
     /**
-      composition of native <tt>String#split</tt>, <tt>Array#reverse</tt> and <tt>Array#join</tt>.
+      composition of native `String#split`, `Array#reverse` and `Array#join`.
       note that this rather naive implementation may not produce correct results.
       for an alternative that knows how to properly reverse
       diacritics and accented characters use [esrever](https://github.com/mathiasbynens/esrever).
@@ -792,37 +797,39 @@
     },
 
     /**
-      splits this' string at the given indices. negative indices are allowed.
-      if the resulting substrings overlap, the first one dominates, the latter is front-cut.
+      splits this' string at the given `indices`. negative indices will be
+      added this' string's length, min-ed to `0` and max-ed to this' string's length.
+      if the resulting substrings overlap, the first/left one dominates,
+      the latter/right is truncated by the overlapping characters.
 
       @method  splitAt
-      @param {Number} ...index
-        indices to split at. negatives allowed
-      @return {String[]}
+      @param {Array} [indices=[]]
+        numeric indices to split at. negatives allowed.
+      @return {Array} array of substrings
      */
-    splitAt: function (input /*, index... */) {
+    splitAt: function (input, indices) {
       input = toString(input);
-      // TODO
-      var inputLen = input.length,
-        args = arguments,
-        argsLen = args.length,
-        i = 1, // skip `input`
-        index = 0,
-        pendingIndex = 0,
-        result = [];
 
-      for (; i < argsLen; i++) {
-        index = numberToInteger(args[i]);
+      if (indices === void 0) indices = [];
+      else if (!isArray(indices)) exit('expected type: array');
+
+      var inputLen = input.length,
+          pendingIndex = 0, index = 0,
+          result = [], r = 0,
+          len = indices.length, i = -1;
+
+      while (++i < len){
+        index = numberToInteger(indices[i]);
         if (index < 0) index += inputLen;
         if (index <= pendingIndex) {
-          result.push(''); // faster than slicing the empty string first
+          result[r++] = ''; // faster than slicing the empty string first
           index = pendingIndex;
         } else {
-          result.push(input.substring(pendingIndex, index));
+          result[r++] = input.substring(pendingIndex, index);
           pendingIndex = index;
         }
       }
-      result.push(input.substring(index));
+      result[r] = input.substring(index);
       return result;
     },
 
@@ -844,10 +851,10 @@
       if (!n) return [];
 
       var result = [],
-        match,
-        index,
-        lastIndex = 0,
-        difference;
+          match,
+          index,
+          lastIndex = 0,
+          difference;
 
       if (isRegExp(delimiter)) {
         while (n-- && (match = input.match(delimiter))) {
@@ -937,10 +944,11 @@
      */
     exchangeLeft: function (input, replacee, replacement, n) {
       input = toString(input);
+      n = (n === void 0 ? -1 : n) >>> 0;
       replacee = String(replacee);
       replacement = String(replacement);
       if (replacee === replacement) return input;
-      return Stryng.splitLeft(input, replacee, n).join(replacement); // implies parsing
+      return stryngFunctions.splitLeft(input, replacee, n).join(replacement);
     },
 
     /**
@@ -956,10 +964,11 @@
      */
     exchangeRight: function (input, replacee, replacement, n) {
       input = toString(input);
+      n = (n === void 0 ? -1 : n) >>> 0;
       replacee = String(replacee);
       replacement = String(replacement);
       if (replacee === replacement) return input;
-      return Stryng.splitRight(input, replacee, n).join(replacement); // implies parsing
+      return stryngFunctions.splitRight(input, replacee, n).join(replacement);
     },
 
     /**
@@ -1042,17 +1051,18 @@
 
     /**
       the combination of [Stryng.stripLeft](#stripLeft) and [Stryng.stripRight](#stripRight).
-      removes `outfix` `n` times from the both ends of this' string.
+      removes `outfix` max. `n` times from the both ends of this' string.
 
       @method  strip
       @chainable
       @param {string} [outfix="undefined"] string to remove
-      @param {number} [n=1] no. removals
+      @param {number} [n=Math.pow(2,32)-1] max. no. removals
       @return {Stryng} -
 
      */
     strip: function (input, outfix, n) {
-      return Stryng.stripRight(Stryng.stripLeft(input, outfix, n), outfix, n);
+      return stryngFunctions.stripRight(
+             stryngFunctions.stripLeft(input, outfix, n), outfix, n);
     },
 
     /**
@@ -1061,7 +1071,7 @@
       @method  stripLeft
       @chainable
       @param {string} [prefix="undefined"] string to remove
-      @param {number} [n=Math.pow(2,32)-1] no. removals.
+      @param {number} [n=Math.pow(2,32)-1] max. no. removals
       @return {Stryng}
      */
     stripLeft: function (input, prefix, n) {
@@ -1071,22 +1081,24 @@
       if (!n || !prefix) return input;
 
       var prefixLen = prefix.length,
-        pendingIndex = 0,
-        i;
+          pendingIndex = -prefixLen,
+          i;
 
-      do i = input.indexOf(prefix, pendingIndex);
-      while (n-- && i === pendingIndex && (pendingIndex += prefixLen));
+      do {
+        pendingIndex += prefixLen;
+        i = input.indexOf(prefix, pendingIndex);
+      } while (n-- && i === pendingIndex);
       return pendingIndex ? input.substring(pendingIndex) : input;
     },
 
     /**
       the right-associative version of [Stryng.stripLeft](#stripLeft).
-      removes `prefix` `n` times from the end of this' string.
+      removes `suffix` `n` times from the end of this' string.
 
       @method stripRight
       @chainable
       @param {string} [suffix="undefined"] string to remove
-      @param {number} [n=Math.pow(2,32)-1] no. removals.
+      @param {number} [n=Math.pow(2,32)-1] max. no. removals
       @return {Stryng}
      */
     stripRight: function (input, suffix, n) {
@@ -1134,7 +1146,7 @@
       backspace, tab, vertical tab, newline, form feed and carriage return,
       hex-encodes any non-ASCII-printable character and wraps the result
       in (unescaped) double quotes. this can be interpreted as a
-      shallow version of the native _JSON#stringify_. shim for non-standard
+      shallow version of the native `JSON#stringify`. shim for non-standard
       [String#quote](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/quote).
 
       @method  quote
@@ -1379,7 +1391,7 @@
     },
 
     /**
-      convenience wrapper for native <tt>RegExp</tt> constructor.
+      convenience wrapper for native `RegExp` constructor.
 
       @method  toRegex
       @param  {string} flags
@@ -1441,7 +1453,7 @@
   };
 
   /**
-    delegates to native <tt>String.fromCharCode</tt>.
+    delegates to native `String.fromCharCode`.
     returns the concatenated string representations of the given
     `charCode`s from the UTF-16 table. return the empty string if no arguments passed.
     
@@ -1537,11 +1549,11 @@
 
     if (isFunction(VERSION[fnName]) && !_arrayContains.call(overrides, fnName)) {
 
-      console.log('shimming %s', fnName);
-
       Stryng[fnName] = hasStaticNatives && String[fnName] || function (input, a, b, c) {
         var value = toString(input),
             argc = arguments.length;
+
+        console.log('called ', fnName, ' with args ', JSON.stringify([input, a, b, c]));
 
         // avoid unoptimizable `.apply(null, arguments)`
         return (

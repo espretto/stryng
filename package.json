@@ -1,6 +1,6 @@
 {
   "name": "stryng",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "devDependencies": {
     "benchmark": "~1.0.0",
     "browserify": "^4.2.0",
@@ -15,7 +15,8 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha ./test/stryng.test.js",
-    "gzip": "gzip -c dist/stryng.min.js > dist/stryng.min.js.gz"
+    "gzip": "gzip -c dist/stryng.min.js | tee dist/stryng.min.js.gz",
+    "test-opt": "node --trace_opt --trace_deopt --allow-natives-syntax ./test/stryng.opt.call.js"
   },
   "repository": "git@github.com:espretto/stryng"
 }

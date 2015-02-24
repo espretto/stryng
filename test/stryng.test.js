@@ -466,23 +466,23 @@ describe('Stryng()', function() {
     });
 
     it('should split at the given indices', function() {
-      expect(Stryng.splitAt('gosplitthis', 2, 7)).to.eql([ 'go', 'split', 'this' ]);
+      expect(Stryng.splitAt('gosplitthis', [2, 7])).to.eql([ 'go', 'split', 'this' ]);
     });
 
     it('should split at the given negative / backwards indices', function() {
-      expect(Stryng.splitAt('gosplitthis', -9, -4)).to.eql([ 'go', 'split', 'this' ]);
+      expect(Stryng.splitAt('gosplitthis', [-9, -4])).to.eql([ 'go', 'split', 'this' ]);
     });
 
     it('should split at 0 and `input.length` - edge case', function() {
-      expect(Stryng.splitAt('foo', 0, 3)).to.eql([ '', 'foo', '' ]);
+      expect(Stryng.splitAt('foo', [0, 3])).to.eql([ '', 'foo', '' ]);
     });
 
     it('should apply `input.length` as max', function() {
-      expect(Stryng.splitAt('foo', Infinity)).to.eql([ 'foo', '' ]);
+      expect(Stryng.splitAt('foo', [Infinity])).to.eql([ 'foo', '' ]);
     });
 
     it('should apply the previous as the min index if substrings overlap', function() {
-      expect(Stryng.splitAt('foo bar baz', 3, 1, 7)).to.eql([ 'foo', '', ' bar', ' baz' ]);
+      expect(Stryng.splitAt('foo bar baz', [3, 1, 7])).to.eql([ 'foo', '', ' bar', ' baz' ]);
     });
   });
 
