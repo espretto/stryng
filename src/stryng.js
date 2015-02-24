@@ -12,6 +12,7 @@
 
   // constants
   // ---------
+  // except regular expressions
 
   var
   INFINITY = 1 / 0,
@@ -39,6 +40,7 @@
 
   // native instance methods `Stryng` hopes to adapt. the world isn't
   // ready for `Object.getOwnPropertyNames(String.prototype)` yet.
+  // 
   methods = ('charAt,charCodeAt,codePointAt,concat,contains,' +
     'endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,' +
     'replace,search,slice,split,startsWith,substr,substring,' +
@@ -81,32 +83,35 @@
     return n ? isFinite(n) ? n - (n%1) : n : 0;
   },
 
-  objectDefineProperty = (function (defineProperty) {
+  objectDefineProperty = (function (objectDefineProperty) {
     // wrap try-catch clauses for optimizability of outer scope
 
     try {
-      defineProperty(Stryng, 'VERSION', {
+      objectDefineProperty(Stryng, 'VERSION', {
         writable: false,
         value: VERSION
       });
+      objectDefineProperty(Stryng[STR_PROTOTYPE], 'length', {
+        get: function () { return this.__value__.length; },
+        set: function () {} // provide noop setter for Safari 5/5.1
+      });
     } catch (e) {
       Stryng.VERSION = VERSION;
-      defineProperty = false; // mess with arguments object; this closure isn't optimizable anyway
+      objectDefineProperty = false;
     }
 
-    return defineProperty;
+    return objectDefineProperty;
 
-  })(Object.defineProperty),
+  }(Object.defineProperty)),
 
   // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys).
   // further assume that the `object` has `hasOwnProperty` on its prototype chain.
   // 
   objectKeys = Object.keys || function (object) {
     var keys = [],
-        key,
         i = 0;
 
-    for (key in object){
+    for (var key in object){ // required to be purely local
       if (object.hasOwnProperty(key)){
         keys[i++] = key;
       }
@@ -139,23 +144,6 @@
 
   _arrayContains = methods.contains || function (item) {
     return _arrayIndexOf.call(this, item) !== -1;
-  },
-
-  // type safety
-  // -----------
-
-  isRegExp = function (any) {
-    return _objectToString.call(any) === STR_OBJECT_REGEXP;
-  },
-
-  // no need to work around old webkit's bug where `typeof /re/` yields `'function'`.
-  // for internal use only.
-  isFunction = function (any) {
-    return typeof any === STR_FUNCTION;
-  },
-
-  isArray = Array.isArray || function (any) {
-    return _objectToString.call(any) == STR_OBJECT_ARRAY;
   },
 
   // regular expressions
@@ -241,10 +229,10 @@
         i = -1,
         charCodes = new Array(len);
   
-   charCodes[0] = 1; // initialize as numerically typed array
-   while (++i < len) charCodes[i] = i + offset;
+    charCodes[0] = 1; // initialize as numerically typed array
+    while (++i < len) charCodes[i] = i + offset;
    
-   return stringFromCharCode.apply(null, charCodes);
+    return stringFromCharCode.apply(null, charCodes);
     
   }()),
 
@@ -257,9 +245,9 @@
   // 
   // native implementations of <tt>String#trim</tt> might miss out
   // on some of the more exotic characters considered [whitespace][1],
-  // [line terminators][2] or the mysterious [Zs][3].
-  // this section detects those flaws and constructs the regular expressions used
-  // in the polyfills. Many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
+  // [line terminators][2] or the mysterious [Zs][3]. this section detects those
+  // flaws and constructs the regular expressions used in the shims.
+  // many thanks to the authors of [faster trim][4] and [whitespace deviations][5].
   //   
   // [1]: http://www.ecma-international.org/ecma-262/5.1/#sec-7.2
   // [2]: http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
@@ -267,7 +255,7 @@
   // [4]: http://blog.stevenlevithan.com/archives/faster-trim-javascript
   // [5]: http://perfectionkills.com/whitespace-deviations/
 
-  reWss = /\s\s*/g,
+  reWss = /\s\s*/g, // used for detecting flaws
   reNoWs = /\S/,
   reTrimLeft = /^\s\s*/,
   reTrimRight = /\s*\s$/,
@@ -293,6 +281,9 @@
           'FEFF'    // byte order mark
         ).split(',');
 
+    // check if the native whitespace character class matches all of the above
+    // and patch regexes if it doesn't.
+    // 
     _arrayForEach.call(hexCharCodes, function (hex) {
       if (!reWss.test(stringFromCharCode(parseInt(hex, 16)))) {
         reWsSource += '\\u' + hex;
@@ -301,6 +292,7 @@
 
     if (reWsSource.length > reWsSourceLen) {
       overrides.push('trim', 'trimRight', 'trimLeft');
+
       reWssSource = '[' + reWsSource + '][' + reWsSource + ']*';
 
       reNoWs = new RegExp('[^' + reWsSource + ']');
@@ -329,8 +321,8 @@
     overrides.push('substr');
   }
 
-  // corner stones
-  // -------------
+  // helper methods
+  // --------------
 
   function toString (input) {
     if (input == null) exit('input must not be null');
@@ -341,8 +333,21 @@
     throw new Error(message || 'invalid usage of stryng member');
   }
 
-  // defining Stryng
-  // ===============
+  function isRegExp (any) {
+    return _objectToString.call(any) === STR_OBJECT_REGEXP;
+  }
+
+  function isFunction (any) {
+    // old webkit yields true for regexes. for internal use only.
+    return typeof any === STR_FUNCTION;
+  }
+
+  function isArray (any) {
+    return _objectToString.call(any) == STR_OBJECT_ARRAY;
+  }
+
+  // override if natively available
+  if (isFunction(Array.isArray)) var isArray = Array.isArray;
 
   // constructor
   // -----------
@@ -352,8 +357,8 @@
     are neither sufficient nor consistent due to the language's minimalistic nature
     and browser incompatibilities. 
 
-    - __inherits native String class__
-    - __every instance method has a static version__
+    - __inherits native String class and namespace__
+    - __every [native] instance method has a static version__
       (except: `clone, valueOf, toString, toSource`)
     - static versions are faster
     - working with immutable instances is faster
@@ -361,11 +366,10 @@
     @class Stryng
     @extends {string}
     @constructor
-    @param {string} value
-      the value to parse.
+    @param {string} string
     @param {boolean} [isMutable=false]
       whether the created instance should be mutable or
-      create a new instance from the result of every method call
+      create a new instance from the result of every chainable method call
     @return {Stryng}
     @throws if `value` is either `null` or `undefined`
    */
@@ -396,21 +400,14 @@
 
     /**
       this' string's length defined via `Object.defineProperty`
-      if available, simply set onto the instance otherwise.
+      on `Stryng.prototype`. if not available, this is a simple property.
       
       @attribute length
       @readOnly
       @type {number}
       @todo further [reading](http://www.2ality.com/2012/08/property-definition-assignment.html)
      */
-    if (objectDefineProperty) {
-      objectDefineProperty(instance, 'length', {
-        get: function () { return instance.__value__.length; },
-        set: function () {} // provide noop setter for Safari 5/5.1
-      });
-    } else {
-      instance.length = instance.__value__.length;
-    }
+    if (!objectDefineProperty) instance.length = instance.__value__.length;
   }
 
   // cloning mutables
@@ -434,8 +431,8 @@
   // ------------
 
   /**
-    returns this' string primitive. only available on the prototype.
-    __alias:__ `valueOf`
+    getter for {{#crossLink "Stryng/__value__:attribute"}}{{/crossLink}}.
+    this method is only available on `Stryng.prototype`. __alias:__ `valueOf`
     
     @method toString
     @return {string}
@@ -750,18 +747,14 @@
     },
 
     /**
-      delegates to native _Arrray#join_. returns the empty string if no arguments passed.
+      delegates to native `Arrray#join`. returns the empty string if no arguments passed.
 
       @method  delimit
-      @param {Array} [joinees=[]]
+      @param {Array} [joinees=[]] substrings to concatenate
       @return {Stryng}
      */
     delimit: function (delimiter, joinees) {
-      if (delimiter == null) exit();
-      if (joinees === void 0) joinees = [];
-      else if (!isArray(joinees)) exit('.join() requires an array as 2nd argument');
-
-      return joinees.join(delimiter); // implies parsing `delimiter`
+      return (joinees || []).join(toString(delimiter));
     },
 
     /**
@@ -779,13 +772,13 @@
     },
 
     /**
-      splits this' string at `position` and rejoins the resulting parts using `insertion`.
-      `position` may also be negative to index backwards.
+      splits this' string at `position` and joins the resulting parts using 
+      `insertion` as the delimiter. `position` may also be negative.
 
       @method insert
       @chainable
-      @param {number} [position=0]
-      @param {string} [insertion="undefined"]
+      @param {number} [position=0] index where `insertion` will be found
+      @param {string} [insertion="undefined"] string to insert
       @return {Stryng}
      */
     insert: function (input, position, insertion) {
@@ -793,6 +786,7 @@
 
       // help out <tt>String#slice<tt/>'s implicit parsing which will apply different
       // defaults for `undefined` to the first and second argument
+      // 
       position = +position || 0;
       return input.slice(0, position) + insertion + input.slice(position); // implies parsing `insertion`
     },
@@ -1478,7 +1472,7 @@
   // is mutable what to return.
   // - if `result` isn't a string at all, simply return it
   // - if the instance `_isMutable`, assign `result` to `_value` and return `this`
-  //   - eventually reset `length` property if Object.defineProperty is not available
+  //   - eventually reset `length` property if `Object.defineProperty` is not available
   // - if not, return a new Stryng instance constructed from `result`
   // 
   function recycle(stryng, result) {
@@ -1515,6 +1509,7 @@
           instance = this,
           value = instance.__value__;
 
+      // avoid unoptimizable `.apply(null, arguments)`
       return recycle(instance,
         !argc      ? fn(value) :
         argc === 1 ? fn(value, a) :
@@ -1540,14 +1535,15 @@
   // 
   _arrayForEach.call(methods, function (fnName) {
 
-    var fn = VERSION[fnName];
+    if (isFunction(VERSION[fnName]) && !_arrayContains.call(overrides, fnName)) {
 
-    if (isFunction(fn) && !_arrayContains.call(overrides, fnName)) {
+      console.log('shimming %s', fnName);
 
       Stryng[fnName] = hasStaticNatives && String[fnName] || function (input, a, b, c) {
         var value = toString(input),
             argc = arguments.length;
 
+        // avoid unoptimizable `.apply(null, arguments)`
         return (
           !argc      ? value[fnName]() :
           argc === 1 ? value[fnName](a) :
@@ -1558,9 +1554,11 @@
 
       Stryng[STR_PROTOTYPE][fnName] = function (a, b, c) {
         var argc = arguments.length,
-            value = this.__value__;
+            instance = this,
+            value = instance.__value__;
 
-        return recycle(this,
+        // avoid unoptimizable `.apply(null, arguments)`
+        return recycle(instance,
           !argc      ? value[fnName]() :
           argc === 1 ? value[fnName](a) :
           argc === 2 ? value[fnName](a, b) :
@@ -1591,7 +1589,7 @@
       
       @method noConflict
       @static
-      @return {Stryng} main object, not an instance
+      @return {Stryng} main class, not an instance
      */
     var previousStryng = root.Stryng;
     Stryng.noConflict = function () {
