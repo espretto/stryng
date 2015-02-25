@@ -81,7 +81,6 @@ module.exports = function (grunt) {
   // task definitions
   grunt.registerTask('doc', 'Generate and serve documentation', [
     'clean:docs',
-    'jsdoc',
     'docker'
   ]);
 
