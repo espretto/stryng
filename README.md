@@ -5,7 +5,7 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 
 ### features
 
-- manually inherits the native `String` namespace and prototype
+- incorporates the native `String` namespace and prototype
 - progressive enhancement to fulfill ECMA-Script 5 & 6 standards
 - every function is (un-)curried for use as static or instance method for composure or chaining
 - Stryng instances can be either mutable or immutable (default)

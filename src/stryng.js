@@ -16,7 +16,8 @@
 
   var
   INFINITY = 1 / 0,
-  MAX_CHARCODE = '\uFFFF'.charCodeAt(0),
+  MAX_CHARCODE = 1 << 16,
+  MAX_STRING_SIZE = 1 << 28,
   STR_FUNCTION = 'function',
   STR_PROTOTYPE = 'prototype',
   STR_UNDEFINED = 'undefined',
@@ -69,6 +70,7 @@
   // instance method names start with an underscore followed by their prototype.
   // shims are for internal use only.
 
+  mathMin = Math.min,
   mathFloor = Math.floor,
   mathRandom = Math.random,
   stringFromCharCode = String.fromCharCode,
@@ -267,15 +269,18 @@
     var reWsSource = '\\s',
         reWsSourceLen = reWsSource.length,
         reWssSource,
-        hexCharCodes = ( // pad to length 4 to avoid `parseInt` inconcistencies
+        hexCharCodes = (
           '0009,' + // tab
           '000A,' + // line feed
           '000B,' + // vertical tab
           '000C,' + // form feed
           '000D,' + // carriage return
           '0020,' + // space
+          '1680,180E,2000,2001,2002,' +
+          '2003,2004,2005,2006,2007,' +
+          '2008,2009,200A,202F,205F,' +
+          '3000,' + // Zs
           '00A0,' + // nbsp
-          '1680,180E,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,200A,202F,205F,3000,' + // Zs
           '2028,' + // line separator
           '2029,' + // paragraph separator
           'FEFF'    // byte order mark
@@ -295,8 +300,8 @@
 
       reWssSource = '[' + reWsSource + '][' + reWsSource + ']*';
 
-      reNoWs = new RegExp('[^' + reWsSource + ']');
       reWss = new RegExp(reWssSource, 'g');
+      reNoWs = new RegExp('[^' + reWsSource + ']');
       reTrimLeft = new RegExp('^' + reWssSource);
       reTrimRight = new RegExp('[' + reWsSource + ']+$');
     }
@@ -342,7 +347,6 @@
     return typeof any === STR_FUNCTION;
   }
 
-  // override if natively available
   var isArray = Array.isArray || function (any) {
     return _objectToString.call(any) == STR_OBJECT_ARRAY;
   };
@@ -353,23 +357,74 @@
   /**
     utility class for manipulating strings in JavaScript. the built-in functions
     are neither sufficient nor consistent due to the language's minimalistic nature
-    and browser incompatibilities. 
+    and browser incompatibilities. `Stryng` extends the set of native prototype
+    and static functions. in addition, __each prototype method is ported to a
+    static version and vice versa__. whichever paradigm you prefer, whether you
+    hold state in closures or objects, chain methods or compose them,
+    `Stryng` has you covered. constraints are highlighted in these docs.
+    ```javascript
+    Stryng('cellar').append('door'); // `new` is optional in case you lint
+    Stryng.append('cellar', 'door');
+    ```
+    static functions are faster because they are implemented this way (unless
+    adapted from native `String.prototype`) and don't need the extra `new`
+    operation which allocates memory, sets `this` and chains prototypes `(Object > Stryng)`.
+    
+    migration path
+    --------------
+    using `Stryng` as a replacement for the native class works. however,
+    when using objects instead of primitives beware [JavaScript's type
+    casting mechanisms][1].
 
-    - __inherits native String class and namespace__
-    - __every [native] instance method has a static version__
-      (except: `clone, valueOf, toString, toSource`)
-    - static versions are faster
-    - working with immutable instances is faster
+    always use `.equals(other)` instead of `==` or `===`. `[<, <=, >=, >]` are safe.
+    ```javascript
+    var fox = Stryng('fox');
+    fox.equals('fox');              // > true
+    fox.equals(new String('fox'));  // > true
+    fox.iequals(new Stryng('FOX')); // > true
+    ```
+
+    always use `.isEmpty()` instead of `!stryng`.
+    ```javascript
+    var empty = Stryng('');
+    empty.isEmpty(); // > true
+    !empty;          // > false
+    ```
+
+    type detection:
+    ```javascript
+    typeof stryng;              // > 'object'
+    ({}).toString.call(stryng); // > '[object Object]'
+    stryng instanceof Stryng;   // > true, beware iframes
+    Stryng.isStryng(stryng);    // > true, wraps the above,
+    ```
+
+    apart from the above mentioned cases you may use `Stryng` instances as if they
+    were primitives. the reason is that JavaScript's inner workings request
+    the `Stryng` instance's _DefaultValue_ whenever it is passed to a native
+    function or operator. this value is retrieved by calling `Stryng.prototype.valueOf`
+    or `Stryng.prototype.toString` (in that order) which both reliably return the
+    instance's wrapped primitive.
+    ```javascript
+    +Stryng('123');                     // > 123
+    Stryng('cellar') + 'door';          // > 'cellardoor'
+    ({'key': 'value'})[Stryng('key')];  // > 'value'
+    parseFloat(Stryng('1.2e-3suffix')); // > 0.0012
+
+    var param = Stryng('%C3%A9cole');
+    decodeURIComponent(param);     // > 'école'
+    console.log(param.simplify()); // > 'ecole'
+    ```
+    [1]: http://www.ecma-international.org/ecma-262/5.1/#sec-8.12.8
 
     @class Stryng
-    @extends {string}
     @constructor
     @param {string} string
     @param {boolean} [isMutable=false]
       whether the created instance should be mutable or
       create a new instance from the result of every chainable method call
     @return {Stryng}
-    @throws if `value` is either `null` or `undefined`
+    @throws if `string` is either `null` or `undefined`
    */
   function Stryng(value, isMutable) {
     var instance = this;
@@ -420,6 +475,18 @@
     @chainable
     @param {boolean} [isMutable=false]
     @return {Stryng}
+    @example
+        var mutable = Stryng(' padded ', true);
+
+        // same as Stryng(mutable.toString(), false)
+        var immutable  = stryng.clone(false); 
+
+        // .trim() changes the value but returns the same reference
+        mutable.equals(mutable.trim()); // > true
+
+        // .trim() returns new instance with the changed value
+        immutable.equals(immutable.trim()); // > false
+
    */
   Stryng[STR_PROTOTYPE].clone = function (isMutable) {
     return new Stryng(this.__value__, isMutable);
@@ -429,11 +496,15 @@
   // ------------
 
   /**
-    getter for {{#crossLink "Stryng/__value__:attribute"}}{{/crossLink}}.
-    this method is only available on `Stryng.prototype`. __alias:__ `valueOf`
+    getter for this instance' wrapped string primitive.
+    this method is only available on `Stryng.prototype`.
+    __alias:__ `valueOf`.
     
     @method toString
     @return {string}
+    @example
+        var fox = Stryng('fox').toString(); // same as .valueOf()
+        typeof fox; // > 'string'
    */
   Stryng[STR_PROTOTYPE].valueOf = Stryng[STR_PROTOTYPE].toString = function () {
     return this.__value__; // we can rest assured that this is a primitive
@@ -441,13 +512,16 @@
 
   /**
     returns the string representation of the expression
-    used to construct this instance.
+    used to construct this instance. this method is only available on `Stryng.prototype`.
     
     @method  toSource
     @return {string} eval-string-expression
+    @example
+        Stryng('fox').toSource(); // > '(new Stryng("fox", false))'
+
    */
   Stryng[STR_PROTOTYPE].toSource = function () { 
-    return '(new Stryng("' + this.__value__ + ', ' + this.isMutable + '"))';
+    return '(new Stryng("' + this.__value__ + '", ' + this.isMutable + '))';
   };
 
   // instance methods
@@ -462,6 +536,8 @@
       @method  trim
       @chainable
       @return {Stryng}
+      @example
+          Stryng.trim(' padded ');
      */
     trim: function (input) {
       return toString(input).replace(reTrimLeft, '').replace(reTrimRight, '');
@@ -474,6 +550,8 @@
       @method  trimLeft
       @chainable
       @return {Stryng}
+      @example
+          Stryng.trimLeft(' padded\n'); // > 'padded\n'
      */
     trimLeft: function (input) {
       return toString(input).replace(reTrimLeft, '');
@@ -486,6 +564,8 @@
       @method  trimRight
       @chainable
       @return {Stryng}
+      @example
+          Stryng.trimRight('\tpadded '); // > '\tpadded'
      */
     trimRight: function (input) {
       return toString(input).replace(reTrimRight, '');
@@ -499,6 +579,11 @@
       @param {string} [search="undefined"]
       @param {number} [position=0]
       @return {boolean}
+      @example
+          Stryng.contains('undefined');         // > true, applied default
+          Stryng.contains('', '', 10);          // > true, always
+          Stryng.contains('within', 'thin');    // > true
+          Stryng.contains('within', 'thin', 4); // > false, `thin` starts at index 2
      */
     contains: function (input, search, position) {
       return toString(input).indexOf(search, position) !== -1;
@@ -565,12 +650,15 @@
       @chainable
       @param {number} [n=0]
       @return {Stryng}
-      @throws if `n` is either negative or infinite.
+      @throws if `n` is either negative, infinite or bigger than `MAX_STRING_SIZE`.
      */
     repeat: function (input, n) {
-      n = +n || 0;
-      if (input == null || n < 0 || n == INFINITY) exit();
-      n = mathFloor(n);
+      input = toString(input);
+      n = numberToInteger(n);
+
+      if (n < 0 ||
+          n == INFINITY ||
+          n * input.length >= MAX_STRING_SIZE) exit();
 
       var result = '';
 
@@ -595,12 +683,8 @@
      */
     substr: function (input, position, length) {
       input = toString(input);
-
-      position = (
-        position <= -1 ?
-          (position = numberToInteger(position) + input.length) < 0 ? 0 : position
-        : position
-      );
+      position = numberToInteger(position);
+      if (position < 0) position += input.length;
       return input.substr(position, length);
     },
 
@@ -617,7 +701,7 @@
      */
     wrap: function (input, outfix, n) {
       input = toString(input);
-      outfix = Stryng.repeat(outfix, n); // implies parsing `input`, `outfix` and `n`
+      outfix = stryngFunctions.repeat(outfix, n);
       return outfix + input + outfix;
     },
 
@@ -699,48 +783,48 @@
           result; // {a: 3, ab: 3, abc: 3}
 
      */
-    countMultiple: function (input, searches){
+    countMultiple: function (input, keys_){
       input = toString(input);
-      if (searches === void 0) return {};
-      if (!isArray(searches)) exit('.countMultiple() requires an array as 2nd argument');
+      if (keys_ === void 0) return {};
+      if (!isArray(keys_)) exit('expected type: array');
 
-      var searchesLen = searches.length, i,
-          containsEmptyString = _arrayContains.call(searches, ''),
-          indices = new Array(searchesLen),
-          result = {},
+      var keys = keys_.slice(),
+          key,
+          hasEmpty = _arrayContains.call(keys, ''),
+          len = keys.length,
+          i = -1,
+          indices = new Array(len),
           offset = 0,
           index,
           minIndex,
-          found,
-          search;
-
-      while (true){
-        minIndex = INFINITY;
-
-        for (i = 0; i < searchesLen; i++){
-          index = indices[i];
-          search = String(searches[i]); // though parsing is implied..
-
-          if (!search) continue; // skip the empty string
-
-          if (index === void 0 || index !== -1 && index < offset){
-            indices[i] = index = input.indexOf(search, offset);
-          }
-
-          if (-1 < index && index < minIndex){
-            minIndex = index;
-            found = search;
+          result = {};
+      
+      while (++i < len) result[keys[i]] = 0;
+        
+      while (len) {
+        for (i = 0; i < len;){
+          key = keys[i];
+          index = input.indexOf(key, offset);
+          
+          if (!key || index === -1){
+            keys.splice(i, 1);
+            indices.splice(i, 1);
+            len--;
+          } else {
+            indices[i++] = index;
           }
         }
-
-        if (minIndex === INFINITY) break;
-
-        result[found] = (result[found]+1) || 1;
-        offset = minIndex + found.length; // ..except for .length access
+        
+        minIndex = mathMin.apply(null, indices);
+        if (minIndex != INFINITY){ 
+          key = keys[indices.indexOf(minIndex)];
+          result[key]++;
+          offset = minIndex + key.length;
+        }
       }
 
-      if (containsEmptyString) result[''] = input.length + 1;
-
+      if (hasEmpty) result[''] = input.length + 1;
+      
       return result;
     },
 
@@ -1437,7 +1521,7 @@
     n = mathFloor(n);
     from = from === void 0 ? 32 : (from >>> 0);
     to = to === void 0 ? 127 : (to >>> 0);
-    if (to > MAX_CHARCODE) exit();
+    if (to >= MAX_CHARCODE) exit();
 
     var result = '',
         difference = to - from;
@@ -1466,7 +1550,7 @@
         i = charCodes.length;
 
     while (i--) {
-      if (charCodes[i] > MAX_CHARCODE) {
+      if (charCodes[i] >= MAX_CHARCODE) {
         exit('charCode ' + charCodes[i] + ' out of range');
       }
     }
