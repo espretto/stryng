@@ -68,6 +68,10 @@ expect.Assertion.prototype.optimizable = function () {
 
 describe('Stryng - ', function () {
 
+  it('constructor should be optimizable', function () {
+    expect(Stryng).withArguments(['fox']).to.be.optimizable();
+  });
+
   (function (tuples) {
 
     tuples.forEach(function (tuple) {
@@ -88,8 +92,9 @@ describe('Stryng - ', function () {
   , ['camelize', 'quick brown fox']
   , ['capitalize', 'foo']
   , ['chr', [65, 66, 67]]
-  , ['clean', '\tf\r\no\r\no  ']
-  , ['count', 'foo', 'o'] //, ['countMultiple', 'foo', ['o']]
+  , ['clean', ' quick  fox ']
+  , ['count', 'foo', 'o']
+  , ['countMultiple', 'foo', ['o', 'f', 'g']]
   , ['delimit', ',', ['a', 'b', 'c']]
   , ['embrace', 'foo', '()']
   , ['equals', 'foo', 'foo']
