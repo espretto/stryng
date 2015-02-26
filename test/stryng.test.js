@@ -220,8 +220,8 @@ describe('Stryng()', function () {
       expect(Stryng.startsWith('foo bar', 'bar', 4)).to.be.ok();
     });
 
-    it('should work for regexes, too', function () {
-      expect(Stryng.startsWith('foo bar', /^foo bar$/)).to.be.ok();
+    it('should throw if passed a regex', function () {
+      expect(Stryng.startsWith).withArgs('foo', /bar/).to.throwError();
     });
   });
 
@@ -371,12 +371,9 @@ describe('Stryng()', function () {
 
   describe('.countMultiple()', function () {
 
-    it('should fail if `input` is missing', function () {
+    it('should fail if argument[s] are missing', function () {
       expect(Stryng.countMultiple).to.throwError();
-    });
-
-    it('should return the empty object if not passed any `searches`', function () {
-      expect(Stryng.countMultiple('text'/* default=[] */)).to.eql({});
+      expect(Stryng.countMultiple).withArgs('text').to.throwError();
     });
 
     it('should return the length + 1 if passed the empty string', function () {
@@ -396,16 +393,16 @@ describe('Stryng()', function () {
 
   describe('.delimit()', function () {
 
-    it('should fail if `input` is missing', function () {
+    it('should fail if argument[s] is missing', function () {
       expect(Stryng.delimit).to.throwError();
     });
 
-    it('should fail if `joinees` is neither `undefined` nor `null` nor an array', function () {
-      expect(Stryng.delimit).withArgs(',', {not: null}).to.throwError();
+    it('should fail if `joinees` is not an array', function () {
+      expect(Stryng.delimit).withArgs(',', {not: 'array'}).to.throwError();
     });
 
-    it('should return the empty string if `joinees` passed', function () {
-      expect(Stryng.delimit('*')).to.equal('');
+    it('should return the empty string if `joinees` is empty', function () {
+      expect(Stryng.delimit('*', [])).to.equal('');
     });
 
     it('should allow an empty delimiter string', function () {
@@ -463,6 +460,7 @@ describe('Stryng()', function () {
 
     it('should fail if `input` is missing', function () {
       expect(Stryng.splitAt).to.throwError();
+      expect(Stryng.splitAt).withArgs('gosplitthis').to.throwError();
     });
 
     it('should split at the given indices', function () {
@@ -537,10 +535,6 @@ describe('Stryng()', function () {
 
     it('should split `n` times but yet include the rest', function () {
       expect(Stryng.splitRight('charactersequence', '', 4)).to.eql([ 'charactersequ', 'e', 'n', 'c', 'e' ]);
-    });
-
-    it('should throw an error if passed a regular expressions', function () {
-      expect(Stryng.splitRight).withArgs('dont care', /re/).to.throwError();
     });
 
     // refer to Stryng.splitLeft for further tests
@@ -1046,8 +1040,8 @@ describe('Stryng()', function () {
 
   describe('.chr()', function () {
 
-    it('should return the empty string if no arguments passed', function () {
-      expect(Stryng.chr().toString()).to.equal('');
+    it('should fail if `input` is missing', function () {
+      expect(Stryng.chr).to.throwError();
     });
 
     it('should fail for number greater than Math.pow(2, 16) - 1', function () {

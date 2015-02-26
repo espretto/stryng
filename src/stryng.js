@@ -16,8 +16,6 @@
 
   var
   INFINITY = 1 / 0,
-  MAX_CHARCODE = 1 << 16,
-  MAX_STRING_SIZE = 1 << 28,
   STR_FUNCTION = 'function',
   STR_PROTOTYPE = 'prototype',
   STR_UNDEFINED = 'undefined',
@@ -33,7 +31,49 @@
     @readOnly
     @type {string}
    */
-  VERSION = '0.1.10',
+  VERSION = '0.1.11',
+
+  /**
+    for documentation purposes only: max. unsigned 32-bit integer. __value:__
+    - `Math.pow(2, 32) - 1`
+    - `-1 >>> 0`
+    - `4,294,967,295`
+
+    @property MAX_UINT
+    @for Stryng
+    @final
+    @readOnly
+    @type {number}
+   */
+  
+  /**
+    for documentation purposes only: max. string size. __value:__
+    - `Math.pow(2, 28) - 1`
+    - `-1 >>> 4`
+    - `268,435,455`
+    - 256 MiB - 1 byte
+
+    @property MAX_STRING_SIZE
+    @for Stryng
+    @final
+    @readOnly
+    @type {number}
+   */
+  MAX_STRING_SIZE = -1 >>> 4,
+  
+  /**
+    for documentation purposes only: max. UTF-16 character code. __value:__
+    - `Math.pow(2, 16) - 1`
+    - `-1 >>> 16`
+    - `65,535`
+
+    @property MAX_CHARCODE
+    @for Stryng
+    @final
+    @readOnly
+    @type {number}
+   */
+  MAX_CHARCODE = -1 >>> 16,
 
   // string inheritance
   // ------------------
@@ -70,6 +110,7 @@
   // instance method names start with an underscore followed by their prototype.
   // shims are for internal use only.
 
+  mathMax = Math.max,
   mathMin = Math.min,
   mathFloor = Math.floor,
   mathRandom = Math.random,
@@ -80,9 +121,8 @@
   // compliant implementation of `Number.toInteger`,
   // tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
   // 
-  numberToInteger = Number.toInteger || function (any) {
-    var n = +any;
-    return n ? isFinite(n) ? n - (n%1) : n : 0;
+  numberToInteger = Number.toInteger || function (n) {
+    return (n = +n) ? isFinite(n) ? n - (n%1) : n : 0;
   },
 
   objectDefineProperty = (function (objectDefineProperty) {
@@ -537,7 +577,8 @@
       @chainable
       @return {Stryng}
       @example
-          Stryng.trim(' padded ');
+          Stryng(' padded ').trim();          // > 'padded'
+          Stryng.trim('\tindented line\r\n'); // > 'indented line'
      */
     trim: function (input) {
       return toString(input).replace(reTrimLeft, '').replace(reTrimRight, '');
@@ -551,7 +592,8 @@
       @chainable
       @return {Stryng}
       @example
-          Stryng.trimLeft(' padded\n'); // > 'padded\n'
+          Stryng(' padded ').trimLeft(); // > 'padded '
+          Stryng.trimLeft('\tindent');   // > 'indent'
      */
     trimLeft: function (input) {
       return toString(input).replace(reTrimLeft, '');
@@ -565,7 +607,8 @@
       @chainable
       @return {Stryng}
       @example
-          Stryng.trimRight('\tpadded '); // > '\tpadded'
+          Stryng(' padded ').trimRight(); // > ' padded'
+          Stryng.trimRight('line\r\n');   // > 'line'
      */
     trimRight: function (input) {
       return toString(input).replace(reTrimRight, '');
@@ -580,10 +623,10 @@
       @param {number} [position=0]
       @return {boolean}
       @example
-          Stryng.contains('undefined');         // > true, applied default
-          Stryng.contains('', '', 10);          // > true, always
-          Stryng.contains('within', 'thin');    // > true
+          Stryng('within').contains('thin');    // > true
+          Stryng.contains('within', '', 10);    // > true, always
           Stryng.contains('within', 'thin', 4); // > false, `thin` starts at index 2
+          Stryng.contains('undefined');         // > true, applied default
      */
     contains: function (input, search, position) {
       return toString(input).indexOf(search, position) !== -1;
@@ -594,22 +637,21 @@
       shim for native [String#startsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.startswith)
       
       @method  startsWith
-      @param {String|RegExp} [search="undefined"]
+      @param {String} [search="undefined"]
       @param {number} [position=0]
       @return {boolean}
+      @example
+          Stryng('within').startsWith('with');     // > true
+          Stryng.startsWith('within', 'thin', 2);  // > true
+          Stryng.startsWith('within', 'with', -1); // > true, min-ed to zero
+          Stryng.startsWith('within', ''    , 10); // > true, max-ed to length
+          Stryng.startsWith('undefined value');    // > true, apply default
      */
     startsWith: function (input, search, position) {
       input = toString(input);
-      if (isRegExp(search)) return !input.substring(position).search(search);
-
-      var i = input.indexOf(search, position),
-        inputLen = input.length;
-
-      return i !== -1 && i === (
-        position === void 0 || position < 0 ? 0 :
-        position > inputLen ? inputLen :
-        mathFloor(position) || 0
-      );
+      if (isRegExp(search)) exit('no regex support for startsWith');
+      return input.indexOf(search, position) === mathMin(
+        input.length, mathMax(0, numberToInteger(position)));
     },
 
     /**
@@ -617,28 +659,28 @@
       shim for native [String#endsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.endswith)
       
       @method  endsWith
-      @param {String|RegExp} [search="undefined"]
-      @param {number} [endPosition=input.length]
+      @param {String} [search="undefined"]
+      @param {number} [position=input.length]
       @return {boolean}
       @throws if `search` is a regular expression.
+      @example
+          Stryng('within').endsWith('thin');     // > true
+          Stryng.endsWith('within', 'with', 4);  // > true
+          Stryng.endsWith('within', 'thin', 10); // > true, max-ed to length
+          Stryng.endsWith('this is undefined');  // > true, apply default
+
+          // if truncated at [0] only the empty string yields true
+          Stryng.endsWith('within', '', -1);     // > true, min-ed to zero
      */
-    endsWith: function (input, search, endPosition) {
+    endsWith: function (input, search, position) {
       input = toString(input);
-
-      var inputLen = input.length, i;
-
-      endPosition = (
-        endPosition === void 0 || endPosition > inputLen ? inputLen :
-        endPosition < 0 ? 0 :
-        mathFloor(endPosition) || 0
-      );
-
       if (isRegExp(search)) exit('no regex support for endsWith');
+      var len = input.length,
+          idx = input.lastIndexOf(search, position);
 
-      search = String(search);
-      if (!search) return true;
-      i = input.lastIndexOf(search, endPosition);
-      return i !== -1 && (i + search.length === endPosition);
+      return idx !== -1 && idx+String(search).length === (
+        position === void 0 ? len : mathMin(len, mathMax(0, numberToInteger(position)))
+      );
     },
 
     /**
@@ -648,19 +690,30 @@
       
       @method  repeat
       @chainable
-      @param {number} [n=0]
+      @param {number} [n=0] range constraint:
+        `0 <= n <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
       @return {Stryng}
-      @throws if `n` is either negative, infinite or bigger than `MAX_STRING_SIZE`.
+      @throws if `n` is out of range
+      @example
+          Stryng('-').repeat(5);        // > '-----'
+          Stryng.repeat('' , 5);        // > ''
+          Stryng.repeat('-', -1);       // throws, out of range
+          Stryng.repeat('-', Infinity); // throws
+
+          // don't try to allocate 256 MiB
+          Stryng.repeat('-' , Math.pow(2, 28)-1); // works, don't try this
+          Stryng.repeat('-' , Math.pow(2, 28)  ); // throws, out of range
+          Stryng.repeat('--', Math.pow(2, 27)  ); // throws, too
+
      */
     repeat: function (input, n) {
       input = toString(input);
       n = numberToInteger(n);
 
-      if (n < 0 ||
-          n == INFINITY ||
-          n * input.length >= MAX_STRING_SIZE) exit();
+      if (0 > n || n*input.length > MAX_STRING_SIZE || n == INFINITY) exit();
 
       var result = '';
+      if (!input) return result;
 
       while (n >= 1) {
         if (n % 2) result += input;
@@ -678,7 +731,7 @@
       @method  substr
       @chainable
       @param {number} [position=0]
-      @param {number} [length=`input.length-position`] this' string's length minus `position`
+      @param {number} [length=this.length-position] this' string's length minus `position`
       @return {Stryng}
      */
     substr: function (input, position, length) {
@@ -696,12 +749,16 @@
       @chainable
       @param {string} outfix
         prefix and suffix
-      @param {number} [n=0] no. operations
+      @param {number} [n=0] no. operations. range constraint:
+        `0 <= n <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
       @return {Stryng}
+      @throws if `n` is out of range
+      @example
+          Stryng('python doc string').wrap('"', 3); // > '"""python doc string"""'
      */
     wrap: function (input, outfix, n) {
       input = toString(input);
-      outfix = stryngFunctions.repeat(outfix, n);
+      outfix = Stryng.repeat(outfix, n);
       return outfix + input + outfix;
     },
 
@@ -751,18 +808,19 @@
       the empty string is considered a _character boundary_
       thus `input.length + 1` will always be the result for that.
 
-      __note:__ duplicate entries within `searches` won't be removed prior to counting
-      and thereby impact performance but don't change the result.
+      __note:__ duplicate entries within `searches` won't be removed prior to
+      counting and thereby impact performance but don't change the result.
 
       @method  countMultiple
-      @param {Array} [searches=[]] substrings to search for
+      @param {Array} searches
+        array of substrings to search for
       @return {Object}
 
+      @example
       if multiple keys in `searches` match `input` at the same index the first
       one encountered in the array will take the credit. for this reason you
       might want to sort your `searches` by length in descending order prior to
       passing them in.
-      @example
           var text       = Stryng('abc abc abc'),
               searches   = ['a', 'ab', 'abc'];
               sortedDesc = ['abc', 'ab', 'a'];
@@ -770,23 +828,20 @@
           text.countMultiple(searches);   // {a: 3}
           text.countMultiple(sortedDesc); // {abc: 3}
 
+      @example
       if you don't want this behavior use {{#crossLink "Stryng/count:method"}}
       {{/crossLink}} for each search instead.
-      @example
-          var testToSearch = Stryng(post),
-              result = {};
-              
-          searches.forEach(function(search){
-            result[search] = testToSearch.count(search);
+          var result = {};
+          searches.forEach(function (search) {
+            result[search] = text.count(search);
           });
-
           result; // {a: 3, ab: 3, abc: 3}
 
      */
     countMultiple: function (input, keys_){
       input = toString(input);
-      if (keys_ === void 0) return {};
       if (!isArray(keys_)) exit('expected type: array');
+      if (!keys_.length) return {};
 
       var keys = keys_.slice(),
           key,
@@ -803,6 +858,7 @@
         
       while (len) {
         for (i = 0; i < len;){
+          if (indices[i] >= offset){ i++; continue; }
           key = keys[i];
           index = input.indexOf(key, offset);
           
@@ -816,7 +872,7 @@
         }
         
         minIndex = mathMin.apply(null, indices);
-        if (minIndex != INFINITY){ 
+        if (minIndex !== INFINITY){ 
           key = keys[indices.indexOf(minIndex)];
           result[key]++;
           offset = minIndex + key.length;
@@ -832,16 +888,14 @@
       delegates to native `Arrray#join`. returns the empty string if no arguments passed.
 
       @method  delimit
-      @param {Array} [joinees=[]] substrings to concatenate
+      @param {Array} joinees
+        array of substrings to concatenate
       @return {Stryng}
      */
     delimit: function (delimiter, joinees) {
       if (delimiter == null) exit();
-      return (
-        joinees === void 0 ? '' :
-        !isArray(joinees) ? exit('expected type: array') : 
-        joinees.join(delimiter) // implies parsing `delimiter`
-      );
+      if (!isArray(joinees)) exit('expected type: array');
+      return joinees.join(delimiter); // implies parsing `delimiter`
     },
 
     /**
@@ -870,30 +924,24 @@
      */
     insert: function (input, position, insertion) {
       input = toString(input);
-
-      // help out <tt>String#slice<tt/>'s implicit parsing which will apply different
-      // defaults for `undefined` to the first and second argument
-      // 
-      position = +position || 0;
-      return input.slice(0, position) + insertion + input.slice(position); // implies parsing `insertion`
+      position = numberToInteger(position);
+      // slice applies different defaults for its 1st and 2nd argument.
+      return input.slice(0, position) + insertion + input.slice(position);
     },
 
     /**
-      splits this' string at the given `indices`. negative indices will be
-      added this' string's length, min-ed to `0` and max-ed to this' string's length.
-      if the resulting substrings overlap, the first/left one dominates,
-      the latter/right is truncated by the overlapping characters.
+      splits this' string at the given `indices`. if the resulting substrings
+      overlap, the first/left one encountered dominates, the latter/right is
+      truncated by the overlapping characters.
 
       @method  splitAt
-      @param {Array} [indices=[]]
-        numeric indices to split at. negatives allowed.
+      @param {Array} indices
+        indices to split at. negatives allowed.
       @return {Array} array of substrings
      */
     splitAt: function (input, indices) {
       input = toString(input);
-
-      if (indices === void 0) indices = [];
-      else if (!isArray(indices)) exit('expected type: array');
+      if (!isArray(indices)) exit('expected type: array');
 
       var inputLen = input.length,
           pendingIndex = 0, index = 0,
@@ -922,9 +970,7 @@
 
       @method  splitLeft
       @param {String|RegExp} [delimiter="undefined"]
-      @param {number} [n=Math.pow(2,32)-1]
-        max. no. split operations.
-        default as per [ecma-262/5.1](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14)
+      @param {number} [n=MAX_UINT] max. no. split operations.
       @return {String[]}
      */
     splitLeft: function (input, delimiter, n) {
@@ -949,8 +995,7 @@
         }
         result.push(input); // push what's left
       } else {
-        delimiter = String(delimiter);
-        result = input.split(delimiter);
+        result = input.split(delimiter); // implies parsing
         difference = result.length - n;
         if (difference > 0) result.push(result.splice(n, difference).join(delimiter));
       }
@@ -958,22 +1003,19 @@
     },
 
     /**
-      the right-associative version of [Stryng.splitLeft](#splitLeft).
-      splits this' string `n` times by the given `delimiter`. the preceding part
-      after the `n`th occurence of `delimiter` - counting backwards -
-      is included in the returned array. currently has no regex support
+      the right-associative version of {{#crossLink "Stryng/splitLeft:method"}}
+      {{/crossLink}}. splits this' string `n` times by the given `delimiter`.
+      the preceding part after the `n`th occurence of `delimiter` -
+      counting backwards - is included in the returned array.
      
       @method  splitRight
       @param {string} [delimiter="undefined"]
-      @param {number} [n=Math.pow(2,32)-1]
-        max. no. split operations.
-        default as per [ecma-262/5.1](http://www.ecma-international.org/ecma-262/5.1/#sec-15.5.4.14)
+      @param {number} [n=MAX_UINT] max. no. split operations.
       @return {String[]}
       @throws if `delimiter` is a regular expression
      */
     splitRight: function (input, delimiter, n) {
       input = toString(input);
-      if (isRegExp(delimiter)) exit('no regex support for splitRight');
       n = (n === void 0 ? -1 : n) >>> 0;
       if (!n) return [];
       delimiter = String(delimiter);
@@ -1021,7 +1063,7 @@
       @chainable
       @param {string} [replacee="undefined"] string to be replaced
       @param {string} [replacement="undefined"]
-      @param {number} [n=Math.pow(2,32)-1] max. no. replacement operations.
+      @param {number} [n=MAX_UINT] max. no. replacement operations.
       @return {Stryng}
      */
     exchangeLeft: function (input, replacee, replacement, n) {
@@ -1041,105 +1083,110 @@
       @chainable
       @param {string} [replacee="undefined"] string to be replaced
       @param {string} [replacement="undefined"]
-      @param {number} [n=Math.pow(2,32)-1] max. no. replacement operations.
+      @param {number} [n=MAX_UINT] max. no. replacement operations.
       @return {Stryng}
      */
     exchangeRight: function (input, replacee, replacement, n) {
       input = toString(input);
-      n = (n === void 0 ? -1 : n) >>> 0;
       replacee = String(replacee);
       replacement = String(replacement);
+      n = (n === void 0 ? -1 : n) >>> 0;
       if (replacee === replacement) return input;
       return stryngFunctions.splitRight(input, replacee, n).join(replacement);
     },
 
     /**
-      both appends and prepends `fill` to this' string as often as needed
-      to reach but not exceed a length of `maxLen`. passing a `maxLen`
+      both appends and prepends `padding` to this' string as often as needed
+      to reach but not exceed a length of `maxLength`. passing a `maxLength`
       lesser than this' string's length has no effect. it is never truncated.
 
       @method just
       @chainable
-      @param {number} [maxLen=0]
-      @param {string} fill
+      @param {number} [maxLength=0] range constraint:
+        `0 <= maxLength <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+      @param {string} [padding=" "]
       @return {Stryng}
+      @throws if `maxLength` is out of range
      */
-    just: function (input, maxLen, fill) {
+    just: function (input, maxLength, padding) {
       input = toString(input);
-      maxLen = +maxLen || 0;
-      if (maxLen < 0 || maxLen == INFINITY) exit();
-      maxLen = mathFloor(maxLen);
-      fill = String(fill);
+      maxLength = numberToInteger(maxLength);
+      if (0 > maxLength || maxLength > MAX_STRING_SIZE) exit();
+      padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
-          fillLen = fill.length * 2; // safe, `<< 1` converts to 32-Bit Integer
+          paddingLen = padding.length * 2; // safe, `<< 1` converts to 32-Bit Integer
 
-      if (maxLen <= inputLen) return input;
-      while (input.length + fillLen <= maxLen) input = fill + input + fill;
+      if (maxLength <= inputLen) return input;
+      while (input.length + paddingLen <= maxLength) input = padding + input + padding;
       return input;
     },
 
     /**
-      prepends `fill` to this' string as often as needed
-      to reach but not exceed a length of `maxLen`. passing a `maxLen`
-      lesser than this' string's length has no effect. it is never truncated.
+      prepends `padding` to this' string as often as needed to reach but not
+      exceed `length`. passing a `length` lesser than this' string's length
+      has no effect. it is never truncated.
 
       @method  justLeft
       @chainable
-      @param {number} [maxLen=0]
-      @param {string} fill
+      @param {number} [length=0] range constraint:
+        `0 <= length <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+      @param {string} [padding=" "]
       @return {Stryng}
+      @throws if `length` is out of range
      */
-    justLeft: function (input, maxLen, fill) {
+    justLeft: function (input, length, padding) {
       input = toString(input);
-      maxLen = +maxLen || 0;
-      if (maxLen < 0 || maxLen == INFINITY) exit();
-      maxLen = mathFloor(maxLen);
-      fill = String(fill);
+      length = numberToInteger(length);
+      if (0 > length || length > MAX_STRING_SIZE) exit();
+      padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
-          fillLen = fill.length;
+          paddingLen = padding.length;
 
-      if (maxLen <= inputLen || !fill) return input;
-      while (input.length + fillLen <= maxLen) input = fill + input;
+      if (length <= inputLen || !padding) return input;
+      while (input.length + paddingLen <= length) input = padding + input;
       return input;
     },
 
     /**
-      appends `fill` to this' string as often as needed
-      to reach but not exceed a length of `maxLen`. passing a `maxLen`
-      lesser than this' string's length has no effect. it is never truncated.
+      appends `padding` to this' string as often as needed to reach but not
+      exceed `length`. passing a `length` lesser than this' string's length
+      has no effect. it is never truncated.
 
       @method  justRight
       @chainable
-      @param {number} [maxLen=0]
-      @param {string} fill
+      @param {number} [length=0] range constraint:
+        `0 <= length <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+      @param {string} [padding=" "]
       @return {Stryng}
+      @throws if `length` is out of range
      */
-    justRight: function (input, maxLen, fill) {
+    justRight: function (input, length, padding) {
       input = toString(input);
-      maxLen = +maxLen || 0;
-      if (maxLen < 0 || maxLen == INFINITY) exit();
-      maxLen = mathFloor(maxLen);
-      fill = String(fill);
+      length = numberToInteger(length);
+      if (0 > length || length > MAX_STRING_SIZE) exit();
+      padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
-          fillLen = fill.length;
+          paddingLen = padding.length;
 
-      if (maxLen <= inputLen || !fill) return input;
-      while (input.length + fillLen <= maxLen) input += fill;
+      if (length <= inputLen || !padding) return input;
+      while (input.length + paddingLen <= length) input += padding;
       return input;
     },
 
     /**
-      the combination of [Stryng.stripLeft](#stripLeft) and [Stryng.stripRight](#stripRight).
+      the composition of {{#crossLink "Stryng/stripLeft:method"}}{{/crossLink}}
+      and {{#crossLink "Stryng/stripRight:method"}}{{/crossLink}}.
       removes `outfix` max. `n` times from the both ends of this' string.
+      note that the actual removal counts may differ.
 
       @method  strip
       @chainable
       @param {string} [outfix="undefined"] string to remove
-      @param {number} [n=Math.pow(2,32)-1] max. no. removals
-      @return {Stryng} -
+      @param {number} [n=MAX_UINT] max. no. removals
+      @return {Stryng}
 
      */
     strip: function (input, outfix, n) {
@@ -1153,7 +1200,7 @@
       @method  stripLeft
       @chainable
       @param {string} [prefix="undefined"] string to remove
-      @param {number} [n=Math.pow(2,32)-1] max. no. removals
+      @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
      */
     stripLeft: function (input, prefix, n) {
@@ -1174,13 +1221,13 @@
     },
 
     /**
-      the right-associative version of [Stryng.stripLeft](#stripLeft).
-      removes `suffix` `n` times from the end of this' string.
+      the right-associative version of {{#crossLink "Stryng/stripLeft:method"}}
+      {{/crossLink}}. removes `suffix` `n` times from the end of this' string.
 
       @method stripRight
       @chainable
       @param {string} [suffix="undefined"] string to remove
-      @param {number} [n=Math.pow(2,32)-1] max. no. removals
+      @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
      */
     stripRight: function (input, suffix, n) {
@@ -1201,35 +1248,42 @@
     },
 
     /**
-      slices this' string to exactly fit the given `maxLen`
-      while including the `ellipsis` at its end (enforced).
+      slices this' string to exactly fit the given `maxLength`
+      while including the `ellipsis` at its end (enforced). this implementation
+      has no knowledge of word boundaries. TODO: search word boundary and trimRight
 
       @method  truncate
       @chainable
-      @param {number} [maxLen=Math.pow(2,32)-1] length of the result.
+      @param {number} [maxLength=42] length of the result. range constraint:
+        `0 <= maxLength`
       @param {string} [ellipsis="..."]
       @return {Stryng}
+      @throws if `maxLength` is out of range
      */
-    truncate: function (input, maxLen, ellipsis) {
+    truncate: function (input, maxLength, ellipsis) {
       input = toString(input);
-      maxLen = (maxLen === void 0 ? -1 : maxLen) >>> 0;
-      if (!maxLen) return '';
-      if (maxLen >= input.length) return input;
+      if (maxLength === void 0) maxLength = 42;
+      else {
+        maxLength = numberToInteger(maxLength);
+        if (0 > maxLength) exit();
+        if (!maxLength) return '';
+      }
+      if (maxLength >= input.length) return input;
       ellipsis = ellipsis !== void 0 ? String(ellipsis) : '...';
 
       var ellipsisLen = ellipsis.length;
 
-      if (ellipsisLen >= maxLen) return ellipsis.slice(-maxLen);
-      return input.substring(0, maxLen - ellipsisLen) + ellipsis;
+      if (ellipsisLen >= maxLength) return ellipsis.slice(-maxLength);
+      return input.substring(0, maxLength - ellipsisLen) + ellipsis;
     },
 
     /**
-      backslash-escapes all occurences of double quote, backslash,
-      backspace, tab, vertical tab, newline, form feed and carriage return,
+      this can be interpreted as a shallow version of the native `JSON#stringify`.
+      shim for non-standard [String#quote](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/quote).
+      backslash-escapes all occurences of `", \, \b, \t, \v, \n, \f, \r`,
       hex-encodes any non-ASCII-printable character and wraps the result
-      in (unescaped) double quotes. this can be interpreted as a
-      shallow version of the native `JSON#stringify`. shim for non-standard
-      [String#quote](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/quote).
+      in (unescaped) double quotes. see {{#crossLink "Stryng/unquote:method"}}
+      {{/crossLink}} for the inverse operation.
 
       @method  quote
       @chainable
@@ -1248,10 +1302,11 @@
     },
 
     /**
-      mirrors the effect of {{#crossLink "Stryng/quote:method"}}{{/crossLink}}
       without using `eval`. unescapes all occurences of backslash-escaped
-      characters (`"\\t\r\n\f\b`), decodes all hex-encoded characters and
-      removes surrounding double quotes once.
+      characters `", \, \b, \t, \v, \n, \f, \r`, decodes all hex-encoded 
+      characters and removes surrounding double quotes once without using `eval`.
+      see {{#crossLink "Stryng/unquote:method"}}{{/crossLink}} for the inverse
+      operation.
 
       @method unquote
       @chainable
@@ -1273,6 +1328,11 @@
       @param {boolean} [once=false] if truthy and this' string already ends
                                     with `tail` the operation has no effect
       @return {Stryng}
+      @example
+          Stryng('cellar').append('door');       // > 'cellardoor'
+          Stryng.append('within', 'thin');       // > 'withinthin', duplicate suffix
+          Stryng.append('within', 'thin', true); // > 'within', pre-checks if endsWith
+          Stryng.append('this is ');             // > 'this is undefined', applied default
      */
     append: function (input, tail, once) {
       input = toString(input);
@@ -1289,6 +1349,11 @@
       @param {boolean} [once=false] if truthy and this' string already starts
                                     with `tail` the operation has no effect
       @return {Stryng}
+      @example
+          Stryng('door').prepend('cellar');       // > 'cellardoor'
+          Stryng.prepend('within', 'with');       // > 'withwithin', duplicate prefix
+          Stryng.prepend('within', 'thin', true); // > 'within', pre-checks if startsWith
+          Stryng.prepend('efinitely');            // > 'undefinedefinitely', applied default
      */
     prepend: function (input, head, once) {
       input = toString(input);
@@ -1297,20 +1362,48 @@
     },
 
     /**
+      always use this method instead of the double- or triple-equality-operator
+      if you want to compare the contents, not the heap address (of objects in
+      general that implement the method).
       @method  equals
       @param {string} [comparable="undefined"] string to compare to
       @return {boolean} whether or not this' string strictly equals the
         string representation of `comparable`.
+      @example
+          Stryng('fox').equals('fox');             // > true
+          Stryng.equals('fox', 'fox');             // > true
+          Stryng.equals('fox', new String('fox')); // > true
+          Stryng.equals('fox', new Stryng('fox')); // > true
+          Stryng.equals('fox', 'FOX');             // > false, case-sensitive
+          Stryng.equals('undefined');              // > true, applies default
+          
+          'fox' == new String('fox');              // > true, type casting has hint string
+          'fox' == new Stryng('fox');              // > true
+
+          'fox' === new String('fox');             // > false, no casting applied
+          'fox' === new Stryng('fox');             // > false
+          
+          new String('fox') == new Stryng('fox');  // > false, no hint for casting
+          new String('fox') === new Stryng('fox'); // > false, different instances
+          // same goes for all other combinations of String and Stryng
+
      */
     equals: function (input, comparable) {
       return toString(input) === String(comparable);
     },
 
     /**
+      the case-insensitive version of {{#crossLink "Stryng/equals:method"}}
+      {{/crossLink}}
+
       @method iequals
       @param {string} [comparable="undefined"] string to compare to
       @return {boolean} whether or not this' string strictly equals the
         string representation of `comparable` ignoring case.
+      @example
+          Stryng('fox').iequals('fox'); // > true
+          Stryng.iequals('fox', 'FOX'); // > true
+          Stryng.iequals('Undefined');  // > true, applies default
      */
     iequals: function (input, comparable) {
       return toString(input).toLowerCase() === String(comparable).toLowerCase();
@@ -1319,6 +1412,10 @@
     /**
       @method isEmpty
       @return {boolean} whether or not this' string has length `0`.
+      @example
+          Stryng('').isEmpty();   // > true
+          Stryng.isEmpty('\r\n'); // > false
+          Styrng.isEmpty([]);     // > true, []+'' yiels ''
      */
     isEmpty: function (input) {
       return !toString(input);
@@ -1328,6 +1425,11 @@
       @method isBlank
       @return {boolean} whether or not this' string is empty or consists of
         whitespace, line terminators and/or Zs only.
+      @example
+          Stryng('').isBlank();   // > true
+          Stryng.isBlank(' ');    // > true
+          Stryng.isBlank('\r\n'); // > true
+          Stryng.isBlank('fox');  // > false
      */
     isBlank: function (input) {
       input = toString(input);
@@ -1340,6 +1442,18 @@
         number format from the beginning __until the end__ in contrast to
         native _parseFloat_. note that it won't throw if the actual number
         exceeds JavaScript's float range.
+      @example
+          Stryng('1').isFloat();      // > true
+          Stryng.isFLoat('1.0');      // > true
+          Stryng.isFLoat('1e3');      // > true
+          Stryng.isFLoat('1e-2.3');   // > true
+
+          Stryng.isFLoat('1e3-text'); // > false, although
+          parseFloat('1e3-text');     // > 1000
+
+          Stryng.isFloat('2e+309');   // > true, however
+          Number.MAX_VALUE;           // > 1.7976931348623157e+308
+          parseFloat('2e+309');       // > Infinity
      */
     isFloat: function (input) {
       return reIsFloat.test(toString(input));
@@ -1352,6 +1466,10 @@
       @method  clean
       @chainable
       @return {Stryng}
+      @example
+          Stryng(' padded ').clean();    // > 'padded'
+          Stryng.clean('-\t-\n-');       // > '- - -'
+          Stryng.clean('line\r\nbreak'); // > 'line break'
      */
     clean: function (input) {
       return Stryng.trim(input).replace(reWss, ' ');
@@ -1363,6 +1481,10 @@
       @method capitalize
       @chainable
       @return {Stryng}
+      @example
+          Stryng('fox').capitalize(); // > 'Fox'
+          Stryng.capitalize('');      // > ''
+          Stryng.capitalize('ä');     // > 'Ä', relies on toUpperCase
      */
     capitalize: function (input) {
       input = toString(input);
@@ -1432,8 +1554,8 @@
 
     /**
       replaces ligatures and diacritics from the Latin-1 Supplement
-      with their nearest ASCII equivalent.
-      compose this method with [Stryng#hyphenize](#hyphenize) to produce URL slugs
+      with their nearest ASCII equivalent. compose this method with
+      {{#crossLink "Stryng/hyphenize:method"}}{{/crossLink}} to produce URL slugs.
 
       @method  simplify
       @chainable
@@ -1490,8 +1612,8 @@
   /**
     returns whether or not `value` is an instance of Stryng.
     beware of Stryng classes hosted by other HTML frames inside
-    browser windows. this method won't recognize Stryngs
-    created with foreign Stryng constructors.
+    browser windows. this method won't recognize `Stryng` instances
+    created with foreign `Stryng` constructors.
     
     @method isStryng
     @static
@@ -1505,31 +1627,31 @@
   /**
     generates a string of `n` random characters in char-code range `[from, to)`.
     this range defaults to the ASCII printables. to choose randomly from the whole
-    UTF-16 table call `Stryng.random(n, 0, 1>>16)`.
+    UTF-16 table call `Stryng.random(n, 0, -1 >>> 16)`.
     
     @method random
     @static
-    @param {number} [n=0]
-    @param {number} [from=32] inclusively
-    @param {number} [to=127] exclusively
+    @param {number} [n=0] range constraint:
+      `0 <= n <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+    @param {number} [from=32] range constraint:
+      `0 <= from <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
+    @param {number} [to=127] range constraint:
+      `from < to <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @return {string}
-    @throws if `n` is negative or not finite or `to` exceeds `Math.pow(2, 16)`
+    @throws if `n`, `from` or `to` is out of range
    */
   Stryng.random = function (n, from, to) {
-    n = +n || 0;
-    if (n < 0 || n == INFINITY) exit();
-    n = mathFloor(n);
-    from = from === void 0 ? 32 : (from >>> 0);
-    to = to === void 0 ? 127 : (to >>> 0);
-    if (to >= MAX_CHARCODE) exit();
+    n = numberToInteger(n);
+    if (0 > n || n > MAX_STRING_SIZE) exit();
+    from = from === void 0 ? 32  : (from >>> 0);
+    to   = to   === void 0 ? 127 : (to   >>> 0);
+    if (from >= to || to > MAX_CHARCODE) exit();
 
     var result = '',
         difference = to - from;
 
     if (difference > 0) {
-      while (n--) {
-        result += stringFromCharCode(from + mathFloor(mathRandom() * difference));
-      }
+      while (n--) result += stringFromCharCode(from + mathFloor(mathRandom() * difference));
     }
     return result;
   };
@@ -1537,20 +1659,20 @@
   /**
     delegates to native `String.fromCharCode`.
     returns the concatenated string representations of the given
-    `charCode`s from the UTF-16 table. return the empty string if no arguments passed.
+    `charCode`s from the UTF-16 table. returns the empty string if no arguments passed.
     
     @method chr
     @static
-    @param {Array} [charCodes=[]]
+    @param {Array} charCodes
+      array of character codes in range
+      `0 <= cc <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @return {string}
-    @throws if any `charCode` exceeds `Math.pow(2, 16) - 1`
+    @throws if any `charCode` exceeds `MAX_CHARCODE`
    */
-  Stryng.chr = function (charCodes_) {
-    var charCodes = charCodes_ || [],
-        i = charCodes.length;
-
-    while (i--) {
-      if (charCodes[i] >= MAX_CHARCODE) {
+  Stryng.chr = function (charCodes) {
+    if (!isArray(charCodes)) exit('expected type: array');
+    for (var i = charCodes.length; i--;) {
+      if (charCodes[i] > MAX_CHARCODE) {
         exit('charCode ' + charCodes[i] + ' out of range');
       }
     }
@@ -1637,7 +1759,7 @@
         var value = toString(input),
             argc = arguments.length;
 
-        console.log('called ', fnName, ' with args ', JSON.stringify([input, a, b, c]));
+        // console.log('called ', fnName, ' with args ', JSON.stringify([input, a, b, c]));
 
         // avoid unoptimizable `.apply(null, arguments)`
         return (
