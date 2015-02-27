@@ -969,9 +969,9 @@
       in the returned array.
 
       @method  splitLeft
-      @param {String|RegExp} [delimiter="undefined"]
+      @param {string|RegExp} [delimiter="undefined"]
       @param {number} [n=MAX_UINT] max. no. split operations.
-      @return {String[]}
+      @return {Array} array of substrings
      */
     splitLeft: function (input, delimiter, n) {
       input = toString(input);
@@ -1011,11 +1011,13 @@
       @method  splitRight
       @param {string} [delimiter="undefined"]
       @param {number} [n=MAX_UINT] max. no. split operations.
-      @return {String[]}
-      @throws if `delimiter` is a regular expression
+      @return {Array} array of substrings
+      @throws if `delimiter` is a regular expression, compare
+        {{#crossLink "Stryng/splitLeft:method"}}{{/crossLink}}
      */
     splitRight: function (input, delimiter, n) {
       input = toString(input);
+      if (isRegExp(delimiter)) exit('no regex support');
       n = (n === void 0 ? -1 : n) >>> 0;
       if (!n) return [];
       delimiter = String(delimiter);
@@ -1032,7 +1034,7 @@
       [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-7.3).
      
       @method  splitLines
-      @return {String[]}
+      @return {Array} array of substrings
      */
     splitLines: function (input) {
       return toString(input).split(reLineTerminators);
@@ -1048,11 +1050,7 @@
       @return {Stryng}
      */
     exchange: function (input, replacee, replacement) {
-      input = toString(input);
-      replacee = String(replacee);
-      replacement = String(replacement);
-      if (replacee === replacement) return input;
-      return input.split(replacee).join(replacement); // implies parsing
+      return Stryng.exchangeRight(input, replacee, replacement);
     },
 
     /**
@@ -1068,11 +1066,8 @@
      */
     exchangeLeft: function (input, replacee, replacement, n) {
       input = toString(input);
-      n = (n === void 0 ? -1 : n) >>> 0;
-      replacee = String(replacee);
-      replacement = String(replacement);
-      if (replacee === replacement) return input;
-      return stryngFunctions.splitLeft(input, replacee, n).join(replacement);
+      return String(replacee) == replacement ? input :
+        Stryng.splitLeft(input, replacee, n).join(replacement);
     },
 
     /**
@@ -1088,11 +1083,8 @@
      */
     exchangeRight: function (input, replacee, replacement, n) {
       input = toString(input);
-      replacee = String(replacee);
-      replacement = String(replacement);
-      n = (n === void 0 ? -1 : n) >>> 0;
-      if (replacee === replacement) return input;
-      return stryngFunctions.splitRight(input, replacee, n).join(replacement);
+      return String(replacee) == replacement ? input :
+        Stryng.splitRight(input, replacee, n).join(replacement);
     },
 
     /**
@@ -1190,8 +1182,8 @@
 
      */
     strip: function (input, outfix, n) {
-      return stryngFunctions.stripRight(
-             stryngFunctions.stripLeft(input, outfix, n), outfix, n);
+      return Stryng.stripRight(
+             Stryng.stripLeft(input, outfix, n), outfix, n);
     },
 
     /**
@@ -1570,7 +1562,7 @@
       maps every character of this' string to its ordinal representation.
 
       @method ord
-      @return {Array} array of character codes
+      @return {Array} array of numeric character codes
      */
     ord: function (input) {
       input = toString(input);
@@ -1667,7 +1659,7 @@
       array of character codes in range
       `0 <= cc <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @return {string}
-    @throws if any `charCode` exceeds `MAX_CHARCODE`
+    @throws if `charCodes[i]` is out of range
    */
   Stryng.chr = function (charCodes) {
     if (!isArray(charCodes)) exit('expected type: array');
