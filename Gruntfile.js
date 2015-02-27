@@ -75,7 +75,6 @@ module.exports = function (grunt) {
     'grunt-contrib-jshint',
     'grunt-browserify',
     'grunt-docker',
-    'grunt-jsdoc'
   ].forEach(grunt.loadNpmTasks, grunt);
 
   // task definitions
