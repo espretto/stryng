@@ -14,39 +14,34 @@
   // ---------
   // except regular expressions
 
-  var
-  INFINITY = 1 / 0,
-  STR_FUNCTION = 'function',
-  STR_PROTOTYPE = 'prototype',
-  STR_UNDEFINED = 'undefined',
-  STR_OBJECT_ARRAY = '[object Array]',
-  STR_OBJECT_REGEXP = '[object RegExp]',
+  var CONSTANTS = {
 
-  /**
-    Stryng's version. __value:__ `0.1.11`
+    /**
+      Stryng's version. __value:__ `0.1.12`
+      
+      @property VERSION
+      @for  Stryng
+      @final
+      @readOnly
+      @type {string}
+     */
+    VERSION: '0.1.12',
+
+    /**
+      max. unsigned 32-bit integer. __value:__
+      - `Math.pow(2, 32) - 1`
+      - `-1 >>> 0`
+      - 4,294,967,295
+
+      @property MAX_UINT
+      @for Stryng
+      @final
+      @readOnly
+      @type {number}
+     */
+    MAX_UINT: -1 >>> 0
+  },
     
-    @property VERSION
-    @for  Stryng
-    @final
-    @readOnly
-    @type {string}
-   */
-  VERSION = '0.1.11',
-
-  /**
-    max. unsigned 32-bit integer. __value:__
-    - `Math.pow(2, 32) - 1`
-    - `-1 >>> 0`
-    - 4,294,967,295
-
-    @property MAX_UINT
-    @for Stryng
-    @final
-    @readOnly
-    @type {number}
-   */
-  MAX_UINT = -1 >>> 0,
-  
   /**
     max. string size. __value:__
     - `Math.pow(2, 28) - 1`
@@ -60,8 +55,8 @@
     @readOnly
     @type {number}
    */
-  MAX_STRING_SIZE = -1 >>> 4,
-  
+  MAX_STRING_SIZE = CONSTANTS.MAX_STRING_SIZE = -1 >>> 4,
+    
   /**
     max. UTF-16 character code. __value:__
     - `Math.pow(2, 16) - 1`
@@ -74,7 +69,7 @@
     @readOnly
     @type {number}
    */
-  MAX_CHARCODE = -1 >>> 16,
+  MAX_CHARCODE = CONSTANTS.MAX_STRING_SIZE = -1 >>> 16,
 
   /**
     punctuation symbols from the ASCII charset. __value:__ <code>!"#$%&'()*+,-./:;<=>?@[\\]^`{|}~</code>
@@ -85,11 +80,23 @@
     @readOnly
     @type {string}
    */
-  PUNCTUATION = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
+  PUNCTUATION = CONSTANTS.PUNCTUATION = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
+
+  INFINITY = 1 / 0,
+  STR_FUNCTION = 'function',
+  STR_PROTOTYPE = 'prototype',
+  STR_UNDEFINED = 'undefined',
+  STR_CONSTRUCTOR = 'constructor',
+  STR_OBJECT_ARRAY = '[object Array]',
+  STR_OBJECT_REGEXP = '[object RegExp]',
+
+  Object = CONSTANTS[STR_CONSTRUCTOR],
 
   // string inheritance
   // ------------------
-  String = PUNCTUATION.constructor,
+  String = STR_UNDEFINED[STR_CONSTRUCTOR],
+  
+  STR_NATIVE_FN_BODY = String(String).replace(/^[^{]+/, ''),
 
   // native instance methods `Stryng` hopes to adapt. the world isn't
   // ready for `Object.getOwnPropertyNames(String.prototype)` yet.
@@ -103,18 +110,7 @@
   // methods which's native implementations to override if necessary
   overrides = [],
 
-  // whether or not to adapt native static functions
-  hasStaticNatives = (function () {
-    // wrap try-catch clauses for optimizability of outer scope
-
-    if (isFunction(String.slice)) {
-      try { String.slice(/* undefined */); } // expect to throw
-      catch (e){ return true; }
-    }
-
-    return false;
-
-  }()),
+  Array = overrides[STR_CONSTRUCTOR],
 
   // method shortcuts
   // ----------------
@@ -123,10 +119,10 @@
   // shims are for internal use only.
 
   _arrayPush = methods.push,
+  _objectToString = CONSTANTS.toString,
+  _functionToString = _objectToString.toString,
 
-  _objectToString = ({}).toString,
-
-  _arrayForEach = methods.forEach || function (fn) {
+  _arrayForEach = returnNativeFunction(methods.forEach) || function (fn) {
     var array = this,
         len = array.length,
         i = -1;
@@ -134,7 +130,7 @@
     while (++i < len) if (fn(array[i], i, array) === false) break;
   },
 
-  _arrayIndexOf = methods.indexOf || function (item) {
+  _arrayIndexOf = returnNativeFunction(methods.indexOf) || function (item) {
     var i = -1;
 
     _arrayForEach.call(this, function (item_, i_) {
@@ -144,29 +140,39 @@
     return i;
   },
 
-  _arrayContains = methods.contains || function (item) {
+  _arrayContains = returnNativeFunction(methods.contains) || function (item) {
     return _arrayIndexOf.call(this, item) !== -1;
   },
 
-  mathMax = Math.max,
-  mathMin = Math.min,
-  mathFloor = Math.floor,
-  mathRandom = Math.random,
+  Math_ = Math,
+  mathMax = Math_.max,
+  mathMin = Math_.min,
+  mathFloor = Math_.floor,
+  mathRandom = Math_.random,
+
   stringFromCharCode = String.fromCharCode,
-  jsonStringify = typeof JSON !== STR_UNDEFINED && JSON.stringify,
+
+  jsonStringify = (
+    typeof JSON !== STR_UNDEFINED &&
+    returnNativeFunction(JSON.stringify)
+  ),
+
+  isArray = returnNativeFunction(Array.isArray) || function (any) {
+    return _objectToString.call(any) == STR_OBJECT_ARRAY;
+  },
 
   // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4)
   // compliant implementation of `Number.toInteger`,
   // tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
   // 
-  numberToInteger = Number.toInteger || function (n) {
+  numberToInteger = returnNativeFunction(Number.toInteger) || function (n) {
     return (n = +n) ? isFinite(n) ? n - (n%1) : n : 0;
   },
 
   // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys).
   // further assume that the `object` has `hasOwnProperty` on its prototype chain.
   // 
-  objectKeys = Object.keys || function (object) {
+  objectKeys = returnNativeFunction(Object.keys) || function (object) {
     var keys = [],
         i = 0;
 
@@ -179,29 +185,18 @@
     return keys;
   },
 
-  objectDefineProperty = (function (objectDefineProperty) {
-    // wrap try-catch clauses for optimizability of outer scope
-
-    try {
-      objectDefineProperty(Stryng[STR_PROTOTYPE], 'length', {
-        get: function () { return this.__value__.length; },
-        set: function () {} // provide noop setter for Safari 5/5.1
-      });
-      objectDefineProperty(Stryng, 'VERSION', {
-        writable: false,
-        value: VERSION
-      });
-    } catch (e) {
-      Stryng.VERSION = VERSION;
-      objectDefineProperty = false;
-    }
-
-    return objectDefineProperty;
-
-  }(Object.defineProperty)),
+  objectDefineProperty = returnNativeFunction(Object.defineProperty),
 
   // regular expressions
   // -------------------
+
+  // ### util
+  reRegex = /([.,*+-?^=!:${}()|\[\]\/\\])/g,
+  cbRegex = '\\$1',
+
+  reIsFloat = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
+
+  RegExp = reIsFloat[STR_CONSTRUCTOR],
 
   // ### quote & unquote
   ctrlMap = {
@@ -253,12 +248,6 @@
   reCaseSwitch = /([a-z])([A-Z])/g,
   reSpaceHyphen = /[ -]/g,
   reSpaceUnderscore = /[ _]/g,
-
-  // ### util
-  reRegex = /([.,*+-?^=!:${}()|\[\]\/\\])/g,
-  cbRegex = '\\$1',
-
-  reIsFloat = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
 
   // ### diacritics & liguatures
   // 
@@ -367,14 +356,15 @@
   // already knows how to deal with indices.
   // consider `String#endsWith` to behave the same on that matter.
   // 
-  if (!isFunction(VERSION.startsWith) || !'ab'.startsWith('b', 1)) {
+  if (!returnNativeFunction(STR_UNDEFINED.startsWith) ||
+      !STR_UNDEFINED.startsWith('n', 1)) {
     overrides.push('startsWith', 'endsWith');
   }
 
   // check if the native implementation of `String#substr`
   // correctly deals with negative indices.
   // 
-  if ('ab'.substr(-1) !== 'b') {
+  if (STR_UNDEFINED.substr(-1) !== 'd') {
     overrides.push('substr');
   }
 
@@ -399,9 +389,16 @@
     return typeof any === STR_FUNCTION;
   }
 
-  var isArray = Array.isArray || function (any) {
-    return _objectToString.call(any) == STR_OBJECT_ARRAY;
-  };
+  function returnNativeFunction (fn) {
+    if (!fn) return false;
+    
+    // cannot assign native endsWith's integrity yet
+    var str = _functionToString.call(fn),
+        li = str.lastIndexOf(STR_NATIVE_FN_BODY),
+        endsWith = li === str.length - STR_NATIVE_FN_BODY.length;
+
+    return isFunction(fn) && endsWith && fn;
+  }
 
   // constructor
   // -----------
@@ -514,6 +511,34 @@
      */
     if (!objectDefineProperty) instance.length = instance.__value__.length;
   }
+
+  (function () {
+    // wrap try-catch clauses for optimizability of outer scope
+
+    try {
+      objectDefineProperty(Stryng[STR_PROTOTYPE], 'length', {
+        get: function () { return this.__value__.length; },
+        set: function () {} // provide noop setter for Safari 5/5.1
+      });
+    } catch (e) {
+      // pass, see functions `Stryng.prototype.const` and `recycle`
+    }
+  }());
+
+  // constants
+  // ---------
+  // if `Object.defineProperty` is not available we simply set attributes.
+
+  _arrayForEach.call(objectKeys(CONSTANTS), function (key) {
+    try {
+      objectDefineProperty(Stryng, key, {
+        writable: false,
+        value: CONSTANTS[key]
+      });
+    } catch (e) {
+      Stryng[key] = CONSTANTS[key];
+    }
+  });
 
   // cloning mutables
   // ----------------
@@ -1758,6 +1783,18 @@
 
   // native methods
   // --------------
+  
+  // whether or not to adapt native static functions
+  var hasStaticNatives = (function () {
+    // wrap try-catch clauses for optimizability of outer scope
+
+    if (returnNativeFunction(String.slice)){
+      try { String.slice(/* undefined */); } // expect to throw
+      catch (e){ return true; }
+    }
+    return false;
+  }());
+
   // - provide a closure for each wrapper function
   // - skip functions that need stay shimmed
   // - populate the native static function `String[ fnName ]` onto the
@@ -1772,22 +1809,26 @@
   // 
   _arrayForEach.call(methods, function (fnName) {
 
-    if (isFunction(VERSION[fnName]) && !_arrayContains.call(overrides, fnName)) {
+    if (returnNativeFunction(STR_UNDEFINED[fnName]) &&
+        !_arrayContains.call(overrides, fnName)) {
 
-      Stryng[fnName] = hasStaticNatives && String[fnName] || function (input, a, b, c) {
-        var value = toString(input),
-            argc = arguments.length;
+      Stryng[fnName] = (
+        hasStaticNatives &&
+        returnNativeFunction(String[fnName]) ||
 
-        // console.log('called ', fnName, ' with args ', JSON.stringify([input, a, b, c]));
+        function (input, a, b, c) {
+          var value = toString(input),
+              argc = arguments.length;
 
-        // avoid unoptimizable `.apply(null, arguments)`
-        return (
-          !argc      ? value[fnName]() :
-          argc === 1 ? value[fnName](a) :
-          argc === 2 ? value[fnName](a, b) :
-                       value[fnName](a, b, c)
-        );
-      };
+          // avoid unoptimizable `.apply(null, arguments)`
+          return (
+            !argc      ? value[fnName]() :
+            argc === 1 ? value[fnName](a) :
+            argc === 2 ? value[fnName](a, b) :
+                         value[fnName](a, b, c)
+          );
+        }
+      );
 
       Stryng[STR_PROTOTYPE][fnName] = function (a, b, c) {
         var argc = arguments.length,
