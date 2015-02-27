@@ -23,7 +23,7 @@
   STR_OBJECT_REGEXP = '[object RegExp]',
 
   /**
-    Stryng's version.
+    Stryng's version. __value:__ `0.1.11`
     
     @property VERSION
     @for  Stryng
@@ -34,10 +34,10 @@
   VERSION = '0.1.11',
 
   /**
-    for documentation purposes only: max. unsigned 32-bit integer. __value:__
+    max. unsigned 32-bit integer. __value:__
     - `Math.pow(2, 32) - 1`
     - `-1 >>> 0`
-    - `4,294,967,295`
+    - 4,294,967,295
 
     @property MAX_UINT
     @for Stryng
@@ -45,12 +45,13 @@
     @readOnly
     @type {number}
    */
+  MAX_UINT = -1 >>> 0,
   
   /**
-    for documentation purposes only: max. string size. __value:__
+    max. string size. __value:__
     - `Math.pow(2, 28) - 1`
     - `-1 >>> 4`
-    - `268,435,455`
+    - 268,435,455
     - 256 MiB - 1 byte
 
     @property MAX_STRING_SIZE
@@ -62,10 +63,10 @@
   MAX_STRING_SIZE = -1 >>> 4,
   
   /**
-    for documentation purposes only: max. UTF-16 character code. __value:__
+    max. UTF-16 character code. __value:__
     - `Math.pow(2, 16) - 1`
     - `-1 >>> 16`
-    - `65,535`
+    - 65,535
 
     @property MAX_CHARCODE
     @for Stryng
@@ -75,9 +76,20 @@
    */
   MAX_CHARCODE = -1 >>> 16,
 
+  /**
+    punctuation symbols from the ASCII charset. __value:__ <code>!"#$%&'()*+,-./:;<=>?@[\\]^`{|}~</code>
+
+    @property PUNCTUATION
+    @for Stryng
+    @final
+    @readOnly
+    @type {string}
+   */
+  PUNCTUATION = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
+
   // string inheritance
   // ------------------
-  String = VERSION.constructor,
+  String = PUNCTUATION.constructor,
 
   // native instance methods `Stryng` hopes to adapt. the world isn't
   // ready for `Object.getOwnPropertyNames(String.prototype)` yet.
@@ -106,61 +118,9 @@
 
   // method shortcuts
   // ----------------
-  // static function names start with their parent namespace.
   // instance method names start with an underscore followed by their prototype.
+  // static function names start with their parent namespace.
   // shims are for internal use only.
-
-  mathMax = Math.max,
-  mathMin = Math.min,
-  mathFloor = Math.floor,
-  mathRandom = Math.random,
-  stringFromCharCode = String.fromCharCode,
-  jsonStringify = typeof JSON !== STR_UNDEFINED && JSON.stringify,
-
-  // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4)
-  // compliant implementation of `Number.toInteger`,
-  // tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
-  // 
-  numberToInteger = Number.toInteger || function (n) {
-    return (n = +n) ? isFinite(n) ? n - (n%1) : n : 0;
-  },
-
-  objectDefineProperty = (function (objectDefineProperty) {
-    // wrap try-catch clauses for optimizability of outer scope
-
-    try {
-      objectDefineProperty(Stryng, 'VERSION', {
-        writable: false,
-        value: VERSION
-      });
-      objectDefineProperty(Stryng[STR_PROTOTYPE], 'length', {
-        get: function () { return this.__value__.length; },
-        set: function () {} // provide noop setter for Safari 5/5.1
-      });
-    } catch (e) {
-      Stryng.VERSION = VERSION;
-      objectDefineProperty = false;
-    }
-
-    return objectDefineProperty;
-
-  }(Object.defineProperty)),
-
-  // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys).
-  // further assume that the `object` has `hasOwnProperty` on its prototype chain.
-  // 
-  objectKeys = Object.keys || function (object) {
-    var keys = [],
-        i = 0;
-
-    for (var key in object) { // `key` is required to be purely local
-      if (object.hasOwnProperty(key)){
-        keys[i++] = key;
-      }
-    }
-
-    return keys;
-  },
 
   _arrayPush = methods.push,
 
@@ -187,6 +147,58 @@
   _arrayContains = methods.contains || function (item) {
     return _arrayIndexOf.call(this, item) !== -1;
   },
+
+  mathMax = Math.max,
+  mathMin = Math.min,
+  mathFloor = Math.floor,
+  mathRandom = Math.random,
+  stringFromCharCode = String.fromCharCode,
+  jsonStringify = typeof JSON !== STR_UNDEFINED && JSON.stringify,
+
+  // fully [spec](http://www.ecma-international.org/ecma-262/5.1/#sec-9.4)
+  // compliant implementation of `Number.toInteger`,
+  // tested and benchmarked at [jsperf](http://jsperf.com/to-integer/11).
+  // 
+  numberToInteger = Number.toInteger || function (n) {
+    return (n = +n) ? isFinite(n) ? n - (n%1) : n : 0;
+  },
+
+  // ignore the [dont-enum bug](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys).
+  // further assume that the `object` has `hasOwnProperty` on its prototype chain.
+  // 
+  objectKeys = Object.keys || function (object) {
+    var keys = [],
+        i = 0;
+
+    for (var key in object) { // `key` is required to be purely local
+      if (object.hasOwnProperty(key)){
+        keys[i++] = key;
+      }
+    }
+
+    return keys;
+  },
+
+  objectDefineProperty = (function (objectDefineProperty) {
+    // wrap try-catch clauses for optimizability of outer scope
+
+    try {
+      objectDefineProperty(Stryng[STR_PROTOTYPE], 'length', {
+        get: function () { return this.__value__.length; },
+        set: function () {} // provide noop setter for Safari 5/5.1
+      });
+      objectDefineProperty(Stryng, 'VERSION', {
+        writable: false,
+        value: VERSION
+      });
+    } catch (e) {
+      Stryng.VERSION = VERSION;
+      objectDefineProperty = false;
+    }
+
+    return objectDefineProperty;
+
+  }(Object.defineProperty)),
 
   // regular expressions
   // -------------------
@@ -691,7 +703,7 @@
       @method  repeat
       @chainable
       @param {number} [n=0] range constraint:
-        `0 <= n <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+        `0 <= (n * this.length) <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
       @return {Stryng}
       @throws if `n` is out of range
       @example
@@ -702,8 +714,8 @@
 
           // don't try to allocate 256 MiB
           Stryng.repeat('-' , Math.pow(2, 28)-1); // works, don't try this
-          Stryng.repeat('-' , Math.pow(2, 28)  ); // throws, out of range
-          Stryng.repeat('--', Math.pow(2, 27)  ); // throws, too
+          Stryng.repeat('1' , Math.pow(2, 28)  ); // throws, out of range
+          Stryng.repeat('22', Math.pow(2, 27)  ); // throws, too
 
      */
     repeat: function (input, n) {
@@ -1012,8 +1024,7 @@
       @param {string} [delimiter="undefined"]
       @param {number} [n=MAX_UINT] max. no. split operations.
       @return {Array} array of substrings
-      @throws if `delimiter` is a regular expression, compare
-        {{#crossLink "Stryng/splitLeft:method"}}{{/crossLink}}
+      @throws if `delimiter` is a regular expression
      */
     splitRight: function (input, delimiter, n) {
       input = toString(input);
@@ -1294,10 +1305,10 @@
     },
 
     /**
-      without using `eval`. unescapes all occurences of backslash-escaped
+      unescapes all occurences of backslash-escaped
       characters `", \, \b, \t, \v, \n, \f, \r`, decodes all hex-encoded 
       characters and removes surrounding double quotes once without using `eval`.
-      see {{#crossLink "Stryng/unquote:method"}}{{/crossLink}} for the inverse
+      see {{#crossLink "Stryng/quote:method"}}{{/crossLink}} for the inverse
       operation.
 
       @method unquote
@@ -1523,7 +1534,7 @@
     },
 
     /**
-      transforms this' string into an underscored form by
+      transforms this' string into a hyphenized form by
 
       - inserting `-` where upper-cased letters follow lower-cased ones
       - replacing space and underscore by `-`
@@ -1602,15 +1613,31 @@
   // ----------------
 
   /**
-    returns whether or not `value` is an instance of Stryng.
-    beware of Stryng classes hosted by other HTML frames inside
-    browser windows. this method won't recognize `Stryng` instances
-    created with foreign `Stryng` constructors.
+    returns whether or not `value` is an instance of Stryng. note that this
+    method won't recognize `Stryng` instances created with foreign `Stryng`
+    constructors hosted by other HTML frames.
     
     @method isStryng
     @static
     @param {any} value
     @return {boolean}
+    @example
+        Stryng.isStryng(Stryng('fox'));     // > true
+        Stryng.isStryng(new String('fox')); // > false
+        Stryng.isStryng('fox');             // > false
+
+        function yours(){}
+        yours.prototype = new Stryng('');
+        yours.prototype.constructor = yours;
+        Stryng.isStryng(new yours());       // > true
+
+        // by-passes constructor call - won't work
+        var brokenInstance = Object.create(Stryng.prototype);
+        Stryng.isStryng(brokenInstance);    // > true
+
+        // assuming the iframe adheres to the same-domain-policy
+        var foreinInstance = iframeElement.contentWindow.Stryng('fox');
+        Stryng.isStryng(foreignInstance);   // > false
    */
   Stryng.isStryng = function (value) {
     return (value instanceof Stryng);
