@@ -69,7 +69,7 @@
     @readOnly
     @type {number}
    */
-  MAX_CHARCODE = CONSTANTS.MAX_STRING_SIZE = -1 >>> 16,
+  MAX_CHARCODE = CONSTANTS.MAX_CHARCODE = -1 >>> 16,
 
   /**
     punctuation symbols from the ASCII charset. __value:__ <code>!"#$%&'()*+,-./:;<=>?@[\\]^`{|}~</code>
