@@ -17,3 +17,4 @@ docs/dist
 test/*.bundle.js
 dist
 perf
+docs
