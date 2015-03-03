@@ -107,189 +107,62 @@ Benchmark.options.setup = function()
 // globals
 // -------
 
+function toString (value) {
+	return String(value);
+}
 
+function exchangeLeft (input, replacee, replacement, n) {
+  input = toString(input);
+  n = (n === void 0 ? -1 : n) >>> 0;
+  replacee = String(replacee);
+  replacement = String(replacement);
+  if (replacee === replacement) return input;
+
+  var result = input.split(replacee),
+      difference = result.length - n;
+
+  if (difference > 0) result.push(result.splice(n, difference).join(replacee));
+  return result.join(replacement);
+}
+
+function exchangeLeft2 (input, replacee, replacement, n) {
+	input = toString(input);
+  n = (n === void 0 ? -1 >>> 0 : (n >>> 0) + 1);
+  replacee = String(replacee);
+  replacement = String(replacement);
+  if (replacee === replacement) return input;
+
+  var result = input.split(replacee, n),
+      len = result.length,
+      i = -1,
+      sum = (len-1) * replacee.length;
+
+  while (++i < len) sum += result[i].length;
+  return result.join(replacement) + input.substring(sum);
+}
+
+
+var input = new Array(1e6).join('^-^');
 
 // suite queue
 suites = [];
 
 suites.push(
 
-	Benchmark.Suite({name: 'splitLeft'})
+	Benchmark.Suite({name: 'exchangeLeft'})
 
-		.add('match substrings', function(){
+		.add('push spliced', function () {
+			Stryng.exchangeLeft(input, '^^', '||', 3);
 			
-			Stryng.splitLeft(html, /<[^>]*>/);
-
 		})
 
-		.add('exec with globalized', function(){
-			
-			Stryng.splitLeft2(html, /<[^>]*>/);
-
+		.add('limited split', function () {
+			Stryng.exchangeLeft(input, '^^', '||', 3);
 		})
 );
 
-suites.push(
-
-	Benchmark.Suite({name: 'count'})
-
-		.add('charAt loop', function(){
-
-			Stryng.count2(sentence, ' ');
-		})
-
-		.add('repetitive indexOf', function(){
-
-			Stryng.count(sentence, ' ');
-		})
-);
-
-suites.push(
-
-	Benchmark.Suite({name:'trimRight'})
-
-		.add('reverse charAt loop with regex test', function(){
-
-		    Stryng.trimRight(rightPadded);
-		})
-
-		.add('reverse charAt loop with contains check', function(){
-
-		    Stryng.trimRight2(rightPadded);
-		})
-		
-		.add('strip by regex', function(){
-
-		    Stryng.trimRight3(rightPadded);
-		})
-);
-
-suites.push(
-
-	Benchmark.Suite({name:'reverse'})
-
-		.add('reverse charAt loop appending to new string', function(){
-
-			Stryng.reverse3('0123456789ABCDEF');
-		})
-
-		.add('reverse charAt loop appending to input then slicing', function(){
-
-			Stryng.reverse2('0123456789ABCDEF');
-		})
-
-		.add('composed split reverse join', function(){
-
-			Stryng.reverse('0123456789ABCDEF');
-		})
-);
-
-suites.push(
-
-	Benchmark.Suite({name:'join'})
-
-		.add('slice args', function(){
-
-			Stryng['join'](' ', splitSentence);
-		})
-
-		.add('shift args', function(){
-
-			Stryng['join2'](' ', splitSentence);
-		})
-);
-
-suites.push( // http://jsperf.com/mention-arguments/3
-
-	Benchmark.Suite({name:'arguments'})
-
-		.add('1', function(x){
-			var y = 1;
-			return Math.random() === x + y;
-		})
-
-		.add('2', function(x, arguments){
-			var y = 1;
-			return Math.random() === x + y;
-		})
-
-		.add('3', function(x){
-			var y = 1, arguments;
-			return Math.random() === x + y;
-		})
-
-		.add('4', function(x){
-			var y = 1;
-			return Math.random() === x + y;
-			var arguments;
-		})
-
-		.add('5', function(x){
-			var y = 1;
-			return Math.random() === x + y;
-			arguments : while(false);
-		})
-
-		.add('6', function(x){
-			arguments : while(false);
-			var y = 1;
-			return Math.random() === x + y;
-		})
-);
-
-suites.push(
-
-	Benchmark.Suite({name:'isEqual'})
-
-		.add('isEqual', function(){
-
-			Stryng.isEqual('hello', 'hello', 'hello', 'hello', 'hello');
-		})
-
-		.add('isEqual2', function(){
-
-			Stryng.isEqual2('hello', 'hello', 'hello', 'hello', 'hello');
-		})
-);
-
-suites.push(
-
-	Benchmark.Suite({name: 'toArray'})
-
-		.add('array slice', function(){
-			array_slice.call('0123456789ABCDEF');
-		})
-
-		.add('string split', function(){
-			'0123456789ABCDEF'.split('')
-		})
-
-)
-
-var value = Array(1e6).join('-');
-var reference = {};
-
-suites.push(
-
-	Benchmark.Suite({name:'func'})
-
-		.add('call by value', function(){
-			(function(arg){
-				Array(1e6).join('-')
-			}(value));
-		})
-
-		.add('call by reference', function(){
-			(function(arg){
-				Array(1e6).join('-')
-			}(reference));
-		})
-);
-
-suites = suites.filter(function(suite){
-
-	return !suite.name.indexOf('func')
-
-});
+// suites = suites.filter(function(suite){
+// 	return !suite.name.indexOf('func')
+// });
 
 suites.shift().run();
