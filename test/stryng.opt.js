@@ -6,6 +6,10 @@ var Stryng = require('./../src/stryng.js');
 
 /* global describe, it*/
 
+/* -----------------------------------------------------------------------------
+ * extend expectjs
+ */
+
 expect.Assertion.prototype.withArguments = function (args) {
   this.obj.__args__ = args;
   return this;
@@ -29,32 +33,10 @@ expect.Assertion.prototype.optimizable = function () {
 
   delete fn.__args__;
 
-  switch(args.length){
-    case 0: fn(); break;
-    case 1: fn(args[0]); break;
-    case 2: fn(args[0], args[1]); break;
-    case 3: fn(args[0], args[1], args[2]); break;
-    case 4: fn(args[0], args[1], args[2], args[3]); break;
-  }
-
-  switch(args.length){
-    case 0: fn(); break;
-    case 1: fn(args[0]); break;
-    case 2: fn(args[0], args[1]); break;
-    case 3: fn(args[0], args[1], args[2]); break;
-    case 4: fn(args[0], args[1], args[2], args[3]); break;
-  }
-
+  fn.apply(null, args);
+  fn.apply(null, args);
   %OptimizeFunctionOnNextCall(fn);
-
-  switch(args.length){
-    case 0: fn(); break;
-    case 1: fn(args[0]); break;
-    case 2: fn(args[0], args[1]); break;
-    case 3: fn(args[0], args[1], args[2]); break;
-    case 4: fn(args[0], args[1], args[2], args[3]); break;
-  }
-
+  fn.apply(null, args);
   status = %GetOptimizationStatus(fn);
   statusText = statusTexts[status] || 'unknown optimziation status';
   isOptimizable = status === 1 || status === 3;
@@ -65,6 +47,10 @@ expect.Assertion.prototype.optimizable = function () {
     function () { return sprintf('got unexpected "%s"', statusText); }
   );
 };
+
+/* -----------------------------------------------------------------------------
+ * generate tests
+ */
 
 describe('Stryng - ', function () {
 

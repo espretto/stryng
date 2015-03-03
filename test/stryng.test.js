@@ -1,9 +1,16 @@
+/**
+ * test module for stryngjs
+ */
+
 /* global describe, it, beforeEach*/
 
 var Stryng = require('./../src/stryng.js');
 var expect = require('expect.js');
 
-// feature detect
+/* -----------------------------------------------------------------------------
+ * feature detect
+ */
+
 var objectDefineProperty = (function(defineProperty) {
   try {
     defineProperty({}, 'x', {});
@@ -13,6 +20,10 @@ var objectDefineProperty = (function(defineProperty) {
   return defineProperty;
 }(Object.defineProperty));
 
+/* -----------------------------------------------------------------------------
+ * tests
+ */
+
 describe('Stryng()', function () {
 
   if ("undefined" != typeof window) {
@@ -20,7 +31,7 @@ describe('Stryng()', function () {
     beforeEach(function(done) {
 
       setTimeout(function () {
-        done();
+        done(); // help out IE
       }, 15);
     });
   }

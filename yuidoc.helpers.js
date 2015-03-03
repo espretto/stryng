@@ -1,18 +1,23 @@
+/**
+ * handlebars helpers for yuidoc
+ */
+
+var sprintf = require('util').format;
 
 module.exports = {
-  mdn: function (item) {
-    item = String(item);
-    var ns_fn = item.split('#');
+  es6: function (section) {
+    return sprintf('<a href="https://people.mozilla.org' +
+      '/~jorendorff/es6-draft.html#sec-%s"><tt>%s</tt></a>',
+      section.toLowerCase(),
+      section.replace('.prototype.', '#')
+    );
+  },
 
-    return [
-      '<a href="',
-      'https://people.mozilla.org/~jorendorff/es6-draft.html#sec-',
-      ns_fn[0].toLowerCase(),
-      '.prototype.',
-      ns_fn[1].toLowerCase(),
-      '"><tt>',
-      item,
-      '</tt></a>'
-    ].join('');
+  mdn: function(path){
+    return sprintf('<a href="https://developer.mozilla.org' +
+      '/en-US/docs/Web/JavaScript/Reference/Global_Objects/%s"><tt>%s</tt></a>',
+      path.split(/\.(?:prototype\.)?/).join('/'),
+      path.replace('.prototype.', '#')
+    );
   }
 };
