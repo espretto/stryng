@@ -17,7 +17,7 @@
   var CONSTANTS = {
 
     /**
-      Stryng's version. __value:__ `0.1.12`
+      Stryng's version. __value:__ `0.1.13`
       
       @property VERSION
       @for  Stryng
@@ -25,7 +25,7 @@
       @readOnly
       @type {string}
      */
-    VERSION: '0.1.12',
+    VERSION: '0.1.13',
 
     /**
       max. unsigned 32-bit integer. __value:__
@@ -652,26 +652,26 @@
     },
 
     /**
-      returns whether or not this' string contains the substring `search` starting at `position`.
-      shim for native [String#contains](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/contains)
+      returns whether or not this' string includes the substring `search`
+      starting at `position`. shim for native {{#mdn "String#includes"}}{{/mdn}}.
       
-      @method  contains
+      @method  includes
       @param {string} [search="undefined"]
       @param {number} [position=0]
       @return {boolean}
       @example
-          Stryng('within').contains('thin');    // > true
-          Stryng.contains('within', '', 10);    // > true, always
-          Stryng.contains('within', 'thin', 4); // > false, `thin` starts at index 2
-          Stryng.contains('undefined');         // > true, applied default
+          Stryng('within').includes('thin');    // > true
+          Stryng.includes('within', '', 10);    // > true, always
+          Stryng.includes('within', 'thin', 4); // > false, `thin` starts at index 2
+          Stryng.includes('undefined');         // > true, applied default
      */
-    contains: function (input, search, position) {
+    includes: function (input, search, position) {
       return toString(input).indexOf(search, position) !== -1;
     },
 
     /**
       returns whether or not this' string at index `position` begins with substring `search`.
-      shim for native [String#startsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.startswith)
+      shim for native {{#mdn "String#startsWith"}}{{/mdn}}.
       
       @method  startsWith
       @param {String} [search="undefined"]
@@ -693,7 +693,7 @@
 
     /**
       returns whether or not this' string truncated at `endPosition` ends with substring `search`.
-      shim for native [String#endsWith](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.endswith)
+      shim for native {{#mdn "String#endsWith"}}{{/mdn}}
       
       @method  endsWith
       @param {String} [search="undefined"]
@@ -722,7 +722,7 @@
 
     /**
       concatenates this' string `n` times to the empty string.
-      shim for native [String#repeat](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.repeat).
+      shim for native {{#mdn "String#repeat"}}{{/mdn}}
       reduction of concat operations inspired by [mout/string/repeat](https://github.com/mout/mout/blob/v0.9.0/src/string/repeat.js)
       
       @method  repeat
@@ -763,7 +763,7 @@
     /**
       returns the substring of `input` with length `length` starting at
       `position` which may also be negative to index backwards.
-      shim for native [String#substr](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype.substr)
+      shim for native {{#mdn "String#substr"}}{{/mdn}}
       
       @method  substr
       @chainable
@@ -780,7 +780,8 @@
 
     /**
       prepends and appends `outfix` to `input` in one go.
-      to do the opposite use {{#crossLink "Stryng/strip:method"}}{{/crossLink}}
+      to do the opposite use {{#crossLink "Stryng/strip:method"}}{{/crossLink}}.
+      related to {{#crossLink "Stryng/embrace:method"}}{{/crossLink}}.
       
       @method  wrap
       @chainable
@@ -792,6 +793,9 @@
       @throws if `n` is out of range
       @example
           Stryng('python doc string').wrap('"', 3); // > '"""python doc string"""'
+          Stryng.wrap('quote', '"');                // > 'quote', applied default
+          Stryng.wrap('quote', '"', 1);             // > '"quote"'
+
      */
     wrap: function (input, outfix, n) {
       input = toString(input);
@@ -800,29 +804,41 @@
     },
 
     /**
-      prepends the 1st and appends the 2nd character of `braces` to this' string.
+      prepends the 1st and appends the 2nd half of `braces` to this' string.
       
       @method embrace
       @chainable
       @param  {string} [braces='()']
       @return {Stryng}
-      @throws if `braces.length !== 2`
+      @throws if `braces.length` is odd
+      @example
+          Stryng('optional').embrace('[]'); // > '[optional]'
+          Stryng.embrace('hbs', '\{\{\}\}');    // > '\{\{hbs\}\}'
+          Stryng.embrace('0, 1', '[)');     // > '[0, 1)'
+          Stryng.embrace('0, 1', '');       // > '0, 1'
+          Stryng.embrace('side note');      // > '(side note)', applies default
+          Stryng.embrace('floored split idx', '<em></em>'); // > '<em>floored split idx</em>'
      */
     embrace: function(input, braces){
-      input = toString(input);
       braces = braces !== void 0 ? String(braces) : '()';
-      if (braces.length !== 2) exit();
-      return braces.charAt(0) + input + braces.charAt(1);
+      return Stryng.insert(braces, mathFloor(braces.length/2), toString(input));
     },
 
     /**
       returns the no. non-overlapping occurrences of `search` within `input`.
       the empty string is considered a _character boundary_
-      thus `input.length + 1` will always be the result for that.
+      thus `this.length + 1` will always be the result for that.
       
       @method  count
       @param {string} [search="undefined"] the substring to search for
       @return {number}
+      @example
+          var tongueTwister = 'Can you can a can as a canner can can a can?';
+          Stryng(tongueTwister).count('can'); // > 6
+          Stryng.count(tongueTwister, 'a');   // > 11
+          Stryng.count(tongueTwister, '');    // > 45
+          tongueTwister.length;               // > 44
+          Stryng.count(tongueTwister);        // > 0, 'undefined' wasn't found
      */
     count: function (input, search) {
       input = toString(input);
@@ -840,49 +856,42 @@
     },
 
     /**
-      returns an object with `searches` as keys. each key is associated with its
+      returns an object with `substrings` as keys. each key is associated with its
       no. non-overlapping occurrences within `input`.
       the empty string is considered a _character boundary_
-      thus `input.length + 1` will always be the result for that.
+      thus `this.length + 1` will always be the result for that.
 
-      __note:__ duplicate entries within `searches` won't be removed prior to
+      __note:__ duplicate entries within `substrings` won't be removed prior to
       counting and thereby impact performance but don't change the result.
 
       @method  countMultiple
-      @param {Array} searches
+      @param {Array} substrings
         array of substrings to search for
       @return {Object}
 
       @example
-      if multiple keys in `searches` match `input` at the same index the first
+      if multiple keys in `substrings` match `input` at the same index the first
       one encountered in the array will take the credit. for this reason you
-      might want to sort your `searches` by length in descending order prior to
+      might want to sort your `substrings` by length in descending order prior to
       passing them in.
-          var text       = Stryng('abc abc abc'),
-              searches   = ['a', 'ab', 'abc'];
-              sortedDesc = ['abc', 'ab', 'a'];
+
+          var tongueTwister = 'Can you can a can as a canner can can a can?',
+              sortedAsc  = ['c', 'can', 'can a'],
+              sortedDesc = ['can a', 'can', 'c'];
               
-          text.countMultiple(searches);   // {a: 3}
-          text.countMultiple(sortedDesc); // {abc: 3}
+          Stryng(tongueTwister).countMultiple(sortedAsc);  // {"c": 6}
+          Stryng.countMultiple(tongueTwister, sortedDesc); // {"can a": 3}
 
-      @example
       if you don't want this behavior use {{#crossLink "Stryng/count:method"}}
-      {{/crossLink}} for each search instead.
-          var result = {};
-          searches.forEach(function (search) {
-            result[search] = text.count(search);
-          });
-          result; // {a: 3, ab: 3, abc: 3}
-
+      {{/crossLink}} for each substring instead.
      */
-    countMultiple: function (input, keys_){
+    countMultiple: function (input, substrings){
       input = toString(input);
-      if (!isArray(keys_)) exit('expected type: array');
-      if (!keys_.length) return {};
+      if (!isArray(substrings)) exit('expected type: array');
+      if (!substrings.length) return {};
 
-      var keys = keys_.slice(),
+      var keys = substrings.slice(),
           key,
-          hasEmpty = _arrayContains.call(keys, ''),
           len = keys.length,
           i = -1,
           indices = new Array(len),
@@ -916,7 +925,7 @@
         }
       }
 
-      if (hasEmpty) result[''] = input.length + 1;
+      if (_arrayContains.call(substrings, '')) result[''] = input.length + 1;
       
       return result;
     },
@@ -928,6 +937,10 @@
       @param {Array} joinees
         array of substrings to concatenate
       @return {Stryng}
+      @example
+          Stryng(',').delimit([1,2,3]); // > '1,2,3'
+          Stryng.delimit(',', []);      // > ''
+          Stryng.delimit(',');          // throws
      */
     delimit: function (delimiter, joinees) {
       if (delimiter == null) exit();
@@ -944,6 +957,9 @@
       @method  reverse
       @chainable
       @return {Stryng}
+      @example
+          Stryng('mordnilap a ton').reverse(); // > 'not a palindrom'
+          Stryng.reverse('mañana');            // > 'anãnam', use esrever
      */
     reverse: function (input) {
       return toString(input).split('').reverse().join('');
@@ -958,6 +974,12 @@
       @param {number} [position=0] index where `insertion` will be found
       @param {string} [insertion="undefined"] string to insert
       @return {Stryng}
+      @example
+          Stryng('int').insert(2, 'ser');         // > 'insert'
+          Stryng.insert('fix', void 0, 'pre');    // > 'prefix', default pos. is zero
+          Stryng.insert('fix', -1, 'pre');        // > 'prefix', pos. is min-ed to zero
+          Stryng.insert('out of ', 10, 'bounds'); // > 'out of bounds', pos. is max-ed to length
+          Stryng.insert('this is ', 10);          // > 'this is undefined'
      */
     insert: function (input, position, insertion) {
       input = toString(input);
@@ -1086,7 +1108,7 @@
       @return {Stryng}
      */
     exchange: function (input, replacee, replacement) {
-      return Stryng.exchangeRight(input, replacee, replacement);
+      return Stryng.exchangeLeft(input, replacee, replacement);
     },
 
     /**
@@ -1102,6 +1124,7 @@
      */
     exchangeLeft: function (input, replacee, replacement, n) {
       input = toString(input);
+      // let cast with hint string
       return String(replacee) == replacement ? input :
         Stryng.splitLeft(input, replacee, n).join(replacement);
     },
@@ -1119,35 +1142,44 @@
      */
     exchangeRight: function (input, replacee, replacement, n) {
       input = toString(input);
+      // let cast with hint string
       return String(replacee) == replacement ? input :
         Stryng.splitRight(input, replacee, n).join(replacement);
     },
 
     /**
       both appends and prepends `padding` to this' string as often as needed
-      to reach but not exceed a length of `maxLength`. passing a `maxLength`
+      to reach but not exceed a length of `length`. passing a `length`
       lesser than this' string's length has no effect. it is never truncated.
 
       @method just
       @chainable
-      @param {number} [maxLength=0] range constraint:
-        `0 <= maxLength <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+      @param {number} [length=0] range constraint:
+        `0 <= length <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
       @param {string} [padding=" "]
       @return {Stryng}
-      @throws if `maxLength` is out of range
+      @throws if `length` is out of range
+      @example
+          Stryng('HEAD').just(10, '+'); // > '+++HEAD+++'
+          Stryng.just('pad');           // > 'pad'
+          Styrng.just('pad', 1);        // > 'pad', never truncated
+          Styrng.just('pad', 6, '++');  // > 'pad', combined length exceeds 6
+          
+          var align = Stryng.just('align', 8); // > ' align ', default to space
+          align.length;                        // > 7, needs to fit both ends
      */
-    just: function (input, maxLength, padding) {
+    just: function (input, length, padding) {
       input = toString(input);
-      maxLength = numberToInteger(maxLength);
-      if (0 > maxLength || maxLength > MAX_STRING_SIZE) exit();
+      length = numberToInteger(length);
+      if (0 > length || length > MAX_STRING_SIZE) exit();
       padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
-          paddingLen = padding.length * 2; // safe, `<< 1` converts to 32-Bit Integer
+          paddingLen = padding.length;
 
-      if (maxLength <= inputLen) return input;
-      while (input.length + paddingLen <= maxLength) input = padding + input + padding;
-      return input;
+      if (length <= inputLen || !paddingLen) return input;
+      padding = Stryng.repeat(padding, mathFloor((length-inputLen) / 2 / paddingLen));
+      return padding + input + padding;
     },
 
     /**
@@ -1162,6 +1194,12 @@
       @param {string} [padding=" "]
       @return {Stryng}
       @throws if `length` is out of range
+      @example
+          Stryng('left').justLeft(8, '+');     // > '++++left'
+          Stryng.justLeft('left');             // > 'left'
+          Stryng.justLeft('left', 2);          // > 'left', never truncated
+          Stryng.justLeft('indent', 8);        // > '  indent', default to space
+          Stryng.justLeft('indent', 8, '>>>'); // > 'indent', combined length exceeds 8
      */
     justLeft: function (input, length, padding) {
       input = toString(input);
@@ -1172,9 +1210,8 @@
       var inputLen = input.length,
           paddingLen = padding.length;
 
-      if (length <= inputLen || !padding) return input;
-      while (input.length + paddingLen <= length) input = padding + input;
-      return input;
+      if (length <= inputLen || !paddingLen) return input;
+      return Stryng.repeat(padding, mathFloor((length-inputLen) / paddingLen)) + input;
     },
 
     /**
@@ -1189,6 +1226,12 @@
       @param {string} [padding=" "]
       @return {Stryng}
       @throws if `length` is out of range
+      @example
+          Stryng('right').justRight(8, '+');  // > 'right+++'
+          Stryng.justRight('right');          // > 'right'
+          Stryng.justRight('right', 2);       // > 'right', never truncated
+          Stryng.justRight('right', 8);       // > 'right   ', default to space
+          Stryng.justRight('right', 6, '++'); // > 'right', combined length exceeds 6
      */
     justRight: function (input, length, padding) {
       input = toString(input);
@@ -1199,9 +1242,8 @@
       var inputLen = input.length,
           paddingLen = padding.length;
 
-      if (length <= inputLen || !padding) return input;
-      while (input.length + paddingLen <= length) input += padding;
-      return input;
+      if (length <= inputLen || !paddingLen) return input;
+      return input + Stryng.repeat(padding, mathFloor((length-inputLen) / paddingLen));
     },
 
     /**
@@ -1215,7 +1257,11 @@
       @param {string} [outfix="undefined"] string to remove
       @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
-
+      @example
+          Stryng('__private__').strip('_'); // > 'private'
+          Stryng.strip('++ NEWS +', '+', 1);  // > '+ NEWS '
+          Stryng.strip('  indented', ' ');  // > 'indented'
+          Stryng.strip('undefined');        // > '', applies default
      */
     strip: function (input, outfix, n) {
       return Stryng.stripRight(
@@ -1230,6 +1276,10 @@
       @param {string} [prefix="undefined"] string to remove
       @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
+      @example
+          Stryng('  indented').stripLeft(' '); // > 'indented'
+          Stryng.stripLeft('+++ NEWS +++').stripLeft('+'); // > ' NEWS +++'
+          Stryng.stripLeft('__private').stripLeft('_', 1); // > '_private'
      */
     stripLeft: function (input, prefix, n) {
       input = toString(input);
@@ -1257,6 +1307,10 @@
       @param {string} [suffix="undefined"] string to remove
       @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
+      @example
+          Stryng('\n line \n').stripRight('\n'); // > '\n line '
+          Stryng.stripRight('+++ NEWS +++').stripRight('+'); // > '+++ NEWS '
+          Stryng.stripRight('fee').stripRight('e', 1); // > 'fe'
      */
     stripRight: function (input, suffix, n) {
       input = toString(input);
@@ -1277,7 +1331,7 @@
 
     /**
       slices this' string to exactly fit the given `maxLength`
-      while including the `ellipsis` at its end (enforced). this implementation
+      while including the complete `ellipsis` at its end. this implementation
       has no knowledge of word boundaries. TODO: search word boundary and trimRight
 
       @method  truncate
@@ -1316,6 +1370,8 @@
       @method  quote
       @chainable
       @return {Stryng}
+      @example
+          Stryng('en école\nj'apprends').quote(); // > '"en \xE9cole\\nj'apprends"'
      */
     quote: function (input) {
       input = toString(input);
@@ -1522,20 +1578,28 @@
     /**
       transforms this' string into camel-case by
 
-      - removing all occurences of space, underscore and hyphen
-      - upper-casing the first letter directly following the above
+      - lower-casing the input
+      - removing all occurences of space, underscore and hyphen followed by a
+        lower-case letter which is then upper-cased.
 
-      inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_camelize)
-      note that this leaves the very first letter untouched.
+      inspired by [emberjs](http://emberjs.com/api/classes/Ember.String.html#method_camelize).
       for a _classified_ output compose this method with 
       {{#crossLink "Stryng/capitalize:method"}}{{/crossLink}}.
 
       @method  camelize
       @chainable
       @return {Stryng}
+      @example
+          Stryng('ClassName').camelize();     // > 'className'
+          Stryng.camelize('hyphen-ized');     // > 'hyphenIzed'
+          Stryng.camelize('MiXeD CaSe');      // > 'mixedCase'
+          Stryng.camelize('CONST_VALUE');     // > 'constValue'
+          Stryng.camelize('This Is A Title'); // > 'thisIsATitle'
      */
     camelize: function (input) {
-      return toString(input).replace(reLowBoundary, cbLowBoundary);
+      return toString(input)
+        .toLowerCase()
+        .replace(reLowBoundary, cbLowBoundary);
     },
 
     /**
@@ -1550,6 +1614,11 @@
       @method  underscore
       @chainable
       @return {Stryng}
+      @example
+          Stryng('ClassName').underscore();     // > 'class_name'
+          Stryng.underscore('hyphen-ized');     // > 'hyphen_ized'
+          Stryng.underscore('MiXeD CaSe');      // > 'mi_xe_d_ca_se'
+          Stryng.underscore('This Is A Title'); // > 'this_is_a_title'
      */
     underscore: function (input) {
       return toString(input)
@@ -1572,6 +1641,11 @@
       @method  hyphenize
       @chainable
       @return {Stryng}
+      @example
+          Stryng('ClassName').hyphenize();     // > 'class-name'
+          Stryng.hyphenize('under_scored');    // > 'under-scored'
+          Stryng.hyphenize('MiXeD CaSe');      // > 'mi-xe-d-ca-se'
+          Stryng.hyphenize('This Is A Title'); // > 'this-is-a-title'
      */
     hyphenize: function (input) {
       return toString(input)
@@ -1595,10 +1669,13 @@
     },
 
     /**
-      maps every character of this' string to its ordinal representation.
+      maps every character of this' string to its decimal representation.
 
       @method ord
       @return {Array} array of numeric character codes
+      @example
+          Stryng('*').ord();  // > [42]
+          Stryng.ord('\t\v'); // > [9, 11]
      */
     ord: function (input) {
       input = toString(input);
@@ -1617,6 +1694,12 @@
       @method escapeRegex
       @chainable
       @return {Stryng}
+      @example
+          var r = Stryng(Stryng.PUNCTUATION)
+            .escapeRegex()
+            .toRegex('g');
+
+          "what's the matter?".split(r); // > ['what', 's the matter', '']
      */
     escapeRegex: function (input) {
       return toString(input).replace(reRegex, cbRegex);
@@ -1628,6 +1711,9 @@
       @method  toRegex
       @param  {string} flags
       @return {RegExp}
+      @example
+          Stryng('\\w').toRegex().test('A');      // > true
+          Stryng('[a-z]').toRegex('i').test('B'); // > true
      */
     toRegex: function (input, flags) {
       return new RegExp(toString(input), flags);
@@ -1701,9 +1787,9 @@
   };
 
   /**
-    delegates to native `String.fromCharCode`.
-    returns the concatenated string representations of the given
-    `charCode`s from the UTF-16 table. returns the empty string if no arguments passed.
+    delegates to native `String.fromCharCode`. returns the concatenated string
+    representations of the given `charCode`s from the UTF-16 table.
+    returns the empty string if passed the empty array.
     
     @method chr
     @static

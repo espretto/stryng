@@ -1,6 +1,6 @@
 {
   "name": "stryng",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "devDependencies": {
     "benchmark": "~1.0.0",
     "browserify": "^4.2.0",

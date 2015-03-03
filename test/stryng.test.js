@@ -162,30 +162,30 @@ describe('Stryng()', function () {
     });
   });
 
-  describe('.contains()', function () {
+  describe('.includes()', function () {
 
     it('should fail if `input` is missing', function () {
-      expect(Stryng.contains).to.throwError();
+      expect(Stryng.includes).to.throwError();
     });
 
     it('should return true on "undefined" with no arguments passed', function () {
-      expect(Stryng.contains('undefined' /*, (undefined).toString() */)).to.be.ok();
+      expect(Stryng.includes('undefined' /*, (undefined).toString() */)).to.be.ok();
     });
 
     it('should find the empty string in any string', function () {
-      expect(Stryng.contains('any', '')).to.be.ok();
+      expect(Stryng.includes('any', '')).to.be.ok();
     });
 
     it('should return true if search equals `input`', function () {
-      expect(Stryng.contains('foo', 'foo')).to.be.ok();
+      expect(Stryng.includes('foo', 'foo')).to.be.ok();
     });
 
-    it('should return true if `input` contains substring', function () {
-      expect(Stryng.contains('the quick brown fox', 'quick')).to.be.ok();
+    it('should return true if `input` includes substring', function () {
+      expect(Stryng.includes('the quick brown fox', 'quick')).to.be.ok();
     });
 
     it('should return false if substring not found', function () {
-      expect(Stryng.contains('foo', 'bar')).not.to.be.ok();
+      expect(Stryng.includes('foo', 'bar')).not.to.be.ok();
     });
   });
 
@@ -337,16 +337,16 @@ describe('Stryng()', function () {
       expect(Stryng.embrace).to.throwError();
     });
 
-    it('should fail `braces.length !== 2`', function () {
-      expect(Stryng.embrace).withArgs('btw', '').to.throwError();
-    });
-
     it('should apply round brackets as the default', function () {
       expect(Stryng.embrace('btw')).to.equal('(btw)');
     });
 
     it('should wrap `input` with the given `braces`', function () {
       expect(Stryng.embrace('optional', '[]')).to.equal('[optional]');
+    });
+
+    it('should floor the middle index', function () {
+      expect(Stryng.embrace('text', '<p></p>')).to.equal('<p>text</p>');
     });
   });
 

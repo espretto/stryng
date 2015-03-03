@@ -1,0 +1,11 @@
+{
+    "name": "Stryng",
+    "description": "utility class for manipulating strings in JavaScript",
+    "version": "0.1.13",
+    "options": {
+        "linkNatives": "true",
+        "outdir": "./docs/",
+        "paths": ["./src/"],
+        "helpers": ["./yuidoc.helpers.js"]
+    }
+}

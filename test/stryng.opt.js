@@ -132,8 +132,8 @@ describe('Stryng - ', function () {
 
   // eventually shimmed
   // ------------------
-  , ['contains', 'foo', 'o']
   , ['endsWith', 'foo', 'o']
+  , ['includes', 'foo', 'o']
   , ['quote', 'foo']
   , ['repeat', 'foo', 3]
   , ['startsWith', 'foo', 'f']
