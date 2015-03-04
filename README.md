@@ -1,5 +1,5 @@
 
-Stryng
+Stryng [![Build Status](https://travis-ci.org/espretto/stryng.svg?branch=develop)](https://travis-ci.org/espretto/stryng)
 ------
 for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively. Stryng to the rescue!
 
@@ -19,12 +19,12 @@ Stryng adopts native static and instance methods and adds another ~40 methods on
 
 method | static | instance | shim | arguments
 :--- | --- | --- | --- | ---
-__append__ | x | x | | tail, ignoreIfEndsWith
+__append__ | x | x | | tail, once
 __camelize__ | x | x | |
 __capitalize__ | x | x | |
 charAt | x | x | | index
 charCodeAt | x | x | | index
-__chr__ | x | | |
+__chr__ | x | | | [65, 66, 67]
 __clean__ | x | x | |
 __clone__ | | x | | isMutable
 codePointAt | x | x | | index
@@ -32,7 +32,8 @@ concat | x | x | | tail
 contains | x | x | x | fromIndex
 __count__ | x | x | | search
 __countMultiple__ | x | x | | [search, searc, sear, ...]
-__embrace__ | x | x | | `'()'`, `'[]'`, `'{}'` etc.
+__delimit__ | x | x | | [str, st, s, ...]
+__embrace__ | x | x | | `'()'`, `'<tag></tag>'`, `'{{}}'` etc.
 endsWith | x | x | x | fromIndex
 __equals__ | x | x | | comparable
 __iequals__ | x | x | | comparable (ignore case)
@@ -48,7 +49,6 @@ __insert__ | x | x | | insertion, index
 __isBlank__ | x | x |
 __isEmpty__ | x | x |
 __isFloat__ | x | x |
-__join__ | x | x | | [str, st, s, ...]
 __just__ | x | x | | maxLength, filler
 __justLeft__ | x | x | | maxLength, filler
 __justRight__ | x | x | | maxLength, filler
@@ -57,7 +57,7 @@ localeCompare | x | x | | comparable
 match | x | x | | regex
 normalize | x | x |
 __ord__ | x | x |
-__prepend__ | x | x | | head, ignoreIfStartsWith
+__prepend__ | x | x | | head, once
 quote | x | x | x
 __random__ | x | | | length, fromCharCode, toCharCode
 repeat | x | x | x | times
@@ -112,7 +112,7 @@ var slug = Stryng(headline, true) // we're only interested in the end-result
 ```
 varying naming schemes
 ```js
-var headline = Stryng('the quick brown fox', false), // though immutable by default
+var headline = Stryng('The quick brown fox', false), // though immutable by default
   hyphenized = headline.hyphenize(),      // 'the-quick-brown-fox'
   camelCased = hyphenized.camelize(),     // 'theQuickBrownFox'
   under_scored = camelCased.underscore(), // 'the_quick_brown_fox'
