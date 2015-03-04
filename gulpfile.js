@@ -1,5 +1,5 @@
 /**
- * gulpfile - build tasks
+ * gulp v3.4.0, latest compatible with node v0.8 
  */
 
 var fs = require('fs');
