@@ -1,5 +1,5 @@
 
-Stryng [![Build Status](https://travis-ci.org/espretto/stryng.svg?branch=develop)](https://travis-ci.org/espretto/stryng)
+Stryng [![Build Status](https://travis-ci.org/espretto/stryng.svg?branch=master)](https://travis-ci.org/espretto/stryng)
 ------
 for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively. Stryng to the rescue!
 
