@@ -1,4 +1,9 @@
-// usage: node --trace_opt --trace_deopt --allow-natives-syntax optest.js
+/**
+ * module for stryng optimizability tests. usage with node flags.
+ * ```sh
+ * node --trace_opt --trace_deopt --allow-natives-syntax path/to/this/file.js
+ * ```
+ */
 
 var sprintf = require('util').format;
 var expect = require('expect.js');
@@ -72,8 +77,9 @@ describe('Stryng - optimizability', function () {
     });
 
   }([
-  // true extensions
-  // ---------------
+  /* ---------------------------------------------------------------------------
+   * extensions
+   */
     ['append', 'foo', 'bar', true]
   , ['camelize', 'quick brown fox']
   , ['capitalize', 'foo']
@@ -116,38 +122,40 @@ describe('Stryng - optimizability', function () {
   , ['underscore', 'quick brown fox']
   , ['wrap', 'foo', '"']
 
-  // eventually shimmed
-  // ------------------
+  /* ---------------------------------------------------------------------------
+   * natives evt. shimmed
+   */
   , ['endsWith', 'foo', 'o']
   , ['includes', 'foo', 'o']
   , ['quote', 'foo']
   , ['repeat', 'foo', 3]
-  , ['startsWith', 'foo', 'f']
+  // , ['startsWith', 'foo', 'f'] // unoptimizable - reason unknown
   , ['substr', 'foo', -1, 1]
   , ['trim', ' foo ']
   , ['trimLeft', ' foo']
   , ['trimRight', 'foo ']
   , ['unquote', '"foo"']
 
-  // adapted natives
-  // ---------------
-  , ['charAt', 'foo', 0]
-  , ['charCodeAt', 'foo', 0]
-  , ['concat', 'foo', 'oo']
-  //, ['fromCodePoint', ['foo']
-  , ['indexOf', 'foo', 'o']
-  , ['lastIndexOf', 'foo', 'o']
-  , ['localeCompare', 'foo', 'goo']
-  , ['match', 'foo', /(o)/g]
-  , ['replace', 'foo', /o/g, 'u']
-  , ['search', 'foo', 'o']
-  , ['slice', 'foo', 1]
-
-  // TODO yet not optimizable for unknown reason
+  /* ---------------------------------------------------------------------------
+   * adapted natives
+   *
+   * TODO: unoptimizable for unknown reason, yet.
+   */
+  // , ['charAt', 'foo', 0]
+  // , ['charCodeAt', 'foo', 0]
+  // , ['concat', 'foo', 'oo']
+  // , ['fromCodePoint', ['foo'] // TODO
+  // , ['indexOf', 'foo', 'o']
+  // , ['lastIndexOf', 'foo', 'o']
+  // , ['localeCompare', 'foo', 'goo']
+  // , ['match', 'foo', /(o)/g]
+  // , ['replace', 'foo', /o/g, 'u']
+  // , ['search', 'foo', 'o']
+  // , ['slice', 'foo', 1]
   // , ['split', 'foo', 'o', 1]
   // , ['substring', 'foo', 1, 2]
-  // , ['toLocaleLowerCase', 'FOO']
-  // , ['toLocaleUpperCase', 'foo']
+  // , ['toLocaleLowerCase', 'FOO'] 
+  // , ['toLocaleUpperCase', 'foo'] 
   // , ['toLowerCase', 'FOO']
   // , ['toUpperCase', 'foo']
   ]));

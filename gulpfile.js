@@ -44,9 +44,9 @@ gulp.task('browserify', function (){
 gulp.task('jshint', function() {
   gulp.src([
         './src/stryng.js',
-        './test/stryng.test.js',
+        './test/stryng.unit.js',
         // './test/stryng.opt.js', // %-natives throw
-        './test/stryng.opt.call.js',
+        './test/stryng.test.js',
         './gulpfile.js'
       ])
       .pipe(jshint())

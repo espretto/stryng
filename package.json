@@ -27,7 +27,6 @@
     "mocha": "~1.15.1"
   },
   "scripts": {
-    "gzip": "gzip -c dist/stryng.min.js | tee dist/stryng.min.js.gz",
     "test": "node --allow-natives-syntax ./test/stryng.test.js"
   },
   "repository": "git@github.com:espretto/stryng"
