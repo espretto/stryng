@@ -1,22 +1,34 @@
 {
   "name": "stryng",
-  "version": "0.1.13",
+  "version": "0.2.0",
+  "description": "utility class for manipulating strings in JavaScript",
+  "main": "src/stryng.js",
+  "directories": {
+    "src": "src",
+    "test": "test"
+  },
+  "keywords": [
+    "string",
+    "mutable",
+    "manipulation",
+    "utils",
+    "native",
+    "prototype"
+  ],
+  "author": "espretto",
+  "license": "MIT",
   "devDependencies": {
-    "benchmark": "~1.0.0",
-    "browserify": "^4.2.0",
     "expect.js": "latest",
-    "grunt": "~0.4.4",
-    "grunt-browserify": "^2.1.1",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-uglify": "~0.4.0",
-    "grunt-docker": "0.0.8",
+    "gulp": "^3.8.10",
+    "gulp-browserify": "^0.5.0",
+    "gulp-jshint": "^1.9.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-uglify": "^1.0.2",
     "mocha": "~1.15.1"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha ./test/stryng.test.js",
     "gzip": "gzip -c dist/stryng.min.js | tee dist/stryng.min.js.gz",
-    "test-opt": "node --trace_opt --trace_deopt --allow-natives-syntax ./test/stryng.opt.call.js"
+    "test": "node --allow-natives-syntax ./test/stryng.test.js"
   },
   "repository": "git@github.com:espretto/stryng"
 }

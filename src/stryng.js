@@ -17,7 +17,7 @@
   var CONSTANTS = {
 
     /**
-      Stryng's version. __value:__ `0.1.13`
+      Stryng's version. __value:__ `0.2.0`
       
       @property VERSION
       @for  Stryng
@@ -25,7 +25,7 @@
       @readOnly
       @type {string}
      */
-    VERSION: '0.1.13',
+    VERSION: '0.2.0',
 
     /**
       max. unsigned 32-bit integer. __value:__
@@ -1536,7 +1536,7 @@
       @example
           Stryng('').isEmpty();   // > true
           Stryng.isEmpty('\r\n'); // > false
-          Styrng.isEmpty([]);     // > true, []+'' yiels ''
+          Styrng.isEmpty([]);     // > true, []+'' yields ''
      */
     isEmpty: function (input) {
       return !toString(input);

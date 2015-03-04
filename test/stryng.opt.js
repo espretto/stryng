@@ -52,7 +52,7 @@ expect.Assertion.prototype.optimizable = function () {
  * generate tests
  */
 
-describe('Stryng - ', function () {
+describe('Stryng - optimizability', function () {
 
   it('constructor should be optimizable', function () {
     expect(Stryng).withArguments(['fox']).to.be.optimizable();
