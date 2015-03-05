@@ -1,6 +1,10 @@
 language: node_js
-install: npm install mocha expect.js
+before_install: npm install mocha expect.js
+install: true
+before_script: true
+script: npm test
 node_js:
   - "0.12"
   - "0.11"
   - "0.10"
+  - "0.8"
