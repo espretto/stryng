@@ -705,7 +705,7 @@
     },
 
     /**
-      returns whether or not this' string truncated at `endPosition` ends with
+      returns whether or not this' string truncated at `position` ends with
       substring `search`. shim for native {{#es6 "String.prototype.endsWith"}}
       {{/es6}}
       
@@ -823,12 +823,12 @@
 
     /**
       prepends the 1st and appends the 2nd half of `braces` to this' string.
+      if `braces.length` is odd the shorter half is prepended.
       
       @method embrace
       @chainable
       @param  {string} [braces='()']
       @return {Stryng}
-      @throws if `braces.length` is odd
       @example
           Stryng('optional').embrace('[]');  // > '[optional]'
           Stryng.embrace('0, 1', '[)');      // > '[0, 1)'
@@ -1284,10 +1284,10 @@
       @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
       @example
-          Stryng('__private__').strip('_'); // > 'private'
-          Stryng.strip('++ NEWS +', '+', 1);  // > '+ NEWS '
-          Stryng.strip('  indented', ' ');  // > 'indented'
-          Stryng.strip('undefined');        // > '', applies default
+          Stryng('__private__').strip('_');  // > 'private'
+          Stryng.strip('++ NEWS +', '+', 1); // > '+ NEWS '
+          Stryng.strip('  indented', ' ');   // > 'indented'
+          Stryng.strip('undefined');         // > '', applies default
      */
     strip: function (input, outfix, n) {
       return Stryng.stripRight(
@@ -1303,7 +1303,7 @@
       @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
       @example
-          Stryng('  indented').stripLeft(' '); // > 'indented'
+          Stryng('  indented').stripLeft(' ');             // > 'indented'
           Stryng.stripLeft('+++ NEWS +++').stripLeft('+'); // > ' NEWS +++'
           Stryng.stripLeft('__private').stripLeft('_', 1); // > '_private'
      */
@@ -1334,9 +1334,9 @@
       @param {number} [n=MAX_UINT] max. no. removals
       @return {Stryng}
       @example
-          Stryng('\n line \n').stripRight('\n'); // > '\n line '
+          Stryng('\n line \n').stripRight('\n');             // > '\n line '
           Stryng.stripRight('+++ NEWS +++').stripRight('+'); // > '+++ NEWS '
-          Stryng.stripRight('fee').stripRight('e', 1); // > 'fe'
+          Stryng.stripRight('fee').stripRight('e', 1);       // > 'fe'
      */
     stripRight: function (input, suffix, n) {
       input = toString(input);
@@ -1737,6 +1737,7 @@
       @example
           var r = Stryng(Stryng.PUNCTUATION)
             .escapeRegex()
+            .embrace('[]')
             .toRegex('g');
 
           "what's the matter?".split(r); // > ['what', 's the matter', '']
