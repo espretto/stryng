@@ -17,7 +17,7 @@
   var CONSTANTS = {
 
     /**
-      Stryng's version. __value:__ `0.2.0`
+      Stryng's version. __value:__ `0.2.1`
       
       @property VERSION
       @for  Stryng
@@ -25,7 +25,7 @@
       @readOnly
       @type {string}
      */
-    VERSION: '0.2.0',
+    VERSION: '0.2.1',
 
     /**
       max. unsigned 32-bit integer. __value:__
@@ -388,12 +388,12 @@
    */
 
   function toString (input) {
-    if (input === null || input === void 0) exit('input must not be null');
+    assert(input !== null && input !== void 0, 'input must not be null');
     return String(input);
   }
 
-  function exit (message) {
-    throw new Error(message || 'invalid usage of stryng member');
+  function assert (test, message) {
+    if (!test) throw new Error(message || 'invalid usage of stryng member');
   }
 
   function isRegExp (any) {
@@ -406,12 +406,8 @@
   }
 
   function returnNativeFunction (fn) {
-    if (!fn) return false;
-    
-    var str = _functionToString.call(fn),
-        isNative = str.replace(reStripDeclaration, '') === nativeFunctionBody;
-
-    return isFunction(fn) && isNative && fn;
+    return isFunction(fn) && _functionToString
+      .call(fn).replace(reStripDeclaration, '') === nativeFunctionBody && fn;
   }
 
   /* ---------------------------------------------------------------------------
@@ -708,7 +704,7 @@
      */
     startsWith: function (input, search, position) {
       input = toString(input);
-      if (isRegExp(search)) exit('no regex support for startsWith');
+      assert(!isRegExp(search), 'no regex support for startsWith');
 
       return input.indexOf(search, position) === mathMin(
         input.length, mathMax(0, numberToInteger(position)));
@@ -735,7 +731,7 @@
      */
     endsWith: function (input, search, position) {
       input = toString(input);
-      if (isRegExp(search)) exit('no regex support for endsWith');
+      assert(!isRegExp(search), 'no regex support for endsWith');
 
       var len = input.length,
           idx = input.lastIndexOf(search, position);
@@ -773,7 +769,7 @@
     repeat: function (input, n) {
       input = toString(input);
       n = numberToInteger(n);
-      if (0 > n || n*input.length > MAX_STRING_SIZE || n == INFINITY) exit();
+      assert(n >= 0 && n*input.length <= MAX_STRING_SIZE && n !== INFINITY);
 
       var result = '';
 
@@ -895,6 +891,7 @@
       @param {Array} substrings
         array of substrings to search for
       @return {Object}
+      @throws if `substrings` is not an array
 
       @example
       if multiple keys in `substrings` match `input` at the same index the first
@@ -914,7 +911,7 @@
      */
     countMultiple: function (input, substrings){
       input = toString(input);
-      if (!isArray(substrings)) exit('expected type: array');
+      assert(isArray(substrings), 'expected type: array');
       if (!substrings.length) return {};
 
       var keys = substrings.slice(),
@@ -964,14 +961,15 @@
       @param {Array} joinees
         array of substrings to concatenate
       @return {Stryng}
+      @throws if `joinees` is not an array
       @example
           Stryng(',').delimit([1,2,3]); // > '1,2,3'
           Stryng.delimit(',', []);      // > ''
           Stryng.delimit(',');          // throws
      */
     delimit: function (delimiter, joinees) {
-      if (delimiter == null) exit();
-      if (!isArray(joinees)) exit('expected type: array');
+      assert(delimiter != null);
+      assert(isArray(joinees), 'expected type: array');
       return joinees.join(delimiter); // implies parsing `delimiter`
     },
 
@@ -1028,10 +1026,11 @@
       @param {Array} indices
         indices to split at. negatives allowed.
       @return {Array} array of substrings
+      @throws if `indices` is not an array
      */
     splitAt: function (input, indices) {
       input = toString(input);
-      if (!isArray(indices)) exit('expected type: array');
+      assert(isArray(indices), 'expected type: array');
 
       var inputLen = input.length,
           pendingIndex = 0, index = 0,
@@ -1107,7 +1106,7 @@
      */
     splitRight: function (input, delimiter, n) {
       input = toString(input);
-      if (isRegExp(delimiter)) exit('no regex support');
+      assert(!isRegExp(delimiter), 'no regex support');
       n = (n === void 0 ? -1 : n) >>> 0;
       if (!n) return [];
       delimiter = String(delimiter);
@@ -1204,7 +1203,7 @@
     just: function (input, length, padding) {
       input = toString(input);
       length = numberToInteger(length);
-      if (0 > length || length > MAX_STRING_SIZE) exit();
+      assert(0 <= length && length <= MAX_STRING_SIZE);
       padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
@@ -1237,7 +1236,7 @@
     justLeft: function (input, length, padding) {
       input = toString(input);
       length = numberToInteger(length);
-      if (0 > length || length > MAX_STRING_SIZE) exit();
+      assert(0 <= length && length <= MAX_STRING_SIZE);
       padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
@@ -1269,7 +1268,7 @@
     justRight: function (input, length, padding) {
       input = toString(input);
       length = numberToInteger(length);
-      if (0 > length || length > MAX_STRING_SIZE) exit();
+      assert(0 <= length && length <= MAX_STRING_SIZE);
       padding = padding === void 0 ? ' ' : String(padding);
 
       var inputLen = input.length,
@@ -1380,7 +1379,7 @@
       if (maxLength === void 0) maxLength = 42;
       else {
         maxLength = numberToInteger(maxLength);
-        if (0 > maxLength) exit();
+        assert(0 <= maxLength);
         if (!maxLength) return '';
       }
       if (maxLength >= input.length) return input;
@@ -1820,10 +1819,10 @@
    */
   Stryng.random = function (n, from, to) {
     n = numberToInteger(n);
-    if (0 > n || n > MAX_STRING_SIZE) exit();
+    assert(0 <= n && n <= MAX_STRING_SIZE);
     from = from === void 0 ? 32  : (from >>> 0);
     to   = to   === void 0 ? 127 : (to   >>> 0);
-    if (from >= to || to > MAX_CHARCODE) exit();
+    assert(from < to && to <= MAX_CHARCODE);
 
     var result = '',
         difference = to - from;
@@ -1847,22 +1846,18 @@
       array of character codes in range
       `0 <= cc <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @return {string}
-    @throws if `charCodes[i]` is out of range
+    @throws if `charCodes` is not an array or `charCodes[i]` is out of range
    */
   Stryng.chr = function (charCodes) {
-    if (!isArray(charCodes)) exit('expected type: array');
-    for (var i = charCodes.length; i--;) {
-      if (charCodes[i] > MAX_CHARCODE) {
-        exit('charCode ' + charCodes[i] + ' out of range');
-      }
-    }
+    assert(isArray(charCodes), 'expected type: array');
+    for (var i = charCodes.length; i--;) assert(charCodes[i] <= MAX_CHARCODE);
 
     // implies parsing `charCodes`
     return stringFromCharCode.apply(null, charCodes);
   };
 
   Stryng.fromCharCode = stringFromCharCode;
-  Stryng.fromCodePoint = String.fromCodePoint || exit;
+  Stryng.fromCodePoint = String.fromCodePoint;
 
   /* ---------------------------------------------------------------------------
    * Stryng - build & transform
