@@ -17,7 +17,7 @@
   var CONSTANTS = {
 
     /**
-      Stryng's version. __value:__ `0.2.1`
+      Stryng's version. __value:__ `0.2.2`
       
       @property VERSION
       @for  Stryng
@@ -25,7 +25,7 @@
       @readOnly
       @type {string}
      */
-    VERSION: '0.2.1',
+    VERSION: '0.2.2',
 
     /**
       max. unsigned 32-bit integer. __value:__
@@ -95,9 +95,6 @@
    * locals
    */
   
-  // strip function declarations
-  reStripDeclaration = /^[^{]+/,
-
   // methods Stryng hopes to adapt
   methods = ('charAt,charCodeAt,codePointAt,concat,contains,' +
     'endsWith,indexOf,lastIndexOf,localeCompare,match,normalize,' +
@@ -109,11 +106,7 @@
   Object = CONSTANTS[STR_CONSTRUCTOR],
   Number = INFINITY[STR_CONSTRUCTOR],
   String = STR_UNDEFINED[STR_CONSTRUCTOR],
-  RegExp = reStripDeclaration[STR_CONSTRUCTOR],
   
-  // prepare `returnNativeFunction`
-  nativeFunctionBody = String(String).replace(reStripDeclaration, ''),
-
   // methods which's native implementations to override if necessary
   overrides = [],
 
@@ -203,6 +196,7 @@
 
   // prepare `Stryng.isFloat`
   reIsFloat = /^\d+(?:\.\d*)?(?:[eE][\-\+]?\d+)?$/,
+  RegExp = reIsFloat[STR_CONSTRUCTOR],
 
   // prepare `Stryng.escapeRegex`
   reRegex = /([.,*+-?^=!:${}()|\[\]\/\\])/g,
@@ -225,7 +219,7 @@
     't': '\t',
     'v': '\v' 
   },
-  reCtrl = new RegExp('[\b\t\n\f\r\v"\\\\]', 'g'),
+  reCtrl = RegExp('[\b\t\n\f\r\v"\\\\]', 'g'),
   cbCtrl = function (match) {
     return '\\' + (ctrlMap[match] || match);
   },
@@ -282,7 +276,7 @@
         limit = 0x100,
         len = limit - offset,
         i = -1,
-        charCodes = new Array(len);
+        charCodes = Array(len);
   
     charCodes[0] = 1; // initialize as numerically typed array
     while (++i < len) charCodes[i] = i + offset;
@@ -291,7 +285,7 @@
     
   }()),
 
-  reLatin1 = new RegExp('[' + latin1Chars + ']', 'g'),
+  reLatin1 = RegExp('[' + latin1Chars + ']', 'g'),
   cbLatin1 = function (match) {
     return latin1Reprs[latin1Chars.indexOf(match)];
   },
@@ -355,10 +349,10 @@
 
       reWssSource = '[' + reWsSource + '][' + reWsSource + ']*';
 
-      reWss = new RegExp(reWssSource, 'g');
-      reNoWs = new RegExp('[^' + reWsSource + ']');
-      reTrimLeft = new RegExp('^' + reWssSource);
-      reTrimRight = new RegExp('[' + reWsSource + ']+$');
+      reWss = RegExp(reWssSource, 'g');
+      reNoWs = RegExp('[^' + reWsSource + ']');
+      reTrimLeft = RegExp('^' + reWssSource);
+      reTrimRight = RegExp('[' + reWsSource + ']+$');
     }
 
   }());
@@ -387,13 +381,13 @@
    * helper methods
    */
 
-  function toString (input) {
-    assert(input !== null && input !== void 0, 'input must not be null');
-    return String(input);
+  function toString (any) {
+    assert(any !== null && any !== void 0, 'input must not be null');
+    return String(any);
   }
 
   function assert (test, message) {
-    if (!test) throw new Error(message || 'invalid usage of stryng member');
+    if (!test) throw Error(message || 'invalid usage of stryng member');
   }
 
   function isRegExp (any) {
@@ -405,9 +399,9 @@
     return typeof any === STR_FUNCTION;
   }
 
-  function returnNativeFunction (fn) {
-    return isFunction(fn) && _functionToString
-      .call(fn).replace(reStripDeclaration, '') === nativeFunctionBody && fn;
+  function returnNativeFunction (any) {
+    // thx: https://gist.github.com/jdalton/5e34d890105aca44399f#comment-1283831
+    return isFunction(any) && !(STR_PROTOTYPE in any) && any;
   }
 
   /* ---------------------------------------------------------------------------
@@ -704,7 +698,7 @@
      */
     startsWith: function (input, search, position) {
       input = toString(input);
-      assert(!isRegExp(search), 'no regex support for startsWith');
+      assert(!isRegExp(search), 'no regex support');
 
       return input.indexOf(search, position) === mathMin(
         input.length, mathMax(0, numberToInteger(position)));
@@ -731,7 +725,7 @@
      */
     endsWith: function (input, search, position) {
       input = toString(input);
-      assert(!isRegExp(search), 'no regex support for endsWith');
+      assert(!isRegExp(search), 'no regex support');
 
       var len = input.length,
           idx = input.lastIndexOf(search, position);
@@ -955,7 +949,7 @@
     },
 
     /**
-      delegates to native `Arrray#join`.
+      delegates to native {{#mdn "Array.prototype.join"}}{{/mdn}}.
 
       @method  delimit
       @param {Array} joinees
@@ -1802,24 +1796,30 @@
   };
 
   /**
-    generates a string of `n` random characters in char-code range `[from, to)`.
-    this range defaults to the ASCII printables. to choose randomly from the whole
-    UTF-16 table call `Stryng.random(n, 0, -1 >>> 16)`.
+    generates a string of `length` random characters in char-code
+    range `[from, to)`. this range defaults to the ASCII printables.
+    to choose randomly from the whole UTF-16 table call
+    `Stryng.random(len, 0, Stryng.MAX_CHARCODE)`.
     
     @method random
     @static
-    @param {number} [n=0] range constraint:
-      `0 <= n <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
+    @param {number} [length=0] range constraint:
+      `0 <= length <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
     @param {number} [from=32] range constraint:
       `0 <= from <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @param {number} [to=127] range constraint:
       `from < to <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
-    @return {string}
-    @throws if `n`, `from` or `to` is out of range
+    @return {Stryng}
+    @throws if `length`, `from` or `to` is out of range
+    @example
+        Stryng.random();           // > '', the only reproducable
+        Stryng.random(10);         // > 'e7Yu$^pPg%', ASCII printables only
+        Stryng.random(10, 65, 91); // > 'LHBBZDVLAQ', caps only
+        Stryng.random(3, 0, Stryng.MAX_CHARCODE).ord(); // > [31947, 46749, 25786]
    */
-  Stryng.random = function (n, from, to) {
-    n = numberToInteger(n);
-    assert(0 <= n && n <= MAX_STRING_SIZE);
+  Stryng.random = function (length, from, to) {
+    length = numberToInteger(length);
+    assert(0 <= length && length <= MAX_STRING_SIZE);
     from = from === void 0 ? 32  : (from >>> 0);
     to   = to   === void 0 ? 127 : (to   >>> 0);
     assert(from < to && to <= MAX_CHARCODE);
@@ -1828,11 +1828,13 @@
         difference = to - from;
 
     if (difference > 0) {
-      while (n--){
-        result += stringFromCharCode(from + mathFloor(mathRandom() * difference));
+      while (length--) {
+        // we need to convert __random__ numbers to string immediately
+        // to sustain optimizability
+        result += stringFromCharCode(from + mathFloor(mathRandom()*difference));
       }
     }
-    return result;
+    return new Stryng(result);
   };
 
   /**
@@ -1843,8 +1845,8 @@
     @method chr
     @static
     @param {Array} charCodes
-      array of character codes in range
-      `0 <= cc <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
+      array of decimal character codes with range constraint:
+      `0 <= charCodes[i] <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @return {string}
     @throws if `charCodes` is not an array or `charCodes[i]` is out of range
    */
