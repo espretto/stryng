@@ -5,7 +5,8 @@
   "main": "src/stryng.js",
   "directories": {
     "src": "src",
-    "test": "test"
+    "test": "test",
+    "docs": "docs"
   },
   "keywords": [
     "string",

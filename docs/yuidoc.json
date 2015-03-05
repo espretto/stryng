@@ -4,8 +4,9 @@
     "version": "0.2.2",
     "options": {
         "linkNatives": "true",
-        "outdir": "./docs/",
+        "outdir": "./docs/publish/",
+        "themedir": "./docs/theme/",
         "paths": ["./src/"],
-        "helpers": ["./yuidoc.helpers.js"]
+        "helpers": ["./docs/yuidoc.helpers.js"]
     }
 }
