@@ -450,7 +450,7 @@
         typeof stryng;              // > 'object'
         ({}).toString.call(stryng); // > '[object Object]'
         stryng instanceof Stryng;   // > true, beware iframes
-        Stryng.isStryng(stryng);    // > true, wraps the above,
+        Stryng.isStryng(stryng);    // > true, wraps the above
 
     apart from the above mentioned cases you may use `Stryng` instances as if
     they were primitives. the reason is that JavaScript's inner workings request
@@ -462,7 +462,7 @@
 
         +Stryng('123');                     // > 123
         Stryng('cellar') + 'door';          // > 'cellardoor'
-        ({'key': 'value'})[Stryng('key')];  // > 'value'
+        ({key: 'value'})[Stryng('key')];    // > 'value'
         parseFloat(Stryng('1.2e-3suffix')); // > 0.0012
 
         var param = Stryng('%C3%A9cole');
@@ -560,15 +560,15 @@
     @param {boolean} [isMutable=false]
     @return {Stryng}
     @example
-        var mutable = Stryng(' padded ', true);
+        var immutable = Stryng(' padded ', false);
 
-        // same as Stryng(mutable.toString(), false)
-        var immutable  = stryng.clone(false); 
+        // same as Stryng(immutable.toString(), true);
+        var mutable = immutable.clone(true); 
 
-        // .trim() changes the value but returns the same reference
+        // .trim() changes the value but returns the same object reference
         mutable.equals(mutable.trim()); // > true
 
-        // .trim() returns new instance with the changed value
+        // .trim() returns a new instance with the changed value
         immutable.equals(immutable.trim()); // > false
 
    */
@@ -711,7 +711,7 @@
       
       @method  endsWith
       @param {String} [search="undefined"]
-      @param {number} [position=input.length]
+      @param {number} [position=this.length]
       @return {boolean}
       @throws if `search` is a regular expression.
       @example
@@ -737,10 +737,7 @@
 
     /**
       concatenates this' string `n` times to the empty string.
-      shim for native {{#es6 "String.prototype.repeat"}}{{/es6}}
-      reduction of concat operations inspired by [mout/string/repeat][1].
-
-      [1]: https://github.com/mout/mout/blob/v0.9.0/src/string/repeat.js
+      shim for native {{#es6 "String.prototype.repeat"}}{{/es6}}.
       
       @method  repeat
       @chainable
@@ -767,18 +764,19 @@
 
       var result = '';
 
-      if (input){
-        while (n >= 1) {
-          if (n % 2) result += input;
-          n /= 2;
-          input += input;
+      do {
+        if (n%2) {
+          n--;
+          result += input;
         }
-      }
+        n /= 2;
+      } while (n && (input += input));
+
       return result;
     },
 
     /**
-      returns the substring of `input` with length `length` starting at
+      returns the this' substring with length `length` starting at
       `position` which may also be negative to index backwards.
       shim for native {{#es6 "String.prototype.substr"}}{{/es6}}
       
@@ -792,12 +790,12 @@
     substr: function (input, position, length) {
       input = toString(input);
       position = numberToInteger(position);
-      if (position < 0) position += input.length;
+      if (position < 0) position = mathMax(0, position + input.length);
       return input.substr(position, length);
     },
 
     /**
-      prepends and appends `outfix` to `input` in one go.
+      prepends and appends `outfix` to this' string in one go.
       to do the opposite use {{#crossLink "Stryng/strip:method"}}{{/crossLink}}.
       related to {{#crossLink "Stryng/embrace:method"}}{{/crossLink}}.
       
@@ -805,20 +803,17 @@
       @chainable
       @param {string} outfix
         prefix and suffix
-      @param {number} [n=0] no. operations. range constraint:
-        `0 <= n <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
       @return {Stryng}
-      @throws if `n` is out of range
       @example
-          Stryng('python doc string').wrap('"', 3); // > '"""python doc string"""'
-          Stryng.wrap('quote', '"');                // > 'quote', applied default
-          Stryng.wrap('quote', '"', 1);             // > '"quote"'
+          Stryng('python doc string').wrap('"""'); // > '"""python doc string"""'
+          Stryng.wrap('quote', '"');               // > '"quote"'
 
      */
     wrap: function (input, outfix, n) {
       input = toString(input);
       outfix = Stryng.repeat(outfix, n);
-      return outfix + input + outfix;
+      input += outfix;
+      return outfix + input;
     },
 
     /**
@@ -842,8 +837,8 @@
     },
 
     /**
-      returns the no. non-overlapping occurrences of `search` within `input`.
-      the empty string is considered a _character boundary_
+      returns the no. non-overlapping occurrences of `search` within
+      this' string. the empty string is considered a _character boundary_
       thus `this.length + 1` will always be the result for that.
       
       @method  count
@@ -874,7 +869,7 @@
 
     /**
       returns an object with `substrings` as keys. each key is associated with
-      its no. non-overlapping occurrences within `input`. the empty string is
+      its no. non-overlapping occurrences within this' string. the empty string is
       considered a _character boundary_ thus `this.length + 1` will always be
       the result for that.
 
@@ -888,7 +883,7 @@
       @throws if `substrings` is not an array
 
       @example
-      if multiple keys in `substrings` match `input` at the same index the first
+      if multiple keys in `substrings` match this' string at the same index the first
       one encountered in the array will take the credit. for this reason you
       might want to sort your `substrings` by length in descending order
       prior to passing them in.
@@ -1125,7 +1120,7 @@
     },
 
     /**
-      substitues all non-overlapping occurrences of `replacee` with `replacement`.
+      substitutes all non-overlapping occurrences of `replacee` with `replacement`.
 
       @method  exchange
       @chainable
@@ -1138,7 +1133,7 @@
     },
 
     /**
-      substitues the first `n` non-overlapping occurrences of
+      substitutes the first `n` non-overlapping occurrences of
       `replacee` with `replacement`.
 
       @method  exchangeLeft
@@ -1156,7 +1151,7 @@
     },
 
     /**
-      substitues the last `n` non-overlapping occurrences of
+      substitutes the last `n` non-overlapping occurrences of
       `replacee` with `replacement`.
 
       @method  exchangeRight
@@ -1401,7 +1396,7 @@
       @chainable
       @return {Stryng}
       @example
-          Stryng('en école\nj'apprends').quote(); // > '"en \xE9cole\\nj'apprends"'
+          Stryng("en école\nj'apprends").quote(); // > '"en \xE9cole\\nj'apprends"'
      */
     quote: function (input) {
       input = toString(input);
@@ -1498,8 +1493,7 @@
           'fox' === new Stryng('fox');             // > false
           
           new String('fox') == new Stryng('fox');  // > false, no hint for casting
-          new String('fox') === new Stryng('fox'); // > false, different instances
-          // same goes for all other combinations of String and Stryng
+          // same goes for all other combinations of String, ==, Stryng and ===
 
      */
     equals: function (input, comparable) {
@@ -1740,7 +1734,7 @@
             .embrace('[]')
             .toRegex('g');
 
-          "what's the matter?".split(r); // > ['what', 's the matter', '']
+          "what's the matter?".split(r); // > ["what", "s the matter", ""]
      */
     escapeRegex: function (input) {
       return toString(input).replace(reRegex, cbRegex);
@@ -1807,7 +1801,7 @@
     @param {number} [length=0] range constraint:
       `0 <= length <= {{#crossLink "Stryng/MAX_STRING_SIZE:property"}}{{/crossLink}}`
     @param {number} [from=32] range constraint:
-      `0 <= from <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
+      `0 <= from < to`
     @param {number} [to=127] range constraint:
       `from < to <= {{#crossLink "Stryng/MAX_CHARCODE:property"}}{{/crossLink}}`
     @return {Stryng}
