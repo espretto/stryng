@@ -1,7 +1,7 @@
 {
     "name": "Stryng",
     "description": "utility class for manipulating strings in JavaScript",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "options": {
         "linkNatives": "true",
         "outdir": "./docs/publish/",

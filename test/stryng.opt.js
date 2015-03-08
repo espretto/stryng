@@ -110,6 +110,7 @@ describe('Stryng - optimizability', function () {
   , ['random', 10]
   , ['reverse', 'foo']
   , ['simplify', 'TODO']
+  , ['slugify', 'archæology']
   , ['splitAt', 'foo', [1, 2]]
   , ['splitLeft', 'foo', 'o', 1]
   , ['splitLines', 'foo\r\nbar']

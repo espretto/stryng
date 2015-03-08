@@ -1030,6 +1030,20 @@ describe('Stryng()', function () {
     });
   });
 
+  describe('.slugify()', function () {
+    it('should fail if `input` is missing', function () {
+      expect(Stryng.slugify).to.throwError();
+    });
+
+    it('should remove punctuation', function () {
+      expect(Stryng.slugify('>>>foo' +
+        Stryng.PUNCTUATION +
+        'bar<<<')).to.equal('foo-bar');
+    });
+
+    // further tests are covered by those for the methods composed herein
+  });
+
   describe('.ord()', function () {
 
     it('should fail if `input` is missing', function () {

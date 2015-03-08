@@ -16,4 +16,4 @@ node_modules
 test/*.bundle.js
 dist
 perf
-docs
+docs/publish

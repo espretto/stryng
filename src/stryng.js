@@ -17,7 +17,7 @@
   var CONSTANTS = {
 
     /**
-      Stryng's version. __value:__ `0.2.2`
+      Stryng's version. __value:__ `0.2.3`
       
       @property VERSION
       @for  Stryng
@@ -25,7 +25,7 @@
       @readOnly
       @type {string}
      */
-    VERSION: '0.2.2',
+    VERSION: '0.2.3',
 
     /**
       max. unsigned 32-bit integer. __value:__
@@ -201,6 +201,9 @@
   // prepare `Stryng.escapeRegex`
   reRegex = /([.,*+-?^=!:${}()|\[\]\/\\])/g,
   cbRegex = '\\$1',
+
+  // prepare `Stryng.slugify`
+  rePunct = RegExp('[' + PUNCTUATION.replace(reRegex, cbRegex) + ']', 'g'),
 
   // prepare `Stryng.quote`, `Styrng.unquote`
   ctrlMap = {
@@ -1698,6 +1701,32 @@
      */
     simplify: function (input) {
       return toString(input).replace(reLatin1, cbLatin1);
+    },
+
+    /**
+     * produces a valid URL slug from this' string by composing
+     * 
+     * - replacement of {{#crossLink "Stryng/PUNCTUATION:property"}} with spaces
+     * - {{#crossLink "Stryng/clean:method"}}{{/crossLink}}
+     * - {{#crossLink "Stryng/simplify:method"}}{{/crossLink}}
+     * - {{#crossLink "Stryng/hyphenize:method"}}{{/crossLink}}
+     * 
+     * @return {Stryng}
+     * @since 0.2.3
+     * @example
+     *     Stryng("En école, j'apprends").slugify(); // > 'en-ecole-j-apprends'
+     *     Stryng.slugify('foo? bar: "baz"!');       // > 'foo-bar-baz'
+     */
+    slugify: function (input) {
+      return (
+        Stryng.hyphenize(
+          Stryng.simplify(
+            Stryng.clean(
+              toString(input).replace(rePunct, ' ')
+            )
+          )
+        )
+      );
     },
 
     /**
