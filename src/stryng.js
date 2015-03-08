@@ -17,7 +17,7 @@
   var CONSTANTS = {
 
     /**
-      Stryng's version. __value:__ `0.2.3`
+      Stryng's version. __value:__ `0.2.4`
       
       @property VERSION
       @for  Stryng
@@ -25,7 +25,7 @@
       @readOnly
       @type {string}
      */
-    VERSION: '0.2.3',
+    VERSION: '0.2.4',
 
     /**
       max. unsigned 32-bit integer. __value:__
@@ -254,6 +254,29 @@
   reCaseSwitch = /([a-z])([A-Z])/g,
   reSpaceHyphen = /[ -]/g,
   reSpaceUnderscore = /[ _]/g,
+
+  // prepare `Stryng.format`
+  typeBaseMap = {
+    b: 2,
+    o: 8,
+    x: 16,
+    X: 16
+  },
+
+  reThousand = /(\d{3}(?=\d))/g,
+  cbThousand = '$1,',
+
+  reFormat = new RegExp('\\{' + [
+    '(\\d\\d*|[\\$_a-zA-Z][\\$\\w]*)', // index or key
+    ':',                            // seperator
+    '(.[<>=^])',                    // fill-char and alignment
+    '([\\+\\- ])',                  // sign
+    '(#)',                          // prefix
+    '(\\d\\d*)',                    // width
+    '(\\,)',                        // thousand seperator
+    '(?:\\.(\\d\\d*))',             // precision
+    '([cjsdboxX])'                  // type
+  ].join('?') + '?\\}', 'g'),
 
   /* ---------------------------------------------------------------------------
    * diacritics & liguatures
@@ -1691,7 +1714,7 @@
       replaces ligatures and diacritics from the [Latin-1 Supplement][1]
       (letters in range `[\xC0, \xFF]`) with their nearest ASCII equivalent.
       compose this method with {{#crossLink "Stryng/hyphenize:method"}}
-      {{/crossLink}} to produce URL slugs. TODO: replace symbols otherwise being percent-escaped
+      {{/crossLink}} to produce URL slugs.
 
       [1]: http://unicode-table.com/en/#latin-1-supplement
 
@@ -1704,18 +1727,21 @@
     },
 
     /**
-     * produces a valid URL slug from this' string by composing
-     * 
-     * - replacement of {{#crossLink "Stryng/PUNCTUATION:property"}} with spaces
-     * - {{#crossLink "Stryng/clean:method"}}{{/crossLink}}
-     * - {{#crossLink "Stryng/simplify:method"}}{{/crossLink}}
-     * - {{#crossLink "Stryng/hyphenize:method"}}{{/crossLink}}
-     * 
-     * @return {Stryng}
-     * @since 0.2.3
-     * @example
-     *     Stryng("En école, j'apprends").slugify(); // > 'en-ecole-j-apprends'
-     *     Stryng.slugify('foo? bar: "baz"!');       // > 'foo-bar-baz'
+      produces a valid URL slug from this' string by composing
+      
+      - replacement of 
+        {{#crossLink "Stryng/PUNCTUATION:property"}}{{/crossLink}} with spaces
+      - {{#crossLink "Stryng/clean:method"}}{{/crossLink}}
+      - {{#crossLink "Stryng/simplify:method"}}{{/crossLink}}
+      - {{#crossLink "Stryng/hyphenize:method"}}{{/crossLink}}
+      
+      @method slugify
+      @chainable
+      @since 0.2.3
+      @return {Stryng}
+      @example
+          Stryng("En école, j'apprends").slugify(); // > 'en-ecole-j-apprends'
+          Stryng.slugify('foo? bar: "baz"!');       // > 'foo-bar-baz'
      */
     slugify: function (input) {
       return (
@@ -1781,6 +1807,120 @@
      */
     toRegex: function (input, flags) {
       return new RegExp(toString(input), flags);
+    },
+
+    /**
+      interpolates this' string replacing placeholders according to python's
+      [format minilanguage][1].
+     
+      [1]: https://docs.python.org/2/library/string.html#formatspec
+     
+      @method format
+      @chainable
+      @since 0.2.4
+      @param {any} [...insertion] value to format and insert
+      @return {Stryng}
+     */
+    format: function () {
+
+      // arguments will be leaked, to array, please.
+      var arguments_ = arguments,
+          i = arguments_.length,
+          args = new Array(i),
+
+          formatString,
+          len,
+          kw;
+      
+      while (i--) args[i] = arguments_[i];
+      
+      formatString = toString(args.shift());
+      len = args.length;
+      kw = args[len-1];
+      
+      return formatString.replace(reFormat, function(_, id, fill_just, sign,
+                                                     prefix, width, seperator,
+                                                     precision, type){
+
+        var index = id === void 0 ? ++i : +id, // reuse i
+            value = index !== index ?
+              (assert(kw && id in kw, 'argument "'+id+'" not found'), kw[id]) :
+              (assert(index < len, 'argument index out of bounds'), args[index]),
+            
+            pair = (fill_just || ' >').split(''),
+            fill = pair[0],
+            just = pair[1],
+
+            isDecimal = type === 'd',
+            hasBase2 = typeBaseMap.hasOwnProperty(type),
+
+            result,
+            digits,
+            padding,
+            diff,
+            nan;
+
+        if (!type || type === 's'){
+          result = String(value);
+        } else if (type === 'j') {
+          result = jsonStringify(value);
+        } else {
+          value = +value;
+          if (type === 'c') {
+            assert(0 <= value && value <= MAX_CHARCODE, 'invalid char-code '+value);
+            result = stringFromCharCode(value);
+          } else if (isDecimal) {
+            result = value.toFixed(precision); // implies exceptions and parsing
+          } else /*if (hasBase2)*/ {
+            result = value.toString(typeBaseMap[type]);
+          }
+        }
+
+        if (type === 'X') result = result.toUpperCase();
+        if (precision) assert(isDecimal, 'precision requires type [d]');
+
+        if (seperator){
+          assert(isDecimal, 'thousand sep. requires type [d]');
+          if (value === value && isFinite(value)) {
+            digits = result.split('');
+            result = Stryng.reverse((value < 0 ? digits.shift() : '') + digits
+              .reverse()
+              .join('')
+              .replace(reThousand, cbThousand)
+            );
+          }
+        }
+
+        if (prefix) {
+          assert(hasBase2, 'prefix (#) requires type [boxX]');
+          result = '0' + type.toLowerCase() + result;
+        }
+
+        if (sign) {
+          assert(isDecimal || hasBase2, 'sign requires type [dboxX]');
+          if (result.indexOf('-')) result = sign + result;
+        }
+
+        diff = (+width) - result.length;
+        if (diff > 0){
+
+          padding = Stryng.repeat(fill, diff);
+          if (padding) {
+
+            nan = +result.charAt(0);
+            result = (
+              just === '<' ? result + padding :
+              just === '>' ||
+              just === '=' && nan === nan ? padding + result :
+              just === '^' ? Stryng.embrace(result, padding) :
+                             // sign-aware padding
+                             Stryng.insert(result, 1, padding)
+            );
+          }
+        }
+
+        return result;
+      });
     }
   };
 

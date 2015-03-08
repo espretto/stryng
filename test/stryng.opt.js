@@ -95,6 +95,7 @@ describe('Stryng - optimizability', function () {
   , ['exchangeLeft', 'foo', 'o', 'u', 1]
   , ['exchangeRight', 'foo', 'o', 'u', 1]
   , ['fromCharCode', 65]
+  , ['format', '{}', 'fox']
   , ['hyphenize', 'quick brown fox']
   , ['iequals', 'foo', 'FOO']
   , ['insert', 'foo', -1, 'o']

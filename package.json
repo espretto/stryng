@@ -1,6 +1,6 @@
 {
   "name": "stryng",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "utility class for manipulating strings in JavaScript",
   "main": "src/stryng.js",
   "directories": {

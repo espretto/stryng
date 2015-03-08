@@ -1144,4 +1144,88 @@ describe('Stryng()', function () {
       expect(result).to.have.length(length);
     });
   });
+
+  describe('.format()', function () {
+
+    it('should fail if format string is missing', function () {
+      expect(Stryng.format).to.throwError();
+    });
+
+    it('should return a string without placeholders as is', function () {
+      expect(Stryng.format('no curly braces here'))
+        .to.equal('no curly braces here');
+    });
+
+    it('should insert a positioned argument', function () {
+      expect(Stryng.format('{}', 'positioned')).to.equal('positioned');
+    });
+
+    it('should complain about too few arguments', function () {
+      expect(Stryng.format).withArgs('{}').to.throwError();
+    });
+
+    it('should complain about non-existent named argument', function () {
+      expect(Stryng.format).withArgs('{name}').to.throwError();
+    });
+
+    it('should insert a named argument', function () {
+      expect(Stryng.format('{name}', {name: 'value'})).to.equal('value');
+    });
+
+    it('should parse to string if no type specified', function () {
+      expect(Stryng.format('{}', true)).to.equal('true');
+    });
+
+    it('should insert arguments in the specified order', function () {
+      expect(Stryng.format('{}{}', 'cellar', 'door')).to.equal('cellardoor');
+    });
+
+    it('should parse argument indices', function () {
+      expect(Stryng.format('{1}{0}', 'door', 'cellar')).to.equal('cellardoor');
+    });
+
+    it('should parse mixed im- and explicitly indexed arguments', function () {
+      expect(Stryng.format('{}{1}{0}{}', 1, 2)).to.equal('1212');
+    });
+
+    if (typeof JSON === 'undefined'){
+      it.skip('should stringify json');
+    } else {
+      it('should stringify json', function () {
+        var obj = {key: 'value'};
+        expect(Stryng.format('{:j}', obj)).to.equal(JSON.stringify(obj));
+      });
+    }
+
+    it('should pad left by defualt', function () {
+      expect(Stryng.format('{:5}', 'fox')).to.equal('  fox');
+    });
+
+    it('should pad left if told so', function () {
+      expect(Stryng.format('{: >5}', 'fox')).to.equal('  fox');
+    });
+
+    it('should not match missing colon with options', function () {
+      expect(Stryng.format('{>5}', 'fox')).to.equal('{>5}');
+    });
+
+    it('will apply colon fill-char if missing', function () {
+      expect(Stryng.format('{:>5}', 'fox')).to.equal('::fox');
+    });
+
+    it('should pad right', function () {
+      expect(Stryng.format('{:+<5}', 'fox')).to.equal('fox++');
+    });
+
+    it('should pad centric', function () {
+      expect(Stryng.format('{:-^5}', 'fox')).to.equal('-fox-');
+    });
+
+    it('should pad centric, app- before prepend', function () {
+      expect(Stryng.format('{:-^4}', 'fox')).to.equal('fox-');
+    });
+
+    // TODO numeric formatting
+
+  });
 });
