@@ -1,6 +1,5 @@
 /*!
- * stryngjs released under MIT licence
- * http://mariusrunge.com/mit-licence.html
+ * stryng released under MIT licence
  */
 
 /**
