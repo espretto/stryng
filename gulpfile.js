@@ -18,10 +18,11 @@ var pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
  */
 
 gulp.task('minify', function () {
-    gulp.src('./src/stryng.js')
-        .pipe(uglify())
-        .pipe(rename(sprintf('stryng.min-%s.js', pkg.version)))
-        .pipe(gulp.dest('./dist/'));
+  return gulp
+    .src('./src/stryng.js')
+    .pipe(uglify())
+    .pipe(rename(sprintf('stryng.min-%s.js', pkg.version)))
+    .pipe(gulp.dest('./dist/'));
 
       // uglify({
       //   mangle: false,
@@ -34,27 +35,31 @@ gulp.task('minify', function () {
       // })
 });
 
+
 gulp.task('browserify', function (){
-  gulp.src('./test/stryng.unit.js')
-      .pipe(browserify({ insertGlobals : true }))
-      .pipe(rename('stryng.unit.bundle.js'))
-      .pipe(gulp.dest('./test/'));
+  return gulp.src('./test/stryng.unit.js')
+    .pipe(browserify({ insertGlobals : true }))
+    .pipe(rename('stryng.unit.bundle.js'))
+    .pipe(gulp.dest('./test/'));
 });
 
+
 gulp.task('jshint', function() {
-  gulp.src([
-        './src/stryng.js',
-        './test/stryng.unit.js',
-        // './test/stryng.opt.js', // %-natives throw
-        './test/stryng.test.js',
-        './gulpfile.js'
-      ])
-      .pipe(jshint())
-      .pipe(jshint.reporter('default'))
-      .pipe(jshint.reporter('fail'));
+  return gulp.src([
+      './src/stryng.js',
+      './test/stryng.unit.js',
+      // './test/stryng.opt.js', // %-natives throw
+      './test/stryng.test.js',
+      './gulpfile.js'
+    ])
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'))
+    .pipe(jshint.reporter('fail'));
 });
+
 
 /* -----------------------------------------------------------------------------
  * task aggregates
  */
-gulp.task('default', ['minify', 'browserify', 'jshint']);
+
+gulp.task('default', gulp.series('minify', 'browserify', 'jshint'));
