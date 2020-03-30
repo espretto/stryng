@@ -28,7 +28,7 @@ fs.readFileSync('./test/mocha.opts', 'UTF-8')
  */
 var mochaInstance = new Mocha(options);
 
-mochaInstance.addFile('./test/stryng.opt.js');
+// mochaInstance.addFile('./test/stryng.opt.js');
 mochaInstance.addFile('./test/stryng.unit.js');
 
 mochaInstance.run(function (failures) {
