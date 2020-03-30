@@ -12,8 +12,13 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 - seemless integration by overriding `toString` and `valueOf` on Stryng's prototype
 - spec-like failproof type casting mechanisms and default values to prevent unexpected results
 
-show cases
-----------
+## roadmap
+
+- [ ] split up monolith
+- [ ] update ci hook
+- [ ] find another generator for api documentation
+
+## show cases
 produce URL slugs
 ```js
 var slug = Stryng(headline, true) // we're only interested in the end-result
