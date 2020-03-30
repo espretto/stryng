@@ -3,7 +3,7 @@ Stryng [![Build Status](https://travis-ci.org/espretto/stryng.svg?branch=master)
 ------
 for the purpose of manipulating strings in JavaScript, the built-in functions are neither sufficient nor consistent due to the language's minimalistic nature and browser incompatibilities respectively. Stryng to the rescue!
 
-### features
+## features
 
 - incorporates the native `String` namespace and prototype
 - progressive enhancement to fulfill ECMA-Script 5 & 6 standards
@@ -46,12 +46,12 @@ rePunct.source  // > "[\^'"\!@#\$%&\*\-\,\.]"
 rePunct.global  // > true
 ```
 
-### type safety
+## type safety
 
-#### arrays
+### arrays
 arguments expected to be arrays are always required.
 
-#### strings
+### strings
 arguments expected to be strings are cast using `String(arg)`. as a direct consequence `'undefined'` will be applied as the default value. this decision derives from JavaScript's native behaviour:
 ```js
 var str = String(undefined);        // > 'undefined'
@@ -65,7 +65,7 @@ str.search(/* undefined */)         // > 0
 ```
 exceptions to this rule are `Stryng`'s constructor and static functions.
 
-#### numbers
+### numbers
 arguments expected to be numbers are cast dependent on the use case. the spec basically follows two different approaches to parsing arguments to numbers which Stryng both applies reasonably.
 
 1. `toUInt32` where only positive numbers make sense and default to the more or less infinite value `Math.pow(2, 32) - 1`. for example `str.split(',')` applies this value to its 2nd argument as the default maximum number of substrings to return.
@@ -76,3 +76,6 @@ arguments expected to be numbers are cast dependent on the use case. the spec ba
    - round towards zero i.e. ceil negatives and floor positives
 
 Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.
+
+## testing
+either run standard `npm test` from the commandline or run `npx gulp browserify` to produce a test-bundle to be executed in the browser. Simply serve the project root directory with e.g. `python3 -m http.server` and open `http://localhost:8000/test/`. the tests will run on pageload.
