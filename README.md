@@ -79,3 +79,6 @@ Stryng does not cast itself if not necessary to max, min or validate arguments b
 
 ## testing
 either run standard `npm test` from the commandline or run `npx gulp browserify` to produce a test-bundle to be executed in the browser. Simply serve the project root directory with e.g. `python3 -m http.server` and open `http://localhost:8000/test/`. the tests will run on pageload.
+
+## build
+run `npm gulp minify` to produce `./dist/stryng.min-<version>.js`.
