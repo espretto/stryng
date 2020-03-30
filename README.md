@@ -14,15 +14,6 @@ for the purpose of manipulating strings in JavaScript, the built-in functions ar
 
 show cases
 ----------
-basic construction
-```js
-var stryng = new Stryng('')    // `new` is optional
-  s = Stryng.noConflict(),     // create shortcut
-  str = s('fox' /*, false */), // immutable by default
-  cpy = str.clone(true);       // curried constructor, make mutable for faster chained operations
-
-s(null) || s(undefined);       // both throw an error
-```
 produce URL slugs
 ```js
 var slug = Stryng(headline, true) // we're only interested in the end-result
@@ -32,22 +23,22 @@ var slug = Stryng(headline, true) // we're only interested in the end-result
 ```
 varying naming schemes
 ```js
-var headline = Stryng('The quick brown fox', false), // though immutable by default
-  hyphenized = headline.hyphenize(),      // 'the-quick-brown-fox'
-  camelCased = hyphenized.camelize(),     // 'theQuickBrownFox'
-  under_scored = camelCased.underscore(), // 'the_quick_brown_fox'
-  rotated = under_scored.hyphenize(),     // 'the-quick-brown-fox'
-  classified = camelCased.capitalize();   // 'TheQuickBrownFox'
+var headline = Stryng('The quick brown fox', false) // though immutable by default
+var hyphenized = headline.hyphenize()       // 'the-quick-brown-fox'
+var camelCased = hyphenized.camelize()      // 'theQuickBrownFox'
+var under_scored = camelCased.underscore()  // 'the_quick_brown_fox'
+var rotated = under_scored.hyphenize()      // 'the-quick-brown-fox'
+var classified = camelCased.capitalize()    // 'TheQuickBrownFox'
 ```
 constructing regular expressions
 ```js
 var rePunct = Stryng('^\'"!@#$%&*-,.', true)
   .escapeRegex()
   .embrace('[]')
-  .toRegex('g');
+  .toRegex('g')
 
-rePunct.source; // > "[\^'"\!@#\$%&\*\-\,\.]"
-rePunct.global; // > true
+rePunct.source  // > "[\^'"\!@#\$%&\*\-\,\.]"
+rePunct.global  // > true
 ```
 
 ### type safety
@@ -60,11 +51,11 @@ arguments expected to be strings are cast using `String(arg)`. as a direct conse
 ```js
 var str = String(undefined);        // > 'undefined'
 
-str.replace('und' /*, undefined*/); // > 'undefinedefined'
-str.startsWith(/* undefined */);    // > true
-str.includes(/* undefined */);      // > true
-str.indexOf(/* undefined */);       // > 0
-str.search(/* undefined */);        // > 0
+str.replace('und' /*, undefined*/)  // > 'undefinedefined'
+str.startsWith(/* undefined */)     // > true
+str.includes(/* undefined */)       // > true
+str.indexOf(/* undefined */)        // > 0
+str.search(/* undefined */)         // > 0
 ...
 ```
 exceptions to this rule are `Stryng`'s constructor and static functions.
@@ -80,7 +71,3 @@ arguments expected to be numbers are cast dependent on the use case. the spec ba
    - round towards zero i.e. ceil negatives and floor positives
 
 Stryng does not cast itself if not necessary to max, min or validate arguments but leaves it up to native implementations instead - if safe - for performance reasons.
-
-Licence
--------
-released under the [MIT licence](http://mariusrunge.com/mit-licence.html)
